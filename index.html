@@ -919,6 +919,77 @@
       </div>
     </div>
 
+    <!-- ======== TAB: CONFIGURACIÓN (solo admin) ======== -->
+    <div class="tab-panel" id="tab-config">
+
+      <div class="card">
+        <div class="card-header"><h3>🔐 PIN del administrador</h3></div>
+        <div class="card-body">
+          <div class="form-group">
+            <label>PIN actual</label>
+            <input type="password" id="cfg-pin-actual" placeholder="••••">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nuevo PIN</label>
+              <input type="password" id="cfg-pin-nuevo" placeholder="••••">
+            </div>
+            <div class="form-group">
+              <label>Confirmar PIN</label>
+              <input type="password" id="cfg-pin-conf" placeholder="••••">
+            </div>
+          </div>
+          <button class="btn-primary" onclick="cambiarPinAdmin()">🔑 Cambiar PIN admin</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h3>🧑‍💼 Editar PIN de vendedor</h3></div>
+        <div class="card-body">
+          <div class="form-group">
+            <label>Vendedor</label>
+            <select id="cfg-sel-vendedor"><option value="">— Seleccionar —</option></select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nuevo PIN</label>
+              <input type="password" id="cfg-vpin-nuevo" placeholder="••••">
+            </div>
+            <div class="form-group">
+              <label>Confirmar PIN</label>
+              <input type="password" id="cfg-vpin-conf" placeholder="••••">
+            </div>
+          </div>
+          <button class="btn-primary" onclick="cambiarPinVendedor()">🔑 Cambiar PIN vendedor</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h3>ℹ️ Sistema</h3></div>
+        <div class="card-body">
+          <div style="display:flex;flex-direction:column;gap:12px;font-size:13px">
+            <div style="display:flex;justify-content:space-between">
+              <span style="color:#718096;font-weight:700">URL pública</span>
+              <span style="font-weight:800;color:var(--azul);font-size:11px">sorteos-jimenez.github.io/Boletas/</span>
+            </div>
+            <div style="display:flex;justify-content:space-between">
+              <span style="color:#718096;font-weight:700">Firebase</span>
+              <span style="font-weight:800;color:var(--verde)">✅ Conectado</span>
+            </div>
+            <div style="display:flex;justify-content:space-between">
+              <span style="color:#718096;font-weight:700">Sorteo principal</span>
+              <span style="font-weight:800">26 Ago 2026</span>
+            </div>
+            <div style="display:flex;justify-content:space-between">
+              <span style="color:#718096;font-weight:700">Versión</span>
+              <span style="font-weight:800">v3</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
     <!-- ======== TAB: MIS VENTAS (vendedor) ======== -->
     <div class="tab-panel" id="tab-mis-ventas">
       <div class="stats-grid">
@@ -964,15 +1035,15 @@
   import { getDatabase, ref, set, get, onValue, update, remove, push }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-  // ===== FIREBASE CONFIG (CAMBIAR POR EL NUEVO PROYECTO) =====
+  // ===== FIREBASE CONFIG =====
   const firebaseConfig = {
-    apiKey: "REEMPLAZAR_API_KEY",
-    authDomain: "REEMPLAZAR.firebaseapp.com",
-    databaseURL: "https://REEMPLAZAR-default-rtdb.firebaseio.com",
-    projectId: "REEMPLAZAR",
-    storageBucket: "REEMPLAZAR.appspot.com",
-    messagingSenderId: "REEMPLAZAR",
-    appId: "REEMPLAZAR"
+    apiKey: "AIzaSyAoxTzqPzhkPjmQ3MlUhHeyIkXtd7-Gmuo",
+    authDomain: "sorteos-jimenez.firebaseapp.com",
+    databaseURL: "https://sorteos-jimenez-default-rtdb.firebaseio.com",
+    projectId: "sorteos-jimenez",
+    storageBucket: "sorteos-jimenez.firebasestorage.app",
+    messagingSenderId: "506374564320",
+    appId: "1:506374564320:web:f5c70633907be712686385"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -1081,6 +1152,7 @@ function construirTabs() {
       { id: 'boletas', label: '🎟️ Boletas' },
       { id: 'venta', label: '➕ Venta' },
       { id: 'vendedores', label: '👥 Vendedores' },
+      { id: 'config', label: '⚙️ Config' },
     ];
     // Mostrar campo vendedor en venta
     document.getElementById('campo-vendedor-sel').style.display = 'block';
@@ -1139,6 +1211,7 @@ function cargarDatos() {
       allVendedores = snap.exists() ? snap.val() : {};
       renderVendedores();
       llenarSelectorVendedor();
+      llenarSelectorConfigVendedor();
     });
   }
 }
@@ -1529,6 +1602,59 @@ function renderVendedores() {
   }).join('');
 }
 
+// ===== CONFIGURACIÓN / CAMBIO DE PINs =====
+function llenarSelectorConfigVendedor() {
+  const sel = document.getElementById('cfg-sel-vendedor');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— Seleccionar —</option>';
+  Object.entries(allVendedores).forEach(([id, v]) => {
+    const opt = document.createElement('option');
+    opt.value = id;
+    opt.textContent = v.nombre + ' (' + v.codigo + ')';
+    sel.appendChild(opt);
+  });
+}
+
+async function cambiarPinAdmin() {
+  const actual = document.getElementById('cfg-pin-actual').value.trim();
+  const nuevo = document.getElementById('cfg-pin-nuevo').value.trim();
+  const conf = document.getElementById('cfg-pin-conf').value.trim();
+
+  if (!actual || !nuevo || !conf) { toast('Completa todos los campos', 'rojo'); return; }
+  if (nuevo !== conf) { toast('Los PINs nuevos no coinciden', 'rojo'); return; }
+  if (nuevo.length < 4) { toast('El PIN debe tener al menos 4 caracteres', 'rojo'); return; }
+
+  const db = window._db, ref = window._ref, get = window._get, update = window._update;
+  const snap = await get(ref(db, 'config/admin'));
+  if (!snap.exists() || snap.val().pin !== actual) {
+    toast('PIN actual incorrecto', 'rojo'); return;
+  }
+
+  await update(ref(db, 'config/admin'), { pin: nuevo });
+  document.getElementById('cfg-pin-actual').value = '';
+  document.getElementById('cfg-pin-nuevo').value = '';
+  document.getElementById('cfg-pin-conf').value = '';
+  toast('✅ PIN admin actualizado', 'verde');
+}
+
+async function cambiarPinVendedor() {
+  const vid = document.getElementById('cfg-sel-vendedor').value;
+  const nuevo = document.getElementById('cfg-vpin-nuevo').value.trim();
+  const conf = document.getElementById('cfg-vpin-conf').value.trim();
+
+  if (!vid) { toast('Selecciona un vendedor', 'rojo'); return; }
+  if (!nuevo || !conf) { toast('Ingresa el nuevo PIN', 'rojo'); return; }
+  if (nuevo !== conf) { toast('Los PINs no coinciden', 'rojo'); return; }
+  if (nuevo.length < 4) { toast('El PIN debe tener al menos 4 caracteres', 'rojo'); return; }
+
+  const db = window._db, ref = window._ref, update = window._update;
+  await update(ref(db, 'vendedores/' + vid), { pin: nuevo });
+  document.getElementById('cfg-vpin-nuevo').value = '';
+  document.getElementById('cfg-vpin-conf').value = '';
+  const nombre = allVendedores[vid]?.nombre || vid;
+  toast('✅ PIN de ' + nombre + ' actualizado', 'verde');
+}
+
 // ===== MODAL =====
 function cerrarModal(id) {
   document.getElementById(id).classList.remove('open');
@@ -1565,6 +1691,8 @@ window.toggleFormVendedor = toggleFormVendedor;
 window.toggleAsignacion = toggleAsignacion;
 window.crearVendedor = crearVendedor;
 window.cerrarModal = cerrarModal;
+window.cambiarPinAdmin = cambiarPinAdmin;
+window.cambiarPinVendedor = cambiarPinVendedor;
 </script>
 </body>
 </html>
