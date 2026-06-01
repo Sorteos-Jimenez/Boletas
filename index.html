@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Sorteos Jiménez — Sistema de Boletas</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap');
+
+  :root {
+    --azul: #0a6abf;
+    --azul-dark: #064d8a;
+    --verde: #28c76f;
+    --rojo: #ea5455;
+    --amarillo: #ff9f43;
+    --gris: #f4f6fb;
+    --dark: #1a1f36;
+    --texto: #2d3748;
+    --borde: #e2e8f0;
+    --card: #ffffff;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--gris);
+    color: var(--texto);
+    min-height: 100vh;
+  }
+
+  /* ===== PANTALLA LOGIN ===== */
+  #screen-login {
+    min-height: 100vh;
+    background: linear-gradient(145deg, #0a6abf 0%, #064d8a 50%, #032d52 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  #screen-login::before {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    top: -100px; right: -100px;
+  }
+  #screen-login::after {
+    content: '';
+    position: absolute;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    bottom: -80px; left: -80px;
+  }
+  .login-logo {
+    text-align: center;
+    margin-bottom: 32px;
+    z-index: 1;
+  }
+  .login-logo h1 {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 52px;
+    color: white;
+    letter-spacing: 3px;
+    line-height: 1;
+  }
+  .login-logo .sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .login-card {
+    background: white;
+    border-radius: 20px;
+    padding: 32px 28px;
+    width: 100%;
+    max-width: 360px;
+    z-index: 1;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .login-card h2 {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--dark);
+    margin-bottom: 6px;
+  }
+  .login-card p {
+    font-size: 13px;
+    color: #718096;
+    margin-bottom: 24px;
+  }
+  .rol-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .rol-btn {
+    padding: 12px;
+    border: 2px solid var(--borde);
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    font-family: 'Nunito', sans-serif;
+  }
+  .rol-btn .icon { font-size: 24px; display: block; margin-bottom: 4px; }
+  .rol-btn .label { font-size: 12px; font-weight: 700; color: var(--texto); }
+  .rol-btn.active {
+    border-color: var(--azul);
+    background: #e8f4fd;
+  }
+  .input-group { margin-bottom: 16px; }
+  .input-group label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .input-group input, .input-group select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--borde);
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: 'Nunito', sans-serif;
+    color: var(--dark);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .input-group input:focus, .input-group select:focus {
+    border-color: var(--azul);
+  }
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: var(--azul);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 800;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    letter-spacing: 0.5px;
+  }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:hover { background: var(--azul-dark); }
+  .error-msg {
+    background: #fff5f5;
+    border: 1px solid #fed7d7;
+    color: var(--rojo);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-top: 12px;
+    display: none;
+  }
+
+  /* ===== LAYOUT PRINCIPAL ===== */
+  #screen-main { display: none; }
+
+  .topbar {
+    background: white;
+    border-bottom: 2px solid var(--borde);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-logo {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 22px;
+    color: var(--azul);
+    letter-spacing: 2px;
+  }
+  .topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .user-badge {
+    background: var(--azul);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .btn-logout {
+    background: none;
+    border: 2px solid var(--borde);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    color: #718096;
+    font-weight: 700;
+  }
+
+  .main-content { padding: 20px; max-width: 700px; margin: 0 auto; }
+
+  /* ===== TABS ===== */
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .tab-btn {
+    padding: 9px 16px;
+    border: 2px solid var(--borde);
+    border-radius: 10px;
+    background: white;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+    color: #718096;
+    transition: all 0.2s;
+  }
+  .tab-btn.active {
+    background: var(--azul);
+    border-color: var(--azul);
+    color: white;
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ===== STATS CARDS ===== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: white;
+    border-radius: 14px;
+    padding: 16px;
+    border: 2px solid var(--borde);
+  }
+  .stat-card .stat-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #a0aec0;
+    margin-bottom: 6px;
+  }
+  .stat-card .stat-value {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 36px;
+    line-height: 1;
+    color: var(--dark);
+  }
+  .stat-card .stat-sub {
+    font-size: 11px;
+    color: #a0aec0;
+    margin-top: 2px;
+  }
+  .stat-card.verde .stat-value { color: var(--verde); }
+  .stat-card.rojo .stat-value { color: var(--rojo); }
+  .stat-card.amarillo .stat-value { color: var(--amarillo); }
+  .stat-card.azul .stat-value { color: var(--azul); }
+
+  /* ===== CARDS GENÉRICAS ===== */
+  .card {
+    background: white;
+    border-radius: 14px;
+    border: 2px solid var(--borde);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--borde);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-header h3 {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--dark);
+  }
+  .card-body { padding: 16px; }
+
+  /* ===== BOLETA ITEM ===== */
+  .boleta-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--borde);
+  }
+  .boleta-item:last-child { border-bottom: none; }
+  .boleta-numeros {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .num-badge {
+    background: var(--gris);
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 13px;
+    font-weight: 800;
+    font-family: 'Bebas Neue', cursive;
+    letter-spacing: 1px;
+    color: var(--azul);
+  }
+  .boleta-info { flex: 1; margin-left: 12px; }
+  .boleta-info .comprador { font-size: 13px; font-weight: 700; color: var(--dark); }
+  .boleta-info .sub { font-size: 11px; color: #a0aec0; }
+  .estado-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .estado-libre { background: #f0fff4; color: var(--verde); }
+  .estado-abono { background: #fffaf0; color: var(--amarillo); }
+  .estado-pagada { background: #ebf8ff; color: var(--azul); }
+
+  /* ===== FORM VENTA ===== */
+  .form-section { margin-bottom: 20px; }
+  .form-section h4 {
+    font-size: 12px;
+    font-weight: 800;
+    color: #a0aec0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #718096;
+    display: block;
+    margin-bottom: 5px;
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 2px solid var(--borde);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Nunito', sans-serif;
+    color: var(--dark);
+    outline: none;
+    transition: border-color 0.2s;
+    background: white;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: var(--azul);
+  }
+  .numeros-input-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .numeros-input-grid input {
+    text-align: center;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 20px;
+    letter-spacing: 1px;
+    color: var(--azul);
+    padding: 10px 6px;
+  }
+  .paste-area {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px dashed var(--borde);
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: 'Nunito', sans-serif;
+    color: #a0aec0;
+    background: var(--gris);
+    resize: none;
+    height: 52px;
+    outline: none;
+  }
+  .paste-area:focus { border-color: var(--azul); color: var(--dark); }
+
+  .metodos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .metodo-btn {
+    padding: 10px 6px;
+    border: 2px solid var(--borde);
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    text-align: center;
+    font-family: 'Nunito', sans-serif;
+    transition: all 0.2s;
+  }
+  .metodo-btn .icon { font-size: 20px; display: block; }
+  .metodo-btn .label { font-size: 11px; font-weight: 700; color: #718096; margin-top: 2px; }
+  .metodo-btn.active { border-color: var(--azul); background: #e8f4fd; }
+  .metodo-btn.active .label { color: var(--azul); }
+
+  .btn-success {
+    width: 100%;
+    padding: 15px;
+    background: var(--verde);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 800;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .btn-success:active { transform: scale(0.98); }
+
+  .btn-danger {
+    padding: 8px 14px;
+    background: var(--rojo);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+  }
+
+  .btn-sm {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-azul { background: var(--azul); color: white; }
+  .btn-outline {
+    background: white;
+    border: 2px solid var(--borde);
+    color: var(--texto);
+  }
+
+  /* ===== BUSCADOR ===== */
+  .search-box {
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 12px 16px 12px 42px;
+    border: 2px solid var(--borde);
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: 'Nunito', sans-serif;
+    outline: none;
+    background: white;
+    transition: border-color 0.2s;
+  }
+  .search-box input:focus { border-color: var(--azul); }
+  .search-box .icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: #a0aec0;
+  }
+
+  /* ===== VENDEDOR CARD ===== */
+  .vendedor-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--borde);
+  }
+  .vendedor-card:last-child { border-bottom: none; }
+  .vendedor-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--azul);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: white;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  .vendedor-data { flex: 1; margin-left: 12px; }
+  .vendedor-data .nombre { font-size: 14px; font-weight: 800; color: var(--dark); }
+  .vendedor-data .codigo { font-size: 12px; color: #a0aec0; }
+  .vendedor-stats { text-align: right; }
+  .vendedor-stats .vendidas { font-size: 18px; font-weight: 800; color: var(--azul); }
+  .vendedor-stats .sub { font-size: 11px; color: #a0aec0; }
+
+  /* ===== PROGRESS BAR ===== */
+  .progress-wrap { margin: 16px 0; }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 700;
+    color: #718096;
+    margin-bottom: 6px;
+  }
+  .progress-bar {
+    height: 10px;
+    background: var(--borde);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--azul), var(--verde));
+    border-radius: 10px;
+    transition: width 0.6s ease;
+  }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 20px 20px 0 0;
+    padding: 24px 20px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .modal-header h3 { font-size: 18px; font-weight: 800; color: var(--dark); }
+  .modal-close {
+    background: var(--gris);
+    border: none;
+    border-radius: 50%;
+    width: 32px; height: 32px;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #718096;
+  }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--dark);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    z-index: 9999;
+    transition: transform 0.3s ease;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.verde { background: var(--verde); }
+  .toast.rojo { background: var(--rojo); }
+
+  /* ===== EMPTY STATE ===== */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #a0aec0;
+  }
+  .empty-state .icon { font-size: 48px; display: block; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; font-weight: 600; }
+
+  /* ===== ASIGNACION BOLETAS ===== */
+  .asignacion-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--gris);
+    color: var(--texto);
+    border: 1px solid var(--borde);
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--borde); border-radius: 4px; }
+
+  @media (max-width: 380px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .numeros-input-grid { gap: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== LOGIN ==================== -->
+<div id="screen-login">
+  <div class="login-logo">
+    <h1>Sorteos<br>Jiménez</h1>
+    <div class="sub">Sistema de Boletas 2026</div>
+  </div>
+  <div class="login-card">
+    <h2>Iniciar sesión</h2>
+    <p>Selecciona tu rol y accede</p>
+    <div class="rol-selector">
+      <button class="rol-btn active" onclick="selRol('admin')" id="rol-admin">
+        <span class="icon">🛡️</span>
+        <span class="label">Administrador</span>
+      </button>
+      <button class="rol-btn" onclick="selRol('vendedor')" id="rol-vendedor">
+        <span class="icon">🧑‍💼</span>
+        <span class="label">Vendedor</span>
+      </button>
+    </div>
+    <div class="input-group" id="campo-codigo" style="display:none">
+      <label>Código de vendedor</label>
+      <input type="text" id="input-codigo" placeholder="Ej: V001" autocomplete="off">
+    </div>
+    <div class="input-group">
+      <label>Contraseña / PIN</label>
+      <input type="password" id="input-pin" placeholder="••••••" autocomplete="off">
+    </div>
+    <button class="btn-primary" onclick="doLogin()">Entrar →</button>
+    <div class="error-msg" id="login-error">Código o PIN incorrecto</div>
+  </div>
+</div>
+
+<!-- ==================== MAIN ==================== -->
+<div id="screen-main">
+  <div class="topbar">
+    <div class="topbar-logo">Sorteos Jiménez</div>
+    <div class="topbar-user">
+      <span class="user-badge" id="topbar-rol">ADMIN</span>
+      <button class="btn-logout" onclick="logout()">Salir</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+
+    <!-- TABS dinámicos -->
+    <div class="tabs" id="tabs-container"></div>
+
+    <!-- ======== TAB: DASHBOARD (solo admin) ======== -->
+    <div class="tab-panel" id="tab-dashboard">
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card azul">
+          <div class="stat-label">Total boletas</div>
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-sub">registradas</div>
+        </div>
+        <div class="stat-card verde">
+          <div class="stat-label">Pagadas</div>
+          <div class="stat-value" id="stat-pagadas">0</div>
+          <div class="stat-sub">completadas</div>
+        </div>
+        <div class="stat-card amarillo">
+          <div class="stat-label">Con abono</div>
+          <div class="stat-value" id="stat-abono">0</div>
+          <div class="stat-sub">pendientes</div>
+        </div>
+        <div class="stat-card rojo">
+          <div class="stat-label">Libres</div>
+          <div class="stat-value" id="stat-libres">0</div>
+          <div class="stat-sub">disponibles</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>💰 Recaudo total</h3>
+        </div>
+        <div class="card-body">
+          <div style="font-family:'Bebas Neue',cursive;font-size:42px;color:var(--verde)" id="stat-recaudo">$0</div>
+          <div class="progress-wrap">
+            <div class="progress-label">
+              <span>Progreso de venta</span>
+              <span id="stat-pct">0%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>🏆 Top vendedores</h3>
+        </div>
+        <div class="card-body" id="top-vendedores">
+          <div class="empty-state"><span class="icon">📊</span><p>Sin datos aún</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== TAB: BOLETAS ======== -->
+    <div class="tab-panel" id="tab-boletas">
+      <div class="search-box">
+        <span class="icon">🔍</span>
+        <input type="text" id="buscar-boleta" placeholder="Buscar por número o nombre..." oninput="filtrarBoletas()">
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px">
+        <button class="chip" onclick="filtrarEstado('')" id="f-todos" style="background:var(--azul);color:white;border-color:var(--azul)">Todas</button>
+        <button class="chip" onclick="filtrarEstado('libre')" id="f-libre">🟢 Libres</button>
+        <button class="chip" onclick="filtrarEstado('abono')" id="f-abono">🟡 Abono</button>
+        <button class="chip" onclick="filtrarEstado('pagada')" id="f-pagada">🔵 Pagadas</button>
+      </div>
+      <div class="card">
+        <div class="card-body" id="lista-boletas" style="padding:8px 16px">
+          <div class="empty-state"><span class="icon">🎟️</span><p>Cargando boletas...</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== TAB: REGISTRAR VENTA ======== -->
+    <div class="tab-panel" id="tab-venta">
+      <div class="card">
+        <div class="card-header"><h3>🎟️ Números de la boleta</h3></div>
+        <div class="card-body">
+          <div class="form-group">
+            <label>Pegar números (separados por coma, espacio o Enter)</label>
+            <textarea class="paste-area" id="paste-numeros" placeholder="Ej: 8296, 5747, 3468, 1019" onpaste="parsePaste(event)" oninput="parsePasteInput()"></textarea>
+          </div>
+          <div class="numeros-input-grid">
+            <input type="number" id="n1" placeholder="N°1" min="0" max="9999" oninput="validarNumero(this)">
+            <input type="number" id="n2" placeholder="N°2" min="0" max="9999" oninput="validarNumero(this)">
+            <input type="number" id="n3" placeholder="N°3" min="0" max="9999" oninput="validarNumero(this)">
+            <input type="number" id="n4" placeholder="N°4" min="0" max="9999" oninput="validarNumero(this)">
+          </div>
+          <div id="boleta-disponible" style="font-size:13px;margin-top:6px;font-weight:700"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h3>👤 Datos del comprador</h3></div>
+        <div class="card-body">
+          <div class="form-group">
+            <label>Nombre completo</label>
+            <input type="text" id="venta-nombre" placeholder="Nombre del comprador">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Teléfono</label>
+              <input type="tel" id="venta-tel" placeholder="3XX XXX XXXX">
+            </div>
+            <div class="form-group" id="campo-vendedor-sel" style="display:none">
+              <label>Vendedor</label>
+              <select id="venta-vendedor"></select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h3>💳 Pago</h3></div>
+        <div class="card-body">
+          <div class="metodos-grid">
+            <button class="metodo-btn active" onclick="selMetodo('efectivo',this)" id="m-efectivo">
+              <span class="icon">💵</span><span class="label">Efectivo</span>
+            </button>
+            <button class="metodo-btn" onclick="selMetodo('nequi',this)" id="m-nequi">
+              <span class="icon">📱</span><span class="label">Nequi</span>
+            </button>
+            <button class="metodo-btn" onclick="selMetodo('transferencia',this)" id="m-transferencia">
+              <span class="icon">🏦</span><span class="label">Transferencia</span>
+            </button>
+          </div>
+          <div class="form-row" style="margin-top:14px">
+            <div class="form-group">
+              <label>Monto recibido</label>
+              <input type="number" id="venta-monto" placeholder="80000" min="0">
+            </div>
+            <div class="form-group">
+              <label>Estado</label>
+              <select id="venta-estado">
+                <option value="pagada">Pagada ✅</option>
+                <option value="abono">Abono 🕐</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Observaciones</label>
+            <input type="text" id="venta-obs" placeholder="Referencia, nota, etc.">
+          </div>
+          <button class="btn-success" onclick="registrarVenta()">✅ Registrar venta</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== TAB: VENDEDORES (solo admin) ======== -->
+    <div class="tab-panel" id="tab-vendedores">
+      <div class="card" id="form-nuevo-vendedor">
+        <div class="card-header">
+          <h3>➕ Nuevo vendedor</h3>
+          <button class="btn-sm btn-outline" onclick="toggleFormVendedor()">▼</button>
+        </div>
+        <div class="card-body" id="body-form-vendedor">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nombre</label>
+              <input type="text" id="nv-nombre" placeholder="Nombre completo">
+            </div>
+            <div class="form-group">
+              <label>Código acceso</label>
+              <input type="text" id="nv-codigo" placeholder="V001">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>PIN (contraseña)</label>
+              <input type="password" id="nv-pin" placeholder="••••">
+            </div>
+            <div class="form-group">
+              <label>Comisión %</label>
+              <input type="number" id="nv-comision" placeholder="10" min="0" max="100">
+            </div>
+          </div>
+          <div class="card-header" style="padding:0;border:none;margin-bottom:10px">
+            <h3 style="font-size:13px">📋 Asignación de boletas</h3>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Tipo de asignación</label>
+              <select id="nv-tipo-asig" onchange="toggleAsignacion()">
+                <option value="rango">Rango (desde–hasta)</option>
+                <option value="lista">Lista específica</option>
+                <option value="todas">Todas las boletas</option>
+              </select>
+            </div>
+          </div>
+          <div id="asig-rango" class="form-row">
+            <div class="form-group">
+              <label>Desde boleta N°</label>
+              <input type="number" id="nv-desde" placeholder="1" min="1">
+            </div>
+            <div class="form-group">
+              <label>Hasta boleta N°</label>
+              <input type="number" id="nv-hasta" placeholder="500" min="1">
+            </div>
+          </div>
+          <div id="asig-lista" style="display:none" class="form-group">
+            <label>Lista de boletas (separadas por coma)</label>
+            <input type="text" id="nv-lista" placeholder="Ej: 1,5,8,12,25,...">
+          </div>
+          <button class="btn-primary" onclick="crearVendedor()">Crear vendedor</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h3>👥 Vendedores activos</h3></div>
+        <div class="card-body" id="lista-vendedores">
+          <div class="empty-state"><span class="icon">👥</span><p>Sin vendedores</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== TAB: MIS VENTAS (vendedor) ======== -->
+    <div class="tab-panel" id="tab-mis-ventas">
+      <div class="stats-grid">
+        <div class="stat-card azul">
+          <div class="stat-label">Mis boletas</div>
+          <div class="stat-value" id="mv-total">0</div>
+          <div class="stat-sub">asignadas</div>
+        </div>
+        <div class="stat-card verde">
+          <div class="stat-label">Vendidas</div>
+          <div class="stat-value" id="mv-vendidas">0</div>
+          <div class="stat-sub">completadas</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>📋 Mis ventas</h3></div>
+        <div class="card-body" id="lista-mis-ventas" style="padding:8px 16px">
+          <div class="empty-state"><span class="icon">📋</span><p>Sin ventas aún</p></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL editar boleta -->
+<div class="modal-overlay" id="modal-boleta">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>✏️ Editar boleta</h3>
+      <button class="modal-close" onclick="cerrarModal('modal-boleta')">×</button>
+    </div>
+    <div id="modal-boleta-body"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, set, get, onValue, update, remove, push }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  // ===== FIREBASE CONFIG (CAMBIAR POR EL NUEVO PROYECTO) =====
+  const firebaseConfig = {
+    apiKey: "REEMPLAZAR_API_KEY",
+    authDomain: "REEMPLAZAR.firebaseapp.com",
+    databaseURL: "https://REEMPLAZAR-default-rtdb.firebaseio.com",
+    projectId: "REEMPLAZAR",
+    storageBucket: "REEMPLAZAR.appspot.com",
+    messagingSenderId: "REEMPLAZAR",
+    appId: "REEMPLAZAR"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  window._db = db;
+  window._ref = ref;
+  window._set = set;
+  window._get = get;
+  window._onValue = onValue;
+  window._update = update;
+  window._remove = remove;
+  window._push = push;
+
+  // Seed admin por defecto si no existe
+  const adminRef = ref(db, 'config/admin');
+  get(adminRef).then(snap => {
+    if (!snap.exists()) {
+      set(adminRef, { pin: '1234', nombre: 'Administrador' });
+    }
+  });
+</script>
+
+<script>
+// ===== ESTADO GLOBAL =====
+let currentUser = null; // { rol, id, nombre, boletasAsignadas }
+let allBoletas = {};
+let allVendedores = {};
+let metodoSeleccionado = 'efectivo';
+let filtroEstado = '';
+
+// ===== LOGIN =====
+let rolSeleccionado = 'admin';
+
+function selRol(rol) {
+  rolSeleccionado = rol;
+  document.querySelectorAll('.rol-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('rol-' + rol).classList.add('active');
+  document.getElementById('campo-codigo').style.display = rol === 'vendedor' ? 'block' : 'none';
+}
+
+async function doLogin() {
+  const pin = document.getElementById('input-pin').value.trim();
+  const codigo = document.getElementById('input-codigo').value.trim().toUpperCase();
+  const err = document.getElementById('login-error');
+  err.style.display = 'none';
+
+  if (!pin) { err.style.display = 'block'; err.textContent = 'Ingresa el PIN'; return; }
+
+  const db = window._db, ref = window._ref, get = window._get;
+
+  if (rolSeleccionado === 'admin') {
+    const snap = await get(ref(db, 'config/admin'));
+    if (snap.exists() && snap.val().pin === pin) {
+      currentUser = { rol: 'admin', nombre: 'Administrador' };
+      iniciarSesion();
+    } else {
+      err.style.display = 'block'; err.textContent = 'PIN incorrecto';
+    }
+  } else {
+    if (!codigo) { err.style.display = 'block'; err.textContent = 'Ingresa tu código'; return; }
+    const snap = await get(ref(db, 'vendedores'));
+    if (snap.exists()) {
+      let encontrado = false;
+      snap.forEach(v => {
+        const d = v.val();
+        if (d.codigo === codigo && d.pin === pin) {
+          currentUser = { rol: 'vendedor', id: v.key, nombre: d.nombre, boletasAsignadas: d.boletasAsignadas || [] };
+          encontrado = true;
+        }
+      });
+      if (encontrado) iniciarSesion();
+      else { err.style.display = 'block'; err.textContent = 'Código o PIN incorrecto'; }
+    } else {
+      err.style.display = 'block'; err.textContent = 'No hay vendedores registrados';
+    }
+  }
+}
+
+document.getElementById('input-pin').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+function iniciarSesion() {
+  document.getElementById('screen-login').style.display = 'none';
+  document.getElementById('screen-main').style.display = 'block';
+  document.getElementById('topbar-rol').textContent = currentUser.rol === 'admin' ? '🛡️ ADMIN' : '🧑‍💼 ' + currentUser.nombre.split(' ')[0].toUpperCase();
+  construirTabs();
+  cargarDatos();
+}
+
+function logout() {
+  currentUser = null;
+  document.getElementById('screen-main').style.display = 'none';
+  document.getElementById('screen-login').style.display = 'flex';
+  document.getElementById('input-pin').value = '';
+  document.getElementById('input-codigo').value = '';
+}
+
+// ===== TABS =====
+function construirTabs() {
+  const c = document.getElementById('tabs-container');
+  c.innerHTML = '';
+  let tabs = [];
+
+  if (currentUser.rol === 'admin') {
+    tabs = [
+      { id: 'dashboard', label: '📊 Dashboard' },
+      { id: 'boletas', label: '🎟️ Boletas' },
+      { id: 'venta', label: '➕ Venta' },
+      { id: 'vendedores', label: '👥 Vendedores' },
+    ];
+    // Mostrar campo vendedor en venta
+    document.getElementById('campo-vendedor-sel').style.display = 'block';
+  } else {
+    tabs = [
+      { id: 'mis-ventas', label: '📋 Mis ventas' },
+      { id: 'boletas', label: '🎟️ Boletas' },
+      { id: 'venta', label: '➕ Venta' },
+    ];
+    document.getElementById('campo-vendedor-sel').style.display = 'none';
+  }
+
+  tabs.forEach((t, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (i === 0 ? ' active' : '');
+    btn.textContent = t.label;
+    btn.onclick = () => abrirTab(t.id);
+    c.appendChild(btn);
+  });
+
+  abrirTab(tabs[0].id);
+}
+
+function abrirTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id)?.classList.add('active');
+  const tabs = document.getElementById('tabs-container');
+  [...tabs.children].forEach(b => { if(b.textContent.includes(id.replace('-',' '))) b.classList.add('active'); });
+  // fix active por índice
+  const labels = {
+    dashboard: '📊 Dashboard', boletas: '🎟️ Boletas',
+    venta: '➕ Venta', vendedores: '👥 Vendedores', 'mis-ventas': '📋 Mis ventas'
+  };
+  [...tabs.children].forEach(b => {
+    if(b.textContent === labels[id]) b.classList.add('active');
+  });
+}
+
+// ===== CARGAR DATOS =====
+function cargarDatos() {
+  const db = window._db, ref = window._ref, onValue = window._onValue;
+
+  onValue(ref(db, 'boletas'), snap => {
+    allBoletas = snap.exists() ? snap.val() : {};
+    renderBoletas();
+    if (currentUser.rol === 'admin') {
+      renderDashboard();
+    } else {
+      renderMisVentas();
+    }
+  });
+
+  if (currentUser.rol === 'admin') {
+    onValue(ref(db, 'vendedores'), snap => {
+      allVendedores = snap.exists() ? snap.val() : {};
+      renderVendedores();
+      llenarSelectorVendedor();
+    });
+  }
+}
+
+// ===== DASHBOARD =====
+function renderDashboard() {
+  const boletas = Object.values(allBoletas);
+  const total = boletas.length;
+  const pagadas = boletas.filter(b => b.estado === 'pagada').length;
+  const abono = boletas.filter(b => b.estado === 'abono').length;
+  const libres = boletas.filter(b => b.estado === 'libre').length;
+  const recaudo = boletas.reduce((s, b) => s + (Number(b.monto_pagado) || 0), 0);
+
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-pagadas').textContent = pagadas;
+  document.getElementById('stat-abono').textContent = abono;
+  document.getElementById('stat-libres').textContent = libres;
+  document.getElementById('stat-recaudo').textContent = '$' + recaudo.toLocaleString('es-CO');
+
+  const pct = total > 0 ? Math.round(((pagadas + abono) / total) * 100) : 0;
+  document.getElementById('stat-pct').textContent = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+
+  // Top vendedores
+  const ventas = {};
+  boletas.filter(b => b.estado !== 'libre').forEach(b => {
+    if (b.vendedor_id) ventas[b.vendedor_id] = (ventas[b.vendedor_id] || 0) + 1;
+  });
+  const top = Object.entries(ventas).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const cont = document.getElementById('top-vendedores');
+  if (!top.length) {
+    cont.innerHTML = '<div class="empty-state"><span class="icon">📊</span><p>Sin datos aún</p></div>';
+    return;
+  }
+  cont.innerHTML = top.map(([vid, cnt]) => {
+    const v = allVendedores[vid];
+    const nombre = v ? v.nombre : vid;
+    return `<div class="vendedor-card">
+      <div class="vendedor-avatar">${nombre.charAt(0)}</div>
+      <div class="vendedor-data">
+        <div class="nombre">${nombre}</div>
+        <div class="codigo">${v ? v.codigo : ''}</div>
+      </div>
+      <div class="vendedor-stats">
+        <div class="vendidas">${cnt}</div>
+        <div class="sub">boletas</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== LISTA BOLETAS =====
+function renderBoletas() {
+  const buscar = document.getElementById('buscar-boleta')?.value.toLowerCase() || '';
+  let lista = Object.entries(allBoletas);
+
+  if (currentUser.rol === 'vendedor') {
+    const asig = currentUser.boletasAsignadas || [];
+    lista = lista.filter(([k]) => asig.includes(Number(k)) || asig.includes(k));
+  }
+
+  if (filtroEstado) lista = lista.filter(([, b]) => b.estado === filtroEstado);
+
+  if (buscar) {
+    lista = lista.filter(([k, b]) =>
+      (b.numeros || '').includes(buscar) ||
+      (b.comprador || '').toLowerCase().includes(buscar) ||
+      k.includes(buscar)
+    );
+  }
+
+  const cont = document.getElementById('lista-boletas');
+  if (!lista.length) {
+    cont.innerHTML = '<div class="empty-state"><span class="icon">🎟️</span><p>Sin resultados</p></div>';
+    return;
+  }
+
+  cont.innerHTML = lista.map(([k, b]) => {
+    const nums = (b.numeros || '').split(',').map(n => n.trim());
+    const estadoClass = `estado-${b.estado || 'libre'}`;
+    const estadoLabel = { libre: 'Libre', abono: 'Abono', pagada: 'Pagada' }[b.estado] || 'Libre';
+    return `<div class="boleta-item">
+      <div>
+        <div class="boleta-numeros">${nums.map(n => `<span class="num-badge">${n}</span>`).join('')}</div>
+        ${b.comprador ? `<div style="font-size:12px;color:#718096;margin-top:4px">${b.comprador}</div>` : ''}
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="estado-badge ${estadoClass}">${estadoLabel}</span>
+        ${currentUser.rol === 'admin' ? `<button class="btn-sm btn-azul" onclick="abrirEditar('${k}')">✏️</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filtrarBoletas() { renderBoletas(); }
+
+function filtrarEstado(estado) {
+  filtroEstado = estado;
+  ['todos','libre','abono','pagada'].forEach(f => {
+    const el = document.getElementById('f-' + f);
+    if (el) { el.style.background = ''; el.style.color = ''; el.style.borderColor = ''; }
+  });
+  const id = estado || 'todos';
+  const el = document.getElementById('f-' + id);
+  if (el) { el.style.background = 'var(--azul)'; el.style.color = 'white'; el.style.borderColor = 'var(--azul)'; }
+  renderBoletas();
+}
+
+// ===== MIS VENTAS (vendedor) =====
+function renderMisVentas() {
+  const asig = currentUser.boletasAsignadas || [];
+  const mis = Object.entries(allBoletas).filter(([k]) => asig.includes(Number(k)) || asig.includes(k));
+  const vendidas = mis.filter(([, b]) => b.estado !== 'libre');
+
+  document.getElementById('mv-total').textContent = asig.length;
+  document.getElementById('mv-vendidas').textContent = vendidas.length;
+
+  const cont = document.getElementById('lista-mis-ventas');
+  if (!vendidas.length) {
+    cont.innerHTML = '<div class="empty-state"><span class="icon">📋</span><p>Sin ventas aún</p></div>';
+    return;
+  }
+  cont.innerHTML = vendidas.map(([k, b]) => {
+    const nums = (b.numeros || '').split(',').map(n => n.trim());
+    const estadoClass = `estado-${b.estado}`;
+    return `<div class="boleta-item">
+      <div>
+        <div class="boleta-numeros">${nums.map(n => `<span class="num-badge">${n}</span>`).join('')}</div>
+        <div style="font-size:12px;color:#718096;margin-top:4px">${b.comprador || ''} · ${(b.metodo_pago || '').toUpperCase()}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <span class="estado-badge ${estadoClass}">${b.estado}</span>
+        <span style="font-size:12px;font-weight:800;color:var(--verde)">$${Number(b.monto_pagado||0).toLocaleString('es-CO')}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== REGISTRO VENTA =====
+function parsePaste(e) {
+  setTimeout(() => parsePasteInput(), 50);
+}
+function parsePasteInput() {
+  const raw = document.getElementById('paste-numeros').value;
+  const nums = raw.split(/[\s,;\n]+/).filter(n => n.trim() !== '').slice(0, 4);
+  ['n1','n2','n3','n4'].forEach((id, i) => {
+    document.getElementById(id).value = nums[i] || '';
+  });
+  verificarDisponibilidad();
+}
+
+function validarNumero(input) {
+  verificarDisponibilidad();
+}
+
+function verificarDisponibilidad() {
+  const n1 = document.getElementById('n1').value;
+  const div = document.getElementById('boleta-disponible');
+  if (!n1) { div.textContent = ''; return; }
+
+  // buscar si ya existe una boleta con ese primer número
+  const existe = Object.values(allBoletas).find(b => {
+    const nums = (b.numeros || '').split(',').map(n => n.trim());
+    return nums[0] === n1;
+  });
+  if (existe) {
+    div.textContent = '⚠️ Este número ya está registrado (' + existe.estado + ')';
+    div.style.color = 'var(--rojo)';
+  } else {
+    div.textContent = '✅ Disponible';
+    div.style.color = 'var(--verde)';
+  }
+}
+
+function selMetodo(m, btn) {
+  metodoSeleccionado = m;
+  document.querySelectorAll('.metodo-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function llenarSelectorVendedor() {
+  const sel = document.getElementById('venta-vendedor');
+  sel.innerHTML = '<option value="">— Seleccionar —</option>';
+  Object.entries(allVendedores).forEach(([id, v]) => {
+    const opt = document.createElement('option');
+    opt.value = id;
+    opt.textContent = v.nombre + ' (' + v.codigo + ')';
+    sel.appendChild(opt);
+  });
+}
+
+async function registrarVenta() {
+  const n1 = document.getElementById('n1').value.trim();
+  const n2 = document.getElementById('n2').value.trim();
+  const n3 = document.getElementById('n3').value.trim();
+  const n4 = document.getElementById('n4').value.trim();
+  const nombre = document.getElementById('venta-nombre').value.trim();
+  const tel = document.getElementById('venta-tel').value.trim();
+  const monto = document.getElementById('venta-monto').value.trim();
+  const estado = document.getElementById('venta-estado').value;
+  const obs = document.getElementById('venta-obs').value.trim();
+
+  if (!n1) { toast('Ingresa al menos el primer número', 'rojo'); return; }
+  if (!nombre) { toast('Ingresa el nombre del comprador', 'rojo'); return; }
+  if (!monto) { toast('Ingresa el monto recibido', 'rojo'); return; }
+
+  const numeros = [n1, n2, n3, n4].filter(Boolean).join(', ');
+  const vendedorId = currentUser.rol === 'admin'
+    ? document.getElementById('venta-vendedor').value
+    : currentUser.id;
+
+  const db = window._db, ref = window._ref, push = window._push, set = window._set;
+  const nuevaRef = push(ref(db, 'boletas'));
+
+  await set(nuevaRef, {
+    numeros,
+    comprador: nombre,
+    telefono: tel,
+    vendedor_id: vendedorId || '',
+    estado,
+    monto_pagado: Number(monto),
+    metodo_pago: metodoSeleccionado,
+    observaciones: obs,
+    fecha: new Date().toLocaleDateString('es-CO'),
+    fecha_ts: Date.now()
+  });
+
+  // limpiar
+  ['n1','n2','n3','n4'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('paste-numeros').value = '';
+  document.getElementById('venta-nombre').value = '';
+  document.getElementById('venta-tel').value = '';
+  document.getElementById('venta-monto').value = '';
+  document.getElementById('venta-obs').value = '';
+  document.getElementById('boleta-disponible').textContent = '';
+
+  toast('✅ Boleta registrada exitosamente', 'verde');
+  abrirTab(currentUser.rol === 'admin' ? 'boletas' : 'mis-ventas');
+}
+
+// ===== EDITAR BOLETA (admin) =====
+function abrirEditar(key) {
+  const b = allBoletas[key];
+  if (!b) return;
+  const body = document.getElementById('modal-boleta-body');
+  body.innerHTML = `
+    <div class="form-group">
+      <label>Números</label>
+      <input type="text" id="e-numeros" value="${b.numeros || ''}" style="font-family:'Bebas Neue',cursive;font-size:18px;color:var(--azul)">
+    </div>
+    <div class="form-group">
+      <label>Comprador</label>
+      <input type="text" id="e-nombre" value="${b.comprador || ''}">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Teléfono</label>
+        <input type="tel" id="e-tel" value="${b.telefono || ''}">
+      </div>
+      <div class="form-group">
+        <label>Estado</label>
+        <select id="e-estado">
+          <option value="libre" ${b.estado==='libre'?'selected':''}>Libre</option>
+          <option value="abono" ${b.estado==='abono'?'selected':''}>Abono</option>
+          <option value="pagada" ${b.estado==='pagada'?'selected':''}>Pagada</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Monto pagado</label>
+        <input type="number" id="e-monto" value="${b.monto_pagado || ''}">
+      </div>
+      <div class="form-group">
+        <label>Método pago</label>
+        <select id="e-metodo">
+          <option value="efectivo" ${b.metodo_pago==='efectivo'?'selected':''}>Efectivo</option>
+          <option value="nequi" ${b.metodo_pago==='nequi'?'selected':''}>Nequi</option>
+          <option value="transferencia" ${b.metodo_pago==='transferencia'?'selected':''}>Transferencia</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Observaciones</label>
+      <input type="text" id="e-obs" value="${b.observaciones || ''}">
+    </div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn-success" style="flex:1" onclick="guardarEdicion('${key}')">💾 Guardar</button>
+      <button class="btn-danger" onclick="eliminarBoleta('${key}')">🗑️</button>
+    </div>
+  `;
+  document.getElementById('modal-boleta').classList.add('open');
+}
+
+async function guardarEdicion(key) {
+  const db = window._db, ref = window._ref, update = window._update;
+  await update(ref(db, 'boletas/' + key), {
+    numeros: document.getElementById('e-numeros').value,
+    comprador: document.getElementById('e-nombre').value,
+    telefono: document.getElementById('e-tel').value,
+    estado: document.getElementById('e-estado').value,
+    monto_pagado: Number(document.getElementById('e-monto').value),
+    metodo_pago: document.getElementById('e-metodo').value,
+    observaciones: document.getElementById('e-obs').value,
+  });
+  cerrarModal('modal-boleta');
+  toast('✅ Boleta actualizada', 'verde');
+}
+
+async function eliminarBoleta(key) {
+  if (!confirm('¿Eliminar esta boleta?')) return;
+  const db = window._db, ref = window._ref, remove = window._remove;
+  await remove(ref(db, 'boletas/' + key));
+  cerrarModal('modal-boleta');
+  toast('🗑️ Boleta eliminada', 'rojo');
+}
+
+// ===== VENDEDORES =====
+function toggleFormVendedor() {
+  const body = document.getElementById('body-form-vendedor');
+  body.style.display = body.style.display === 'none' ? 'block' : 'none';
+}
+
+function toggleAsignacion() {
+  const tipo = document.getElementById('nv-tipo-asig').value;
+  document.getElementById('asig-rango').style.display = tipo === 'rango' ? 'grid' : 'none';
+  document.getElementById('asig-lista').style.display = tipo === 'lista' ? 'block' : 'none';
+}
+
+async function crearVendedor() {
+  const nombre = document.getElementById('nv-nombre').value.trim();
+  const codigo = document.getElementById('nv-codigo').value.trim().toUpperCase();
+  const pin = document.getElementById('nv-pin').value.trim();
+  const comision = document.getElementById('nv-comision').value || 0;
+  const tipo = document.getElementById('nv-tipo-asig').value;
+
+  if (!nombre || !codigo || !pin) { toast('Completa todos los campos', 'rojo'); return; }
+
+  let boletasAsignadas = [];
+  if (tipo === 'rango') {
+    const desde = Number(document.getElementById('nv-desde').value);
+    const hasta = Number(document.getElementById('nv-hasta').value);
+    if (desde && hasta && hasta >= desde) {
+      for (let i = desde; i <= hasta; i++) boletasAsignadas.push(i);
+    }
+  } else if (tipo === 'lista') {
+    boletasAsignadas = document.getElementById('nv-lista').value
+      .split(',').map(n => Number(n.trim())).filter(n => !isNaN(n) && n > 0);
+  }
+  // 'todas' → vacío significa todas
+
+  const db = window._db, ref = window._ref, push = window._push, set = window._set;
+  const nuevaRef = push(ref(db, 'vendedores'));
+  await set(nuevaRef, { nombre, codigo, pin, comision: Number(comision), boletasAsignadas, activo: true });
+
+  document.getElementById('nv-nombre').value = '';
+  document.getElementById('nv-codigo').value = '';
+  document.getElementById('nv-pin').value = '';
+  document.getElementById('nv-comision').value = '';
+  document.getElementById('nv-desde').value = '';
+  document.getElementById('nv-hasta').value = '';
+  document.getElementById('nv-lista').value = '';
+
+  toast('✅ Vendedor creado: ' + nombre, 'verde');
+}
+
+function renderVendedores() {
+  const cont = document.getElementById('lista-vendedores');
+  const lista = Object.entries(allVendedores);
+  if (!lista.length) {
+    cont.innerHTML = '<div class="empty-state"><span class="icon">👥</span><p>Sin vendedores</p></div>';
+    return;
+  }
+  cont.innerHTML = lista.map(([id, v]) => {
+    const boletas = Object.values(allBoletas).filter(b => b.vendedor_id === id && b.estado !== 'libre');
+    const asig = v.boletasAsignadas?.length || '∞';
+    return `<div class="vendedor-card">
+      <div class="vendedor-avatar">${v.nombre.charAt(0)}</div>
+      <div class="vendedor-data">
+        <div class="nombre">${v.nombre}</div>
+        <div class="codigo">Código: ${v.codigo} · Asig: ${asig} · Com: ${v.comision}%</div>
+      </div>
+      <div class="vendedor-stats">
+        <div class="vendidas">${boletas.length}</div>
+        <div class="sub">vendidas</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== MODAL =====
+function cerrarModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if(e.target === m) m.classList.remove('open'); });
+});
+
+// ===== TOAST =====
+function toast(msg, tipo = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (tipo ? ' ' + tipo : '') + ' show';
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+window.toast = toast;
+
+// exponer funciones globales
+window.selRol = selRol;
+window.doLogin = doLogin;
+window.logout = logout;
+window.abrirTab = abrirTab;
+window.filtrarBoletas = filtrarBoletas;
+window.filtrarEstado = filtrarEstado;
+window.parsePaste = parsePaste;
+window.parsePasteInput = parsePasteInput;
+window.validarNumero = validarNumero;
+window.selMetodo = selMetodo;
+window.registrarVenta = registrarVenta;
+window.abrirEditar = abrirEditar;
+window.guardarEdicion = guardarEdicion;
+window.eliminarBoleta = eliminarBoleta;
+window.toggleFormVendedor = toggleFormVendedor;
+window.toggleAsignacion = toggleAsignacion;
+window.crearVendedor = crearVendedor;
+window.cerrarModal = cerrarModal;
+</script>
+</body>
+</html>
