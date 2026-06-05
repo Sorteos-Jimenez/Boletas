@@ -334,6 +334,32 @@
     letter-spacing: 1px;
     color: var(--azul);
   }
+  /* ===== MINI BOLETA CARD (tarjetas de cuenta en vista Boletas) ===== */
+  .mini-boleta-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .mini-boleta-card {
+    background: white;
+    border: 2px solid var(--verde);
+    border-radius: 10px;
+    padding: 5px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 54px;
+  }
+  .mini-boleta-card span {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--verde);
+    letter-spacing: 1.5px;
+    line-height: 1;
+  }
+
   .boleta-info { flex: 1; margin-left: 12px; }
   .boleta-info .comprador { font-size: 13px; font-weight: 700; color: var(--dark); }
   .boleta-info .sub { font-size: 11px; color: #a0aec0; }
@@ -1808,6 +1834,46 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
+  /* ===== AZAR SHOW ===== */
+  @keyframes azarFadeIn {
+    from { opacity:0; transform:scale(0.85) translateY(30px); }
+    to   { opacity:1; transform:scale(1)    translateY(0); }
+  }
+  @keyframes azarCardReveal {
+    0%   { opacity:0; transform:scale(0.5) rotate(-8deg); }
+    60%  { transform:scale(1.08) rotate(2deg); }
+    100% { opacity:1; transform:scale(1) rotate(0deg); }
+  }
+  @keyframes azarShake {
+    0%,100% { transform:translateX(0) rotate(0); }
+    15%  { transform:translateX(-6px) rotate(-4deg); }
+    30%  { transform:translateX(6px) rotate(4deg); }
+    45%  { transform:translateX(-4px) rotate(-2deg); }
+    60%  { transform:translateX(4px) rotate(2deg); }
+    75%  { transform:translateX(-2px) rotate(-1deg); }
+  }
+  @keyframes azarPulse {
+    0%,100% { box-shadow:0 0 0 0 rgba(108,63,197,0.5); }
+    50%     { box-shadow:0 0 0 14px rgba(108,63,197,0); }
+  }
+  @keyframes azarCountdown {
+    from { transform:scale(1.6); opacity:0; }
+    40%  { opacity:1; transform:scale(1); }
+    80%  { opacity:1; transform:scale(1); }
+    to   { opacity:0; transform:scale(0.7); }
+  }
+  @keyframes azarStarPop {
+    0%   { opacity:1; transform:scale(0) translateY(0); }
+    60%  { opacity:1; transform:scale(1.2) translateY(-18px); }
+    100% { opacity:0; transform:scale(0.8) translateY(-30px); }
+  }
+  @keyframes azarNumFlip {
+    0%  { transform:rotateX(90deg); opacity:0; }
+    100%{ transform:rotateX(0deg);  opacity:1; }
+  }
+  .azar-card-anim { animation: azarCardReveal 0.55s cubic-bezier(0.34,1.4,0.64,1) both; }
+  .azar-num-anim  { animation: azarNumFlip 0.35s ease both; }
+
   /* ===== EDITOR DE BOLETAS ===== */
   .editor-boleta-wrap {
     display: flex;
@@ -2118,9 +2184,112 @@
     font-weight: 800;
     color: var(--dark);
   }
+
+  /* ===== MODAL CUSTOM CONFIRM / PROMPT ===== */
+  #sj-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10,20,12,0.72);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(3px);
+  }
+  #sj-modal-overlay.open { display: flex; }
+  #sj-modal-box {
+    background: #fff;
+    border-radius: 20px;
+    padding: 28px 24px 20px;
+    max-width: 360px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    animation: sjModalIn .18s ease;
+    font-family: 'Nunito', sans-serif;
+  }
+  @keyframes sjModalIn {
+    from { transform: scale(.88); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+  #sj-modal-icon {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 14px;
+    font-size: 24px;
+  }
+  #sj-modal-icon.danger  { background: #fff1f0; }
+  #sj-modal-icon.warning { background: #fffbeb; }
+  #sj-modal-icon.info    { background: #f0fdf4; }
+  #sj-modal-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--dark);
+    text-align: center;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  #sj-modal-body {
+    font-size: 13.5px;
+    color: #4a5568;
+    text-align: center;
+    line-height: 1.55;
+    margin-bottom: 18px;
+    white-space: pre-line;
+  }
+  #sj-modal-input-wrap { margin-bottom: 16px; display: none; }
+  #sj-modal-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid var(--borde);
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    outline: none;
+    color: var(--dark);
+    text-align: center;
+    letter-spacing: 1px;
+    transition: border-color .2s;
+  }
+  #sj-modal-input:focus { border-color: var(--azul); }
+  #sj-modal-btns { display: flex; gap: 10px; }
+  #sj-modal-btns button {
+    flex: 1;
+    padding: 13px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: opacity .15s, transform .1s;
+  }
+  #sj-modal-btns button:active { transform: scale(.97); opacity: .85; }
+  #sj-btn-cancel { background: #f1f5f0; color: #4a5568; }
+  #sj-btn-ok { background: linear-gradient(135deg,#ea5455,#c53030); color: white; }
+  #sj-btn-ok.verde    { background: linear-gradient(135deg,#3ab54a,#2a8c38); }
+  #sj-btn-ok.amarillo { background: linear-gradient(135deg,#ff9f43,#e08a2a); }
 </style>
 </head>
 <body>
+
+<!-- ===== MODAL CUSTOM CONFIRM / PROMPT ===== -->
+<div id="sj-modal-overlay">
+  <div id="sj-modal-box">
+    <div id="sj-modal-icon"></div>
+    <div id="sj-modal-title"></div>
+    <div id="sj-modal-body"></div>
+    <div id="sj-modal-input-wrap">
+      <input id="sj-modal-input" type="text" autocomplete="off" />
+    </div>
+    <div id="sj-modal-btns">
+      <button id="sj-btn-cancel">Cancelar</button>
+      <button id="sj-btn-ok">Aceptar</button>
+    </div>
+  </div>
+</div>
 
 <!-- ==================== LOGIN ==================== -->
 <div id="screen-login">
@@ -2237,7 +2406,6 @@
       </div>
       <div style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px">
         <button class="chip" onclick="filtrarEstado('')" id="f-todos" style="background:var(--azul);color:white;border-color:var(--azul)">Todas</button>
-        <button class="chip" onclick="filtrarEstado('libre')" id="f-libre"><svg width="10" height="10" viewBox="0 0 10 10" style="vertical-align:middle;margin-right:3px"><circle cx="5" cy="5" r="5" fill="#3ab54a"/></svg>Libres</button>
         <button class="chip" onclick="filtrarEstado('abonado')" id="f-abonado"><svg width="10" height="10" viewBox="0 0 10 10" style="vertical-align:middle;margin-right:3px"><circle cx="5" cy="5" r="5" fill="#ff9f43"/></svg>Abonado</button>
         <button class="chip" onclick="filtrarEstado('pagada')" id="f-pagada"><svg width="10" height="10" viewBox="0 0 10 10" style="vertical-align:middle;margin-right:3px"><circle cx="5" cy="5" r="5" fill="#3ab54a"/></svg>Pagadas</button>
       </div>
@@ -2535,9 +2703,29 @@
             <option value=""><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Todos los vendedores</option>
           </select>
         </div>
-        <div class="card-body" id="lista-pedidos" style="padding:8px 16px">
-          <div class="empty-state"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><p>Sin pedidos aún</p></div>
+        <!-- Pestañas Pendientes / Confirmados -->
+        <div style="display:flex;gap:0;border-bottom:2px solid var(--borde);margin:0 -1px">
+          <button id="ptab-pendientes" onclick="switchPedidosTab('pendientes')"
+            style="flex:1;padding:10px 8px;border:none;background:none;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:#d97706;border-bottom:3px solid #f59e0b;margin-bottom:-2px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Pendientes
+            <span id="ptab-badge-pend" style="background:#fef3c7;color:#d97706;border:1px solid #fcd34d;border-radius:20px;font-size:10px;font-weight:800;padding:1px 7px">0</span>
+          </button>
+          <button id="ptab-confirmados" onclick="switchPedidosTab('confirmados')"
+            style="flex:1;padding:10px 8px;border:none;background:none;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:#a0aec0;border-bottom:3px solid transparent;margin-bottom:-2px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#a0aec0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Confirmados
+            <span id="ptab-badge-conf" style="background:#f4f8f4;color:#a0aec0;border:1px solid var(--borde);border-radius:20px;font-size:10px;font-weight:800;padding:1px 7px">0</span>
+          </button>
         </div>
+        <div id="lista-pedidos-pendientes" class="card-body" style="padding:8px 16px">
+          <div class="empty-state"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><p>Sin pedidos pendientes</p></div>
+        </div>
+        <div id="lista-pedidos-confirmados" class="card-body" style="padding:8px 16px;display:none">
+          <div class="empty-state"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span><p>Sin pedidos confirmados</p></div>
+        </div>
+        <!-- id fantasma para compatibilidad con badge -->
+        <span id="lista-pedidos" style="display:none"></span>
       </div>
     </div>
 
@@ -2843,11 +3031,17 @@
       <input type="number" id="tienda-buscar" placeholder="Buscar número específico..." oninput="tiendaBuscar()">
     </div>
 
-    <!-- Leyenda -->
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;font-size:11px;font-weight:700">
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;background:white;border:2px solid var(--borde);border-radius:4px;display:inline-block"></span>Disponible</span>
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;background:var(--verde);border-radius:4px;display:inline-block"></span>Seleccionada</span>
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;background:#f0f0f0;border:2px solid #ddd;border-radius:4px;display:inline-block"></span>No disponible</span>
+    <!-- Leyenda + botón al azar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;font-weight:700">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;background:white;border:2px solid var(--borde);border-radius:4px;display:inline-block"></span>Disponible</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;background:var(--verde);border-radius:4px;display:inline-block"></span>Seleccionada</span>
+      </div>
+      <button onclick="escogerAlAzar()"
+        style="display:flex;align-items:center;gap:6px;background:linear-gradient(135deg,#6c3fc5,#9b59b6);color:white;border:none;border-radius:20px;padding:7px 16px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 2px 8px rgba(108,63,197,0.35)">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1.2" fill="white"/><circle cx="16" cy="8" r="1.2" fill="white"/><circle cx="8" cy="16" r="1.2" fill="white"/><circle cx="16" cy="16" r="1.2" fill="white"/><circle cx="12" cy="12" r="1.2" fill="white"/></svg>
+        Escoger al azar
+      </button>
     </div>
 
     <div id="tienda-loading" class="spinner"></div>
@@ -2872,15 +3066,26 @@
       <label style="font-size:12px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Nombre completo *</label>
       <input type="text" id="co-nombre" placeholder="Tu nombre" style="width:100%;padding:12px 16px;border:2px solid var(--borde);border-radius:10px;font-size:15px;font-family:'Nunito',sans-serif;outline:none">
     </div>
-    <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0">
-      <div class="form-group">
-        <label style="font-size:12px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Teléfono *</label>
-        <input type="tel" id="co-tel" placeholder="3XX XXX XXXX" style="width:100%;padding:12px 16px;border:2px solid var(--borde);border-radius:10px;font-size:15px;font-family:'Nunito',sans-serif;outline:none">
+    <div class="form-group" style="margin:10px 0 0">
+      <label style="font-size:12px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Teléfono *</label>
+      <div style="display:flex;gap:0;border:2px solid var(--borde);border-radius:10px;overflow:hidden;background:white;width:100%">
+        <select id="co-tel-prefix" style="padding:12px 8px 12px 10px;border:none;border-right:2px solid var(--borde);background:#f8fafc;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:var(--dark);outline:none;cursor:pointer;width:90px;flex-shrink:0">
+          <option value="+57">🇨🇴 +57</option>
+          <option value="+1">🇺🇸 +1</option>
+          <option value="+52">🇲🇽 +52</option>
+          <option value="+34">🇪🇸 +34</option>
+          <option value="+593">🇪🇨 +593</option>
+          <option value="+51">🇵🇪 +51</option>
+          <option value="+58">🇻🇪 +58</option>
+          <option value="+56">🇨🇱 +56</option>
+          <option value="+54">🇦🇷 +54</option>
+        </select>
+        <input type="tel" id="co-tel" placeholder="3XX XXX XXXX" style="flex:1;padding:12px 14px;border:none;font-size:15px;font-family:'Nunito',sans-serif;outline:none;min-width:0">
       </div>
-      <div class="form-group">
-        <label style="font-size:12px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Ciudad</label>
-        <input type="text" id="co-ciudad" placeholder="Tu ciudad" style="width:100%;padding:12px 16px;border:2px solid var(--borde);border-radius:10px;font-size:15px;font-family:'Nunito',sans-serif;outline:none">
-      </div>
+    </div>
+    <div class="form-group" style="margin:10px 0 0">
+      <label style="font-size:12px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Ciudad</label>
+      <input type="text" id="co-ciudad" placeholder="Tu ciudad" style="width:100%;padding:12px 16px;border:2px solid var(--borde);border-radius:10px;font-size:15px;font-family:'Nunito',sans-serif;outline:none">
     </div>
 
     <!-- Direcciones -->
@@ -2944,7 +3149,7 @@
 </div>
 
 <!-- MODAL editar boleta -->
-<div class="modal-overlay" id="modal-boleta">
+<div class="modal-overlay" id="modal-boleta" style="z-index:1100">
   <div class="modal">
     <div class="modal-header">
       <h3><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar boleta</h3>
@@ -3249,11 +3454,114 @@ async function migrarEstadoAbono() {
 }
 window.migrarEstadoAbono = migrarEstadoAbono;
 
-// ===== ESTADO GLOBAL =====
+// ===== MIGRACIÓN: boletas sin cuenta_id → cuentas_cliente =====
+async function migrarBoletasACuentas() {
+  const db = window._db, ref = window._ref, get = window._get, push = window._push, set = window._set, update = window._update;
+  if (!db) return;
+
+  const [boletasSnap, cuentasSnap] = await Promise.all([
+    get(ref(db, 'boletas')),
+    get(ref(db, 'cuentas_cliente'))
+  ]);
+  if (!boletasSnap.exists()) return;
+
+  const boletas = boletasSnap.val();
+  const cuentasExist = cuentasSnap.exists() ? cuentasSnap.val() : {};
+
+  // Boletas que ya tienen cuenta_id no se tocan
+  const sinCuenta = Object.entries(boletas).filter(([, b]) =>
+    !b.cuenta_id && b.estado !== 'libre' && b.comprador
+  );
+  if (!sinCuenta.length) return;
+
+  // Agrupar por comprador + telefono + vendedor_id (misma persona, misma venta aproximada)
+  const grupos = {};
+  sinCuenta.forEach(([key, b]) => {
+    const gk = (b.telefono || b.comprador || '').trim().toLowerCase() + '|' + (b.vendedor_id || '');
+    if (!grupos[gk]) grupos[gk] = [];
+    grupos[gk].push([key, b]);
+  });
+
+  const updates = {};
+  let migradas = 0;
+
+  for (const lista of Object.values(grupos)) {
+    // Verificar si ya existe una cuenta para este grupo
+    const primeraB = lista[0][1];
+    const yaExiste = Object.values(cuentasExist).find(c =>
+      (c.telefono || c.comprador || '').toLowerCase() === (primeraB.telefono || primeraB.comprador || '').trim().toLowerCase() &&
+      c.vendedor_id === (primeraB.vendedor_id || '')
+    );
+    if (yaExiste) continue; // ya migrado
+
+    // Calcular totales
+    const boleta_keys = lista.map(([k]) => k);
+    const total_cuenta = lista.reduce((s, [, b]) => s + (Number(b.monto_pagado) || 0), 0);
+    const estado = lista.every(([, b]) => b.estado === 'pagada') ? 'pagado' : 'abonado';
+
+    // Crear cuenta nueva
+    const cuentaRef = push(ref(db, 'cuentas_cliente'));
+    const cuentaKey = cuentaRef.key;
+
+    // Recopilar abonos existentes de todas las boletas del grupo
+    const abonosMigrados = {};
+    for (const [bk, b] of lista) {
+      if (b.abonos) {
+        Object.entries(b.abonos).forEach(([ak, a]) => {
+          abonosMigrados[ak] = { ...a, boleta_key: bk };
+        });
+      }
+    }
+
+    const cuentaData = {
+      comprador:      primeraB.comprador || '',
+      telefono:       primeraB.telefono  || '',
+      vendedor_id:    primeraB.vendedor_id || '',
+      ciudad:         primeraB.ciudad    || '',
+      dir_casa:       primeraB.dir_casa  || primeraB.direccion_casa || primeraB.direccion || '',
+      dir_trabajo:    primeraB.dir_trabajo || '',
+      tipo_entrega:   primeraB.tipo_entrega || 'casa',
+      fecha:          primeraB.fecha     || '',
+      fecha_ts:       primeraB.fecha_ts  || 0,
+      boleta_keys,
+      total_cuenta,
+      estado,
+      metodo_pago:    primeraB.metodo_pago || '',
+      observaciones:  primeraB.observaciones || '',
+      nota:           primeraB.nota || '',
+      migrado: true,
+      ...(Object.keys(abonosMigrados).length ? { abonos: abonosMigrados } : {})
+    };
+
+    updates['cuentas_cliente/' + cuentaKey] = cuentaData;
+
+    // Marcar cada boleta con su cuenta_id
+    boleta_keys.forEach(bk => {
+      updates['boletas/' + bk + '/cuenta_id'] = cuentaKey;
+    });
+
+    migradas += lista.length;
+  }
+
+  if (Object.keys(updates).length) {
+    await update(ref(db), updates);
+    console.log(`[Migración cuentas] ${migradas} boletas agrupadas en cuentas_cliente`);
+  }
+}
+window.migrarBoletasACuentas = migrarBoletasACuentas;
 let currentUser = null; // { rol, id, nombre, boletasAsignadas }
+
+// Helper: construye número WhatsApp sin duplicar el prefijo 57
+function _waNum(tel) {
+  const d = (tel || '').replace(/\D/g, '');
+  // Si empieza con 57 y tiene más de 10 dígitos (ej: 573123456789) → ya tiene prefijo
+  if (d.startsWith('57') && d.length > 10) return d;
+  return '57' + d;
+}
 let allBoletas = {};
 let allBoletasPlantilla = {}; // boletas de la tienda (plantilla)
 let allVendedores = {};
+let allCuentas = {}; // cuentas unificadas por cliente { cuentaKey: { comprador, telefono, boleta_keys, abonos, ... } }
 let comisionConfig = { tipo: 'porcentaje', valor: 0 }; // config global de comisión
 let metodoSeleccionado = 'efectivo';
 let filtroEstado = '';
@@ -3348,6 +3656,8 @@ function iniciarSesion() {
   cargarDatos();
   // Migrar boletas antiguas 'abono' → 'abonado' automáticamente (solo admin)
   if (currentUser.rol === 'admin') setTimeout(migrarEstadoAbono, 1500);
+  // Migrar boletas sin cuenta_id → crear cuentas_cliente agrupadas (solo admin)
+  if (currentUser.rol === 'admin') setTimeout(migrarBoletasACuentas, 3000);
 }
 
 function logout() {
@@ -3393,12 +3703,16 @@ function construirTabs() {
   abrirTab(tabs[0].id);
 }
 
-function abrirTab(id) {
+async function abrirTab(id) {
   // Advertir si hay cambios sin guardar en Distribuir
   const tabActiva = document.querySelector('.tab-panel.active');
   const esDistribuir = tabActiva && tabActiva.id === 'tab-distribuir';
   if (esDistribuir && id !== 'distribuir' && _distModificado) {
-    const confirmar = window.confirm('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#d69e2e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Tienes cambios sin guardar en Distribuir.\n\n¿Deseas cambiar de pestaña sin guardar?');
+    const confirmar = await sjConfirm(
+      'Cambios sin guardar',
+      '¿Deseas cambiar de pestaña sin guardar los cambios en Distribuir?',
+      { icon: '⚠️', iconClass: 'warning', okLabel: 'Sí, cambiar', okClass: 'amarillo' }
+    );
     if (!confirmar) return;
     _distModificado = false;
   }
@@ -3474,6 +3788,11 @@ function cargarDatos() {
     }
   });
 
+  onValue(ref(db, 'cuentas_cliente'), snap => {
+    allCuentas = snap.exists() ? snap.val() : {};
+    renderBoletas();
+  });
+
   if (currentUser.rol === 'admin') {
     onValue(ref(db, 'vendedores'), snap => {
       allVendedores = snap.exists() ? snap.val() : {};
@@ -3510,6 +3829,8 @@ function cargarDatos() {
     get(ref(db, 'config/tienda')).then(snap => {
       if (snap.exists()) {
         const c = snap.val();
+        // Poblar window.tiendaConfig para que abrirCuenta y otros lo usen
+        window.tiendaConfig = c;
         document.getElementById('cfg-tienda-nombre').value = c.nombre || '';
         document.getElementById('cfg-tienda-desc').value = c.descripcion || '';
         document.getElementById('cfg-tienda-precio').value = c.precio || '';
@@ -3628,13 +3949,13 @@ function renderBoletas() {
   if (filtroVendedorWrap) filtroVendedorWrap.style.display = (currentUser && currentUser.rol === 'admin') ? 'block' : 'none';
 
   const buscar = document.getElementById('buscar-boleta')?.value.toLowerCase() || '';
-  let lista = Object.entries(allBoletas);
 
+  // ── VENDEDOR: lógica original por boletas de plantilla ──
   if (currentUser.rol === 'vendedor') {
+    let lista = Object.entries(allBoletas);
     const asig = new Set((currentUser.boletasAsignadas || []).map(n => String(n).padStart(4,'0')));
     if (!asig.size) { lista = []; }
     else if (Object.keys(allBoletasPlantilla).length) {
-      // Filtrar por número de lotería (n1 del grupo) en lugar de idx
       lista = Object.entries(allBoletasPlantilla)
         .filter(([, bp]) => asig.has(String(bp.n1).padStart(4,'0')))
         .sort(([, a], [, b]) => (a.idx || 0) - (b.idx || 0))
@@ -3648,10 +3969,8 @@ function renderBoletas() {
             estado: venta ? venta.estado : 'libre',
             comprador: venta ? venta.comprador : ''
           }];
-          // nota: el enriquecimiento completo se hace en renderBoletasPagina
         });
     } else {
-      // Plantilla no cargada aun, cargar desde Firebase y re-render
       const db = window._db, ref = window._ref, get = window._get;
       if (db) {
         get(ref(db, 'boletas_plantilla')).then(snap => {
@@ -3670,25 +3989,53 @@ function renderBoletas() {
       }
       lista = [];
     }
+    if (filtroEstado) lista = lista.filter(([, b]) => b.estado === filtroEstado);
+    if (buscar) lista = lista.filter(([k, b]) =>
+      (b.numeros || '').includes(buscar) || (b.comprador || '').toLowerCase().includes(buscar) || k.includes(buscar)
+    );
+    boletasListaFiltrada = lista;
+    boletasPagActual = 1;
+    renderBoletasPagina();
+    return;
   }
 
-  // Filtro por vendedor para admin
-  if (currentUser.rol === 'admin') {
-    const fvId = document.getElementById('filtro-boletas-vendedor')?.value || '';
-    if (fvId) lista = lista.filter(([, b]) => b.vendedor_id === fvId);
-  }
-  if (filtroEstado) lista = lista.filter(([, b]) => b.estado === filtroEstado);
+  // ── ADMIN: vista por cuentas_cliente agrupadas ──
+  // Combinar cuentas con y sin cuenta_id (boletas huérfanas mostradas como pseudo-cuenta)
+  let cuentasList = Object.entries(allCuentas);
 
+  // Filtro por vendedor
+  const fvId = document.getElementById('filtro-boletas-vendedor')?.value || '';
+  if (fvId === '__oficina__') {
+    cuentasList = cuentasList.filter(([, c]) => !c.vendedor_id || c.vendedor_id === '');
+  } else if (fvId) {
+    cuentasList = cuentasList.filter(([, c]) => c.vendedor_id === fvId);
+  }
+
+  // Filtro por estado
+  if (filtroEstado) {
+    const mapEstado = { pagada: 'pagado', abonado: 'abonado', libre: 'pendiente' };
+    const estadoCuenta = mapEstado[filtroEstado] || filtroEstado;
+    cuentasList = cuentasList.filter(([, c]) => c.estado === estadoCuenta);
+  }
+
+  // Búsqueda
   if (buscar) {
-    lista = lista.filter(([k, b]) =>
-      (b.numeros || '').includes(buscar) ||
-      (b.comprador || '').toLowerCase().includes(buscar) ||
+    cuentasList = cuentasList.filter(([k, c]) =>
+      (c.comprador || '').toLowerCase().includes(buscar) ||
+      (c.telefono  || '').includes(buscar) ||
+      (c.boleta_keys || []).some(bk => {
+        const b = allBoletas[bk];
+        return b && (b.numeros || '').includes(buscar);
+      }) ||
       k.includes(buscar)
     );
   }
 
-  boletasListaFiltrada = lista;
-  boletasPagActual = 1; // resetear a página 1 al filtrar
+  // Ordenar: más recientes primero
+  cuentasList.sort(([, a], [, b]) => (b.fecha_ts || 0) - (a.fecha_ts || 0));
+
+  boletasListaFiltrada = cuentasList;
+  boletasPagActual = 1;
   renderBoletasPagina();
 }
 
@@ -3697,7 +4044,7 @@ function renderBoletasPagina() {
   const lista = boletasListaFiltrada;
 
   if (!lista.length) {
-    cont.innerHTML = '<div class="empty-state"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="2" x2="9" y2="22"/></svg></span><p>Sin resultados</p></div>';
+    cont.innerHTML = '<div class="empty-state"><span class="icon">🎫</span><p>Sin resultados</p></div>';
     return;
   }
 
@@ -3706,22 +4053,20 @@ function renderBoletasPagina() {
   const desde = (boletasPagActual - 1) * BOLETAS_POR_PAGINA;
   const pagina = lista.slice(desde, desde + BOLETAS_POR_PAGINA);
 
-  // Controles de paginación
   const paginador = totalPags > 1 ? `
     <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0 4px;border-top:1px solid var(--borde);margin-top:8px">
       <button onclick="boletasCambiarPag(${boletasPagActual - 1})"
-        style="padding:7px 14px;border:2px solid var(--borde);border-radius:8px;background:${boletasPagActual === 1 ? '#f4f8f4' : 'white'};font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:${boletasPagActual === 1 ? 'default' : 'pointer'};color:${boletasPagActual === 1 ? '#ccc' : 'var(--texto)'};"
-        ${boletasPagActual === 1 ? 'disabled' : ''}>← Ant</button>
+        style="padding:7px 14px;border:2px solid var(--borde);border-radius:8px;background:${boletasPagActual===1?'#f4f8f4':'white'};font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:${boletasPagActual===1?'default':'pointer'};color:${boletasPagActual===1?'#ccc':'var(--texto)'};"
+        ${boletasPagActual===1?'disabled':''}>← Ant</button>
       <span style="font-size:12px;font-weight:700;color:#718096">
-        Página ${boletasPagActual} de ${totalPags} &nbsp;·&nbsp; ${lista.length} boletas
+        Página ${boletasPagActual} de ${totalPags} &nbsp;·&nbsp; ${lista.length} cuentas
       </span>
       <button onclick="boletasCambiarPag(${boletasPagActual + 1})"
-        style="padding:7px 14px;border:2px solid var(--borde);border-radius:8px;background:${boletasPagActual === totalPags ? '#f4f8f4' : 'white'};font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:${boletasPagActual === totalPags ? 'default' : 'pointer'};color:${boletasPagActual === totalPags ? '#ccc' : 'var(--texto)'};"
-        ${boletasPagActual === totalPags ? 'disabled' : ''}>Sig →</button>
+        style="padding:7px 14px;border:2px solid var(--borde);border-radius:8px;background:${boletasPagActual===totalPags?'#f4f8f4':'white'};font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:${boletasPagActual===totalPags?'default':'pointer'};color:${boletasPagActual===totalPags?'#ccc':'var(--texto)'};"
+        ${boletasPagActual===totalPags?'disabled':''}>Sig →</button>
     </div>` : '';
 
-  
-  // Para vendedor: enriquecer boletas de plantilla con info de cliente y usar vdRenderBoletasTile
+  // ── VENDEDOR: flip cards originales ──
   if (currentUser.rol === 'vendedor') {
     const enriched = pagina.map(([k, b]) => {
       const nums = (b.numeros || '').split(',').map(n => n.trim()).filter(Boolean);
@@ -3735,9 +4080,9 @@ function renderBoletasPagina() {
         estadoVenta: b.estado || 'libre',
         _boletaKey: ventaKey || '',
         _comprador: venta ? venta.comprador : '',
-        _telefono: venta ? venta.telefono : '',
-        _fecha: venta ? venta.fecha : '',
-        _monto: venta ? venta.monto_pagado : 0,
+        _telefono:  venta ? venta.telefono  : '',
+        _fecha:     venta ? venta.fecha      : '',
+        _monto:     venta ? venta.monto_pagado : 0,
         _direccion: venta ? (venta.direccion_casa || venta.dir_casa || venta.direccion || '') : '',
         _entregada: venta ? (venta.entregada || false) : false,
         _fechaEntrega: venta ? (venta.fecha_entrega || '') : '',
@@ -3747,32 +4092,107 @@ function renderBoletasPagina() {
     return;
   }
 
-  // Admin: construir lista enriquecida para vdRenderBoletasTile (flip cards)
-  const enrichedAdmin = pagina.map(([k, b]) => {
-    const nums = (b.numeros || '').split(',').map(n => n.trim()).filter(Boolean);
-    // Buscar key de plantilla por n1
-    const bpEntry = Object.entries(allBoletasPlantilla).find(([, bp]) =>
-      String(bp.n1).padStart(4,'0') === String(nums[0] || '').padStart(4,'0')
-    );
-    const bp = bpEntry ? bpEntry[1] : null;
-    const bpKey = bpEntry ? bpEntry[0] : k;
-    return [bpKey, {
-      n1: nums[0]||null, n2: nums[1]||null, n3: nums[2]||null, n4: nums[3]||null,
-      ...(bp || {}),
-      estadoVenta: b.estado || 'libre',
-      _boletaKey: k,
-      _comprador: b.comprador || '',
-      _telefono: b.telefono || '',
-      _fecha: b.fecha || '',
-      _monto: b.monto_pagado || 0,
-      _direccion: b.direccion_casa || b.dir_casa || b.direccion || '',
-      _entregada: b.entregada || false,
-      _fechaEntrega: b.fecha_entrega || '',
-      _editKey: k,
-    }];
-  });
+  // ── ADMIN: tarjetas de cuenta unificada ──
+  const _cuentaCanvasData = [];
+  const html = pagina.map(([cuentaKey, c]) => {
+    const boletas = (c.boleta_keys || []).map(bk => allBoletas[bk]).filter(Boolean);
+    // Construir mini-cards por boleta (imagen + grid 2x2 de números)
+    const _cSlug = cuentaKey.replace(/[^a-z0-9]/gi,'').slice(-6);
+    let numeros = '';
+    if (boletas.length) {
+      const cards = boletas.map((b, bi) => {
+        const nums = (b.numeros || '').split(',').map(n => n.trim()).filter(Boolean);
+        if (!nums.length) return '';
+        const cvId = `cnt-${_cSlug}-${bi}`;
+        // Buscar imagen individual en allBoletasPlantilla por n1
+        const n1pad = String(nums[0] || '').padStart(4, '0');
+        const bpEntry = Object.values(allBoletasPlantilla).find(bp =>
+          String(bp.n1).padStart(4,'0') === n1pad
+        );
+        const anversoImg = bpEntry?.anverso_img || null;
+        let imgHTML = '';
+        if (anversoImg) {
+          imgHTML = '<img src="' + anversoImg + '" loading="lazy" style="width:100%;height:auto;display:block;border-radius:8px 8px 0 0">';
+        } else if (tiendaPlantilla) {
+          imgHTML = '<canvas id="' + cvId + '" style="width:100%;height:auto;display:block;border-radius:8px 8px 0 0"></canvas>';
+          _cuentaCanvasData.push({ cvId });
+        } else {
+          imgHTML = '<div style="width:100%;height:40px;display:flex;align-items:center;justify-content:center;background:var(--gris);border-radius:8px 8px 0 0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#a0aec0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="2" x2="9" y2="22"/></svg></div>';
+        }
+        const numsHTML = nums.map(function(n){ return '<span style="font-size:13px;font-weight:800;font-family:\'Bebas Neue\',cursive;letter-spacing:1px;color:var(--rojo);background:#fff5f5;border:1.5px solid #fecaca;border-radius:5px;padding:3px 4px;text-align:center">' + n + '</span>'; }).join('');
+        return '<div style="display:inline-flex;flex-direction:column;background:white;border:2px solid #e8f9eb;border-radius:10px;overflow:hidden;min-width:88px;max-width:130px;flex:1">' +
+          imgHTML +
+          '<div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:5px 6px">' + numsHTML + '</div>' +
+          '</div>';
+      }).join('');
+      numeros = `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px">${cards}</div>`;
+    } else {
+      numeros = `<div style="font-size:11px;color:#a0aec0;margin-bottom:6px">${(c.boleta_keys || []).length} boleta(s)</div>`;
+    }
+    const abonos  = c.abonos ? Object.values(c.abonos) : [];
+    const totalAbonado = abonos.reduce((s, a) => s + (Number(a.monto) || 0), 0);
+    const totalCuenta  = Number(c.total_cuenta) || 0;
 
-  cont.innerHTML = vdRenderBoletasTile(enrichedAdmin, 'libre') + paginador;
+    // Calcular precio total real si tenemos precio por boleta
+    const precioCfg = (window.tiendaConfig?.precio || '0').toString().replace(/[.,\s]/g,'');
+    const precioBoleta = Number(precioCfg) || 0;
+    const numBoletas = (c.boleta_keys || []).length;
+    const totalEsperado = precioBoleta ? precioBoleta * numBoletas : totalCuenta;
+    const saldo = Math.max(0, totalEsperado - totalAbonado - (c.estado === 'pagado' ? totalEsperado : 0));
+
+    const estadoColor = c.estado === 'pagado' ? '#276749' : c.estado === 'abonado' ? '#975a16' : '#718096';
+    const estadoBg    = c.estado === 'pagado' ? '#f0fff4' : c.estado === 'abonado' ? '#fffaf0' : '#f7fafc';
+    const estadoLabel = c.estado === 'pagado' ? '✅ Pagado' : c.estado === 'abonado' ? '⏳ Abonado' : '⬜ Pendiente';
+    const vendNombre  = allVendedores[c.vendedor_id]?.nombre || c.vendedor_id || 'Sin vendedor';
+
+    return `
+    <div style="background:white;border:1.5px solid var(--borde);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:box-shadow .15s"
+         onclick="abrirCuenta('${cuentaKey}')"
+         onmouseenter="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.10)'"
+         onmouseleave="this.style.boxShadow=''">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+            <span style="font-size:15px;font-weight:800;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px">${c.comprador || 'Sin nombre'}</span>
+            <span style="font-size:11px;font-weight:700;color:${estadoColor};background:${estadoBg};border-radius:20px;padding:2px 9px;border:1px solid ${estadoColor}40;white-space:nowrap">${estadoLabel}</span>
+          </div>
+          <div style="font-size:12px;color:#718096;margin-bottom:6px">${c.telefono ? (() => { const _tw = c.telefono; return `<a href="https://wa.me/${_waNum(_tw)}" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:3px;color:#25d366;text-decoration:none;font-weight:700"><svg width="12" height="12" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>${c.telefono}</a> &middot; `; })() : ''}<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:3px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${c.fecha || ''} &middot; <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:3px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ${vendNombre}</div>
+          ${numeros}
+          ${(c.ciudad || c.dir_casa || c.dir_trabajo) ? `<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:6px;background:#f8fafc;border-radius:8px;padding:7px 10px;border:1px solid var(--borde)">
+            ${c.ciudad ? `<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#4a5568"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#e53e3e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> <strong>${c.ciudad}</strong></div>` : ''}
+            ${c.dir_casa ? `<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#4a5568"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#718096" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> ${c.dir_casa}</div>` : ''}
+            ${c.dir_trabajo ? `<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#4a5568"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#718096" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> ${c.dir_trabajo}</div>` : ''}
+            ${c.tipo_entrega ? `<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#718096"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#718096" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg> Entrega: <strong>${c.tipo_entrega === 'trabajo' ? 'En trabajo' : 'En casa'}</strong></div>` : ''}
+          </div>` : ''}
+          ${c.nota ? `<div style="display:flex;align-items:flex-start;gap:5px;font-size:11px;color:#718096;background:#fffdf0;border:1px solid #fef3c7;border-radius:7px;padding:5px 10px;margin-bottom:6px"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> ${c.nota}</div>` : ''}
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span style="font-size:11px;font-weight:700;color:#276749;background:#f0fff4;border:1px solid #c6f6d5;border-radius:6px;padding:2px 8px">
+              Abonado: $${totalAbonado.toLocaleString('es-CO')}
+            </span>
+            ${saldo > 0 ? `<span style="font-size:11px;font-weight:700;color:#c53030;background:#fff5f5;border:1px solid #fed7d7;border-radius:6px;padding:2px 8px">Saldo: $${saldo.toLocaleString('es-CO')}</span>` : ''}
+            <span style="font-size:11px;font-weight:600;color:#a0aec0;background:#f7fafc;border:1px solid #e2e8f0;border-radius:6px;padding:2px 8px">${numBoletas} boleta${numBoletas !== 1 ? 's' : ''}</span>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#a0aec0;white-space:nowrap;padding-top:2px">›</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  cont.innerHTML = html + paginador;
+
+  // Dibujar canvas de plantilla en las minicards de cuenta
+  if (_cuentaCanvasData.length && tiendaPlantilla) {
+    requestAnimationFrame(() => {
+      const tp = tiendaPlantilla;
+      _cuentaCanvasData.forEach(({ cvId }) => {
+        const cv = document.getElementById(cvId);
+        if (!cv) return;
+        cv.width  = tp.img.naturalWidth  || tp.img.width  || 800;
+        cv.height = tp.img.naturalHeight || tp.img.height || 347;
+        cv.getContext('2d').drawImage(tp.img, 0, 0, cv.width, cv.height);
+      });
+    });
+  }
 }
 
 function boletasCambiarPag(pag) {
@@ -3946,39 +4366,70 @@ async function ejecutarConfirmarEntrega() {
   const precioPorBoleta = Number(precioStr.toString().replace(/[.,\s]/g, '')) || 0;
 
   const estadoBoleta = tipoPago === 'completo' ? 'pagada' : 'abonado';
-  const montoPagado = tipoPago === 'completo' ? precioPorBoleta : montoAbono;
-  const obsExtra = tipoPago === 'abono' ? ' · abono parcial $' + montoAbono.toLocaleString('es-CO') : '';
+  const montoPorBoleta = tipoPago === 'completo' ? precioPorBoleta : Math.floor(montoAbono / grupos.length);
+  const obsBase = 'Pedido desde tienda · entregado por vendedor' + (p.ciudad ? ' · ' + p.ciudad : '');
+
+  // Crear cuenta_cliente unificada para este pedido
+  const cuentaRef = push(ref(db, 'cuentas_cliente'));
+  const cuentaKey = cuentaRef.key;
+  const boletaKeys = [];
+  const batchUpdates = {};
 
   for (const grupo of grupos) {
     const numerosStr = grupo.join(', ');
-    const nueva = push(ref(db, 'boletas'));
-    const nuevaKey = nueva.key;
-    await set(nueva, {
-      numeros: numerosStr,
-      comprador: p.nombre || '',
-      telefono: p.telefono || '',
-      vendedor_id: currentUser.id,
-      estado: estadoBoleta,
-      monto_pagado: montoPagado,
-      metodo_pago: 'tienda',
-      observaciones: 'Pedido desde tienda · entregado por vendedor' + (p.ciudad ? ' · ' + p.ciudad : '') + obsExtra,
-      dir_casa: p.dir_casa || p.dir_entrega || '',
+    const nuevaRef = push(ref(db, 'boletas'));
+    const nuevaKey = nuevaRef.key;
+    boletaKeys.push(nuevaKey);
+
+    batchUpdates['boletas/' + nuevaKey] = {
+      numeros:       numerosStr,
+      comprador:     p.nombre    || '',
+      telefono:      p.telefono  || '',
+      vendedor_id:   currentUser.id,
+      estado:        estadoBoleta,
+      monto_pagado:  montoPorBoleta,
+      metodo_pago:   'tienda',
+      observaciones: obsBase,
+      dir_casa:      p.dir_casa  || p.dir_entrega || '',
+      ciudad:        p.ciudad    || '',
       fecha,
-      fecha_ts
-    });
-    // Si es abono, registrar en subcolección para que aparezca en historial
-    if (tipoPago === 'abono' && montoPagado > 0) {
-      const abonoRef = push(ref(db, 'boletas/' + nuevaKey + '/abonos'));
-      await set(abonoRef, {
-        monto: montoPagado,
-        metodo: 'tienda',
-        fecha,
-        fecha_ts
-      });
-    }
+      fecha_ts,
+      cuenta_id:     cuentaKey
+    };
   }
 
-  await update(ref(db, 'pedidos/' + id), { estado: 'entregado', fecha_entrega: fecha, tipo_pago_entrega: tipoPago });
+  // Datos de la cuenta unificada
+  const totalPagado = tipoPago === 'completo' ? precioPorBoleta * grupos.length : montoAbono;
+  const cuentaData = {
+    comprador:    p.nombre    || '',
+    telefono:     p.telefono  || '',
+    vendedor_id:  currentUser.id,
+    ciudad:       p.ciudad    || '',
+    dir_casa:     p.dir_casa  || p.dir_entrega || '',
+    fecha,
+    fecha_ts,
+    boleta_keys:  boletaKeys,
+    total_cuenta: totalPagado,
+    estado:       tipoPago === 'completo' ? 'pagado' : 'abonado',
+    metodo_pago:  'tienda',
+    observaciones: obsBase,
+    pedido_id:    id
+  };
+
+  // Si es abono, registrar en historial de la cuenta
+  if (tipoPago === 'abono' && montoAbono > 0) {
+    const abonoKey = push(ref(db, 'cuentas_cliente/' + cuentaKey + '/abonos')).key;
+    cuentaData.abonos = {
+      [abonoKey]: { monto: montoAbono, metodo: 'tienda', fecha, fecha_ts }
+    };
+  }
+
+  batchUpdates['cuentas_cliente/' + cuentaKey] = cuentaData;
+  batchUpdates['pedidos/' + id + '/estado'] = 'entregado';
+  batchUpdates['pedidos/' + id + '/fecha_entrega'] = fecha;
+  batchUpdates['pedidos/' + id + '/tipo_pago_entrega'] = tipoPago;
+
+  await update(ref(db), batchUpdates);
 
   // Actualizar estado local inmediatamente para que desaparezca sin esperar Firebase
   if (window._allPedidos && window._allPedidos[id]) {
@@ -4096,9 +4547,9 @@ function renderMisPedidos() {
 
     // ── WhatsApp ──
     const telLimpio = (p.telefono || '').replace(/\D/g, '');
-    const waNumeros = numsFlat.length ? `\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="2" x2="9" y2="22"/></svg> Boletas: ${numsFlat.join(', ')}` : '';
-    const waMensaje = encodeURIComponent(`Hola ${p.nombre||''}, tu pedido en Sorteos Jiménez está listo.${waNumeros}\n¿Confirmas el pago?`);
-    const waLink = telLimpio ? `https://wa.me/57${telLimpio}?text=${waMensaje}` : '';
+    const waNumeros = numsFlat.length ? `\n🎫 Boletas: ${numsFlat.join(', ')}` : '';
+    // waMensaje eliminado — WhatsApp sin mensaje de texto
+    const waLink = telLimpio ? `https://wa.me/${_waNum(telLimpio)}` : '';
     const waBtn = waLink
       ? `<a href="${waLink}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#25d366;color:white;font-size:13px;font-weight:800;padding:10px 18px;border-radius:10px;text-decoration:none;font-family:'Nunito',sans-serif;flex:1;justify-content:center">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
@@ -4221,21 +4672,60 @@ async function registrarVenta() {
     ? document.getElementById('venta-vendedor').value
     : currentUser.id;
 
-  const db = window._db, ref = window._ref, push = window._push, set = window._set;
-  const nuevaRef = push(ref(db, 'boletas'));
+  const db = window._db, ref = window._ref, push = window._push, set = window._set, update = window._update;
+  const fecha = new Date().toLocaleDateString('es-CO');
+  const fecha_ts = Date.now();
+  const montoNum = Number(monto);
 
-  await set(nuevaRef, {
+  // 1. Crear cuenta_cliente primero para obtener cuentaKey
+  const cuentaRef = push(ref(db, 'cuentas_cliente'));
+  const cuentaKey = cuentaRef.key;
+
+  // 2. Crear boleta con referencia a la cuenta
+  const boletaRef = push(ref(db, 'boletas'));
+  const boletaKey = boletaRef.key;
+
+  const boletaData = {
     numeros,
     comprador: nombre,
     telefono: tel,
     vendedor_id: vendedorId || '',
     estado,
-    monto_pagado: Number(monto),
+    monto_pagado: montoNum,
     metodo_pago: metodoSeleccionado,
     observaciones: obs,
-    fecha: new Date().toLocaleDateString('es-CO'),
-    fecha_ts: Date.now()
-  });
+    fecha,
+    fecha_ts,
+    cuenta_id: cuentaKey
+  };
+
+  // Estado de cuenta según estado de boleta
+  const estadoCuenta = estado === 'pagada' ? 'pagado' : (montoNum > 0 ? 'abonado' : 'pendiente');
+
+  const cuentaData = {
+    comprador:    nombre,
+    telefono:     tel,
+    vendedor_id:  vendedorId || '',
+    fecha,
+    fecha_ts,
+    boleta_keys:  [boletaKey],
+    total_cuenta: montoNum,
+    estado:       estadoCuenta,
+    metodo_pago:  metodoSeleccionado,
+    observaciones: obs
+  };
+
+  // Si hay abono, registrarlo en la cuenta
+  if (estado === 'abonado' && montoNum > 0) {
+    const abonoRef = push(ref(db, 'cuentas_cliente/' + cuentaKey + '/abonos'));
+    cuentaData.abonos = { [abonoRef.key]: { monto: montoNum, metodo: metodoSeleccionado, fecha, fecha_ts } };
+  }
+
+  // Escribir todo junto
+  const batch = {};
+  batch['boletas/' + boletaKey] = boletaData;
+  batch['cuentas_cliente/' + cuentaKey] = cuentaData;
+  await update(ref(db), batch);
 
   // limpiar
   ['n1','n2','n3','n4'].forEach(id => document.getElementById(id).value = '');
@@ -4246,9 +4736,922 @@ async function registrarVenta() {
   document.getElementById('venta-obs').value = '';
   document.getElementById('boleta-disponible').textContent = '';
 
-  toast('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Boleta registrada exitosamente', 'verde');
+  toast('✅ Boleta registrada — cuenta de cliente creada', 'verde');
   abrirTab(currentUser.rol === 'admin' ? 'boletas' : 'mis-ventas');
 }
+
+// ===== CUENTA CLIENTE UNIFICADA =====
+function abrirCuenta(cuentaKey) {
+  const c = allCuentas[cuentaKey];
+  if (!c) return;
+
+  const boletas = (c.boleta_keys || []).map(bk => ({ key: bk, ...(allBoletas[bk] || {}) })).filter(b => b.numeros);
+  const abonos  = c.abonos ? Object.entries(c.abonos).sort(([,a],[,b]) => (b.fecha_ts||0)-(a.fecha_ts||0)) : [];
+  const totalAbonado = abonos.reduce((s,[,a]) => s + (Number(a.monto)||0), 0);
+
+  // Precio: leer del input si tiendaConfig aún no tiene precio (por si cargó tarde)
+  const precioCfgRaw = (window.tiendaConfig?.precio || document.getElementById('cfg-tienda-precio')?.value || '0') + '';
+  const precioBoleta = Number(precioCfgRaw.replace(/[.,\s]/g,'')) || 0;
+  const numBoletas   = (c.boleta_keys||[]).length || boletas.length;
+  // Total esperado = precio unitario × número de boletas de esta cuenta
+  const totalEsperado = precioBoleta > 0 ? precioBoleta * numBoletas : 0;
+  const saldo = totalEsperado > 0 ? Math.max(0, totalEsperado - totalAbonado) : 0;
+
+  const vendNombre = allVendedores[c.vendedor_id]?.nombre || c.vendedor_id || 'Sin vendedor';
+  const _svgCheck  = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+  const _svgClock  = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+  const _svgCircle = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px"><circle cx="12" cy="12" r="10"/></svg>`;
+  const estadoLabel = c.estado==='pagado' ? `${_svgCheck} Pagado` : c.estado==='abonado' ? `${_svgClock} Abonado` : `${_svgCircle} Pendiente`;
+  const estadoBadgeBg = c.estado==='pagado' ? 'rgba(198,246,213,0.35)' : c.estado==='abonado' ? 'rgba(253,230,138,0.35)' : 'rgba(255,255,255,0.2)';
+
+  // ── Miniboletas estáticas (sin flip) con imagen + números + estado ──
+  const boletasHtml = boletas.length
+    ? `<div class="vd-flip-grid">${boletas.map(b => {
+        const nums = (b.numeros||'').split(',').map(n=>n.trim()).filter(Boolean);
+        const esPagada  = b.estado === 'pagada';
+        const esAbonado = b.estado === 'abonado';
+        const badgeColor = esPagada ? '#e74c3c' : esAbonado ? '#f39c12' : '#3ab54a';
+        const badgeLabel = esPagada ? 'Vendida' : esAbonado ? 'Abonado' : 'Disponible';
+        // Buscar imagen de plantilla por n1
+        const bpEntry = Object.entries(allBoletasPlantilla).find(([, bp]) =>
+          String(bp.n1).padStart(4,'0') === String(nums[0]||'').padStart(4,'0')
+        );
+        const bp = bpEntry ? bpEntry[1] : null;
+        const cvId = 'cuentacv-' + (b.key||Math.random().toString(36).slice(2));
+        const imgEl = bp?.anverso_img
+          ? `<img src="${bp.anverso_img}" loading="lazy" style="width:100%;height:auto;display:block;border-radius:10px 10px 0 0">`
+          : tiendaPlantilla
+            ? `<canvas id="${cvId}" width="800" height="347" style="width:100%;height:auto;display:block;border-radius:10px 10px 0 0"></canvas>`
+            : `<div style="width:100%;height:70px;background:var(--gris,#f4f8f4);border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:center;font-size:28px">🎫</div>`;
+        const numsHtml = nums.map(n => `<span class="vd-flip-num">${n}</span>`).join('');
+        return `
+          <div class="vd-flip-wrap">
+            <div style="border-radius:12px;overflow:hidden;border:2px solid ${esPagada?'#c6f6d5':esAbonado?'#fbd38d':'#e2e8f0'};position:relative">
+              ${imgEl}
+              <span class="vd-flip-badge" style="background:${badgeColor};color:white">${badgeLabel}</span>
+              <div class="vd-flip-nums">${numsHtml}</div>
+            </div>
+          </div>`;
+      }).join('')}</div>`
+    : '<p style="color:#a0aec0;font-size:13px;text-align:center;padding:8px">Sin boletas registradas</p>';
+
+  // Dibujar canvas tras render (solo para boletas sin anverso_img individual)
+  const _boletasParaDraw = boletas.map(b => {
+    const nums = (b.numeros||'').split(',').map(n=>n.trim()).filter(Boolean);
+    const n1pad = String(nums[0]||'').padStart(4,'0');
+    const bpEntry = Object.entries(allBoletasPlantilla).find(([, bp]) =>
+      String(bp.n1).padStart(4,'0') === n1pad
+    );
+    const hasImg = bpEntry?.[1]?.anverso_img || false;
+    return { key: b.key, hasImg };
+  });
+  setTimeout(() => {
+    if (!tiendaPlantilla) return;
+    const p = tiendaPlantilla;
+    const doDrawCuenta = () => {
+      _boletasParaDraw.forEach(({ key, hasImg }) => {
+        if (hasImg) return;
+        const cv = document.getElementById('cuentacv-' + key);
+        if (!cv) return;
+        cv.width  = p.img.naturalWidth  || p.img.width  || 800;
+        cv.height = p.img.naturalHeight || p.img.height || 347;
+        cv.getContext('2d').drawImage(p.img, 0, 0, cv.width, cv.height);
+      });
+    };
+    if (p.img.complete && p.img.naturalWidth > 0) { doDrawCuenta(); }
+    else { p.img.onload = doDrawCuenta; }
+  }, 80);
+
+  // Historial de abonos
+  const abonosHtml = abonos.length
+    ? abonos.map(([ak, a]) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f0f4f0">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;background:#f0fff4;border-radius:50%;display:flex;align-items:center;justify-content:center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#276749" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div>
+            <div style="font-size:14px;font-weight:800;color:#276749">+$${Number(a.monto||0).toLocaleString('es-CO')}</div>
+            <div style="font-size:11px;color:#a0aec0">${a.metodo||'efectivo'} · ${a.fecha||''}</div>
+          </div>
+        </div>
+        <button onclick="eliminarAbonoCuenta('${cuentaKey}','${ak}')"
+          style="background:#fff5f5;border:1px solid #fed7d7;border-radius:8px;cursor:pointer;color:#e53e3e;font-size:13px;padding:5px 10px;font-weight:700;display:flex;align-items:center;gap:4px">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#e53e3e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </button>
+      </div>`).join('')
+    : '<p style="color:#a0aec0;font-size:13px;text-align:center;padding:12px 0">Sin abonos registrados</p>';
+
+  const html = `
+  <div>
+    <!-- Encabezado verde cliente -->
+    <div style="background:linear-gradient(135deg,var(--primario,#2d6a4f),#1a5c2a);border-radius:16px;padding:18px 16px 14px;margin-bottom:16px;color:white">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px">
+        <div style="font-size:20px;font-weight:800;line-height:1.2">${c.comprador||'Sin nombre'}</div>
+        <button onclick="editarDatosCliente('${cuentaKey}')" style="flex-shrink:0;background:rgba(255,255,255,0.18);border:1.5px solid rgba(255,255,255,0.4);border-radius:10px;color:white;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;padding:6px 10px;cursor:pointer;display:inline-flex;align-items:center;gap:5px"><svg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7'/><path d='M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z'/></svg> Editar datos</button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
+        ${c.telefono ? (() => { const telW = c.telefono; return `<a href="https://wa.me/${_waNum(telW)}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;opacity:.95;color:white;text-decoration:none;background:rgba(37,211,102,0.25);border:1px solid rgba(37,211,102,0.5);border-radius:20px;padding:2px 9px"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> ${c.telefono}</a>`; })() : ''}
+        ${c.ciudad   ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;opacity:.9"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${c.ciudad}</span>` : ''}
+        <span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;opacity:.9"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ${vendNombre}</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;opacity:.9"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${c.fecha||''}</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span style="font-size:11px;font-weight:800;background:${estadoBadgeBg};border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:4px 12px">${estadoLabel}</span>
+        <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:4px 12px"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="2" x2="9" y2="22"/></svg> ${numBoletas} boleta${numBoletas!==1?'s':''}</span>
+        ${precioBoleta > 0 ? `<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:4px 12px"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> $${precioBoleta.toLocaleString('es-CO')} c/u</span>` : ''}
+      </div>
+    </div>
+
+    <!-- Resumen financiero -->
+    <div style="margin-bottom:18px">
+      ${totalEsperado > 0 ? `
+      <div style="background:#f8faff;border:1.5px solid #e2e8f0;border-radius:14px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:11px;font-weight:700;color:#a0aec0">TOTAL A PAGAR (${numBoletas} × $${precioBoleta.toLocaleString('es-CO')})</span>
+        <span style="font-size:14px;font-weight:800;color:#4a5568">$${totalEsperado.toLocaleString('es-CO')}</span>
+      </div>` : ''}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:#f0fff4;border:2px solid #c6f6d5;border-radius:14px;padding:14px;text-align:center">
+          <div style="font-size:10px;font-weight:800;color:#276749;letter-spacing:.5px;margin-bottom:4px">ABONADO</div>
+          <div style="font-size:22px;font-weight:800;color:#276749;line-height:1">$${totalAbonado.toLocaleString('es-CO')}</div>
+        </div>
+        <div style="background:${saldo>0?'#fff5f5':'#f0fff4'};border:2px solid ${saldo>0?'#fed7d7':'#c6f6d5'};border-radius:14px;padding:14px;text-align:center">
+          <div style="font-size:10px;font-weight:800;color:${saldo>0?'#c53030':'#276749'};letter-spacing:.5px;margin-bottom:4px">${saldo>0?'FALTA PAGAR':'✅ AL DÍA'}</div>
+          <div style="font-size:22px;font-weight:800;color:${saldo>0?'#c53030':'#276749'};line-height:1">${saldo>0?'$'+saldo.toLocaleString('es-CO'):'$0'}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Boletas (miniboletas flip) -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:11px;font-weight:800;color:#a0aec0;letter-spacing:.8px;margin-bottom:10px">BOLETAS</div>
+      ${boletasHtml}
+    </div>
+
+    <!-- Historial abonos -->
+    <div style="background:#fafafa;border:1.5px solid #e2e8f0;border-radius:14px;padding:14px;margin-bottom:14px">
+      <div style="font-size:11px;font-weight:800;color:#a0aec0;letter-spacing:.8px;margin-bottom:4px">HISTORIAL DE ABONOS</div>
+      ${abonosHtml}
+    </div>
+
+    <!-- Registrar abono — layout vertical para no desbordar -->
+    <div style="background:#f0f7ff;border:2px solid #bee3f8;border-radius:14px;padding:14px;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:800;color:#2b6cb0;margin-bottom:10px;display:flex;align-items:center;gap:6px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2b6cb0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> REGISTRAR ABONO</div>
+      <input id="cuenta-abono-monto" type="number" placeholder="Monto $" min="0"
+        style="width:100%;box-sizing:border-box;padding:12px 14px;border:2px solid #bee3f8;border-radius:10px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:700;outline:none;color:var(--dark,#1a202c);margin-bottom:8px">
+      <select id="cuenta-abono-metodo"
+        style="width:100%;box-sizing:border-box;padding:12px 14px;border:2px solid #bee3f8;border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;outline:none;background:white;color:var(--dark,#1a202c);margin-bottom:10px">
+        <option value="efectivo">Efectivo</option>
+        <option value="nequi">Nequi</option>
+        <option value="daviplata">Daviplata</option>
+        <option value="transferencia">Transferencia</option>
+      </select>
+      <button onclick="guardarAbonoCuenta('${cuentaKey}')"
+        style="width:100%;padding:13px;background:linear-gradient(135deg,#2b6cb0,#1a4a7a);color:white;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Guardar abono
+      </button>
+    </div>
+
+    <!-- Marcar pagada -->
+    ${c.estado !== 'pagado' ? `
+    <button onclick="marcarCuentaPagada('${cuentaKey}')"
+      style="width:100%;padding:13px;background:linear-gradient(135deg,#276749,#1a5c2a);color:white;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Marcar cuenta como PAGADA completa
+    </button>` : `
+    <div style="width:100%;padding:13px;background:#f0fff4;border:2px solid #c6f6d5;border-radius:12px;text-align:center;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;color:#276749;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#276749" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Cuenta pagada completa
+    </div>`}
+
+    <!-- Enviar boleta JPG -->
+    <button onclick="enviarBoletaJPG('${cuentaKey}')"
+      style="width:100%;padding:13px;background:linear-gradient(135deg,#6c3fc5,#9b59b6);color:white;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Enviar boletas 📲
+    </button>
+
+    <!-- Eliminar -->
+    <button onclick="eliminarCuenta('${cuentaKey}')"
+      style="width:100%;padding:11px;background:white;color:#e53e3e;border:1.5px solid #fed7d7;border-radius:12px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e53e3e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Eliminar esta cuenta
+    </button>
+  </div>`;
+
+  // Crear modal si no existe
+  let modal = document.getElementById('modal-cuenta-cliente');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'modal-cuenta-cliente';
+    modal.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:1000;overflow-y:auto;-webkit-overflow-scrolling:touch';
+    modal.innerHTML = `
+      <div style="min-height:100%;display:flex;align-items:flex-start;justify-content:center;padding:16px">
+        <div style="background:white;border-radius:20px;width:100%;max-width:480px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+          <div style="position:sticky;top:0;z-index:2;background:white;display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--borde,#e2e8f0)">
+            <span style="font-size:16px;font-weight:800;color:var(--dark,#1a202c)">Cuenta del cliente</span>
+            <button id="btn-cerrar-cuenta"
+              style="width:34px;height:34px;border-radius:50%;background:#f1f5f0;border:none;font-size:20px;cursor:pointer;color:#718096;display:flex;align-items:center;justify-content:center;line-height:1">
+              ×
+            </button>
+          </div>
+          <div id="modal-cuenta-body" style="padding:16px 20px 28px"></div>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+    // Cerrar con el botón X
+    document.getElementById('btn-cerrar-cuenta').addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+    // Cerrar al tocar el fondo
+    modal.addEventListener('click', e => {
+      if (e.target === modal) modal.style.display = 'none';
+    });
+  }
+
+  document.getElementById('modal-cuenta-body').innerHTML = html;
+  modal.style.display = 'block';
+  modal.scrollTop = 0;
+}
+
+function editarDatosCliente(cuentaKey) {
+  const c = allCuentas[cuentaKey];
+  if (!c) return;
+  const modal = document.getElementById('modal-cuenta-cliente');
+  const body  = document.getElementById('modal-cuenta-body');
+  body.innerHTML = `
+    <div style="margin-bottom:14px">
+      <div style="font-size:14px;font-weight:800;color:#718096;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Editar datos del cliente</div>
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" id="ec-nombre" value="${(c.comprador||'').replace(/"/g,'&quot;')}" placeholder="Nombre completo" style="width:100%;padding:10px 12px;border:1.5px solid var(--borde);border-radius:8px;font-family:'Nunito',sans-serif;font-size:14px;outline:none">
+      </div>
+      <div class="form-group">
+        <label>Teléfono</label>
+        <input type="tel" id="ec-telefono" value="${(c.telefono||'').replace(/"/g,'&quot;')}" placeholder="3XX XXX XXXX" style="width:100%;padding:10px 12px;border:1.5px solid var(--borde);border-radius:8px;font-family:'Nunito',sans-serif;font-size:14px;outline:none">
+      </div>
+      <div class="form-group">
+        <label>Ciudad</label>
+        <input type="text" id="ec-ciudad" value="${(c.ciudad||'').replace(/"/g,'&quot;')}" placeholder="Ciudad" style="width:100%;padding:10px 12px;border:1.5px solid var(--borde);border-radius:8px;font-family:'Nunito',sans-serif;font-size:14px;outline:none">
+      </div>
+      <div class="form-group">
+        <label>Dir. casa</label>
+        <input type="text" id="ec-dir-casa" value="${(c.dir_casa||'').replace(/"/g,'&quot;')}" placeholder="Cra 5 #12-34" style="width:100%;padding:10px 12px;border:1.5px solid var(--borde);border-radius:8px;font-family:'Nunito',sans-serif;font-size:14px;outline:none">
+      </div>
+      <div class="form-group">
+        <label>Dir. trabajo <span style="font-size:10px;color:#a0aec0;background:#f0f0f0;padding:1px 6px;border-radius:8px;margin-left:4px">Opcional</span></label>
+        <input type="text" id="ec-dir-trabajo" value="${(c.dir_trabajo||'').replace(/"/g,'&quot;')}" placeholder="Calle 10 #5-20" style="width:100%;padding:10px 12px;border:1.5px solid var(--borde);border-radius:8px;font-family:'Nunito',sans-serif;font-size:14px;outline:none">
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="guardarDatosCliente('${cuentaKey}')"
+        style="flex:1;padding:13px;background:linear-gradient(135deg,var(--verde),var(--azul-dark));color:white;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Guardar
+      </button>
+      <button onclick="abrirCuenta('${cuentaKey}')"
+        style="padding:13px 18px;background:white;color:#718096;border:1.5px solid var(--borde);border-radius:12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer">
+        Cancelar
+      </button>
+    </div>`;
+  modal.scrollTop = 0;
+}
+
+async function guardarDatosCliente(cuentaKey) {
+  const db = window._db, ref = window._ref, update = window._update;
+  const nombre    = document.getElementById('ec-nombre')?.value.trim() || '';
+  const telefono  = document.getElementById('ec-telefono')?.value.trim() || '';
+  const ciudad    = document.getElementById('ec-ciudad')?.value.trim() || '';
+  const dirCasa   = document.getElementById('ec-dir-casa')?.value.trim() || '';
+  const dirTrabajo= document.getElementById('ec-dir-trabajo')?.value.trim() || '';
+  if (!nombre) { toast('El nombre no puede estar vacío', 'rojo'); return; }
+  try {
+    const patch = { comprador: nombre, telefono, ciudad, dir_casa: dirCasa, dir_trabajo: dirTrabajo };
+    await update(ref(db, 'cuentas_cliente/' + cuentaKey), patch);
+    // Actualizar boletas vinculadas también
+    const c = allCuentas[cuentaKey] || {};
+    const batchUpd = {};
+    (c.boleta_keys || []).forEach(bk => {
+      batchUpd['boletas/' + bk + '/comprador'] = nombre;
+      batchUpd['boletas/' + bk + '/telefono']  = telefono;
+      batchUpd['boletas/' + bk + '/ciudad']    = ciudad;
+      batchUpd['boletas/' + bk + '/dir_casa']  = dirCasa;
+      batchUpd['boletas/' + bk + '/dir_trabajo'] = dirTrabajo;
+    });
+    if (Object.keys(batchUpd).length) await update(ref(db), batchUpd);
+    toast('✅ Datos del cliente actualizados', 'verde');
+    abrirCuenta(cuentaKey);
+  } catch(e) {
+    console.error(e);
+    toast('Error al guardar', 'rojo');
+  }
+}
+
+async function guardarAbonoCuenta(cuentaKey) {
+  const montoInput  = document.getElementById('cuenta-abono-monto');
+  const metodoInput = document.getElementById('cuenta-abono-metodo');
+  const monto  = Number(montoInput?.value || 0);
+  const metodo = metodoInput?.value || 'efectivo';
+  if (!monto || monto <= 0) { toast('Ingresa un monto válido', 'rojo'); return; }
+
+  const db = window._db, ref = window._ref, push = window._push, update = window._update, get = window._get;
+  const fecha = new Date().toLocaleDateString('es-CO');
+  const fecha_ts = Date.now();
+
+  // Registrar abono en la cuenta
+  const abonoRef = push(ref(db, 'cuentas_cliente/' + cuentaKey + '/abonos'));
+  const abonoKey = abonoRef.key;
+
+  const c = allCuentas[cuentaKey] || {};
+  const precioCfg = ((window.tiendaConfig?.precio || '0') + '').replace(/[.,\s]/g,'');
+  const precioBoleta = Number(precioCfg) || 0;
+  const numBoletas = (c.boleta_keys || []).length;
+  const totalEsperado = precioBoleta ? precioBoleta * numBoletas : (Number(c.total_cuenta)||0);
+
+  const abonosExist = c.abonos ? Object.values(c.abonos) : [];
+  const totalAbonado = abonosExist.reduce((s,a) => s + (Number(a.monto)||0), 0) + monto;
+  const nuevoEstado  = totalAbonado >= totalEsperado && totalEsperado > 0 ? 'pagado' : 'abonado';
+
+  const updates = {};
+  updates['cuentas_cliente/' + cuentaKey + '/abonos/' + abonoKey] = { monto, metodo, fecha, fecha_ts };
+  updates['cuentas_cliente/' + cuentaKey + '/total_cuenta'] = totalAbonado;
+  updates['cuentas_cliente/' + cuentaKey + '/estado'] = nuevoEstado;
+
+  // Actualizar estado en las boletas hijas
+  if (c.boleta_keys) {
+    const estadoBoleta = nuevoEstado === 'pagado' ? 'pagada' : 'abonado';
+    c.boleta_keys.forEach(bk => {
+      updates['boletas/' + bk + '/estado'] = estadoBoleta;
+      updates['boletas/' + bk + '/monto_pagado'] = Math.floor(totalAbonado / numBoletas);
+    });
+  }
+
+  await update(ref(db), updates);
+
+  if (montoInput) montoInput.value = '';
+  toast(`✅ Abono de $${monto.toLocaleString('es-CO')} registrado${nuevoEstado==='pagado' ? ' — cuenta pagada 🎉' : ''}`, 'verde');
+
+  // Reabrir el modal actualizado
+  setTimeout(() => abrirCuenta(cuentaKey), 400);
+}
+
+async function eliminarAbonoCuenta(cuentaKey, abonoKey) {
+  const ok = await sjConfirm('Eliminar abono', '¿Seguro que deseas eliminar este abono?', { icon: '🗑️', iconClass: 'danger', okLabel: 'Eliminar' });
+  if (!ok) return;
+
+  const db = window._db, ref = window._ref, update = window._update, remove = window._remove;
+  const c = allCuentas[cuentaKey] || {};
+  const abonosExist = c.abonos ? { ...c.abonos } : {};
+  delete abonosExist[abonoKey];
+
+  const totalAbonado = Object.values(abonosExist).reduce((s,a) => s + (Number(a.monto)||0), 0);
+  const precioCfg    = ((window.tiendaConfig?.precio || '0') + '').replace(/[.,\s]/g,'');
+  const precioBoleta = Number(precioCfg) || 0;
+  const numBoletas   = (c.boleta_keys || []).length;
+  const totalEsperado = precioBoleta ? precioBoleta * numBoletas : (Number(c.total_cuenta)||0);
+  const nuevoEstado   = totalAbonado >= totalEsperado && totalEsperado > 0 ? 'pagado' : totalAbonado > 0 ? 'abonado' : 'pendiente';
+
+  const updates = {};
+  updates['cuentas_cliente/' + cuentaKey + '/abonos/' + abonoKey] = null;
+  updates['cuentas_cliente/' + cuentaKey + '/total_cuenta'] = totalAbonado;
+  updates['cuentas_cliente/' + cuentaKey + '/estado'] = nuevoEstado;
+  if (c.boleta_keys) {
+    const estadoBoleta = nuevoEstado === 'pagado' ? 'pagada' : nuevoEstado === 'abonado' ? 'abonado' : 'libre';
+    c.boleta_keys.forEach(bk => { updates['boletas/' + bk + '/estado'] = estadoBoleta; });
+  }
+
+  await update(ref(db), updates);
+  toast('Abono eliminado', 'rojo');
+  setTimeout(() => abrirCuenta(cuentaKey), 400);
+}
+
+async function marcarCuentaPagada(cuentaKey) {
+  const ok = await sjConfirm('Marcar como pagada', '¿Confirmar que esta cuenta fue pagada en su totalidad?', { icon: '✅', iconClass: 'info', okLabel: 'Confirmar', okClass: 'verde' });
+  if (!ok) return;
+
+  const db = window._db, ref = window._ref, update = window._update;
+  const c = allCuentas[cuentaKey] || {};
+  const precioCfg = ((window.tiendaConfig?.precio || '0') + '').replace(/[.,\s]/g,'');
+  const precioBoleta = Number(precioCfg) || 0;
+  const numBoletas   = (c.boleta_keys || []).length;
+  const totalEsperado = precioBoleta ? precioBoleta * numBoletas : (Number(c.total_cuenta)||0);
+
+  const updates = {};
+  updates['cuentas_cliente/' + cuentaKey + '/estado'] = 'pagado';
+  updates['cuentas_cliente/' + cuentaKey + '/total_cuenta'] = totalEsperado;
+  if (c.boleta_keys) c.boleta_keys.forEach(bk => { updates['boletas/' + bk + '/estado'] = 'pagada'; });
+
+  await update(ref(db), updates);
+  toast('✅ Cuenta marcada como pagada', 'verde');
+  setTimeout(() => abrirCuenta(cuentaKey), 400);
+}
+
+async function eliminarCuenta(cuentaKey) {
+  const ok = await sjConfirm('Eliminar cuenta', 'Se eliminará la cuenta y todas sus boletas asociadas. Esta acción no se puede deshacer.', { icon: '🗑️', iconClass: 'danger', okLabel: 'Eliminar' });
+  if (!ok) return;
+
+  const db = window._db, ref = window._ref, update = window._update;
+  const c = allCuentas[cuentaKey] || {};
+  const updates = {};
+  updates['cuentas_cliente/' + cuentaKey] = null;
+  if (c.boleta_keys) c.boleta_keys.forEach(bk => { updates['boletas/' + bk] = null; });
+
+  await update(ref(db), updates);
+  cerrarModal('modal-cuenta-cliente');
+  toast('Cuenta eliminada', 'rojo');
+}
+
+// ===== ENVIAR BOLETAS JPG AL CLIENTE =====
+async function enviarBoletaJPG(cuentaKey) {
+  const c = allCuentas[cuentaKey];
+  if (!c) return;
+
+  const boletas = (c.boleta_keys || []).map(bk => {
+    const b = allBoletas[bk];
+    if (b) b.key = bk;
+    return b;
+  }).filter(Boolean);
+  if (!boletas.length) { toast('Sin boletas para enviar', 'rojo'); return; }
+
+  const nombre    = c.comprador || 'Cliente';
+  const telLimpio = (c.telefono || '').replace(/\D/g, '');
+  const waLink    = telLimpio ? `https://wa.me/${_waNum(telLimpio)}` : '';
+
+  // ── Extraer dataURL de la imagen ya renderizada en el DOM ──
+  // Prioridad: canvas cuentacv-{key} → img con anverso_img → plantilla global → degradado
+  function extraerDataURL(b) {
+    return new Promise(resolve => {
+      const nums = (b.numeros || '').split(',').map(n => n.trim()).filter(Boolean);
+
+      // Superpone los números sobre el canvas ya dibujado
+      function superponerNums(cv) {
+        const ctx = cv.getContext('2d');
+        const W = cv.width, H = cv.height;
+        if (!nums.length) return;
+
+        // Calcular tamaño y posición automática para 4 números en fila horizontal
+        const fontSize = Math.round(H * 0.16);
+        const boxW = Math.round(W * 0.14);
+        const boxH = Math.round(fontSize * 1.5);
+        const gap = Math.round(W * 0.025);
+        const totalW = nums.length * boxW + (nums.length - 1) * gap;
+        let startX = Math.round((W - totalW) / 2);
+        const startY = Math.round(H * 0.76);
+
+        ctx.save();
+        nums.forEach((num, i) => {
+          const x = startX + i * (boxW + gap);
+          const y = startY;
+          // Fondo blanco con borde rojo
+          ctx.fillStyle = 'rgba(255,255,255,0.92)';
+          ctx.strokeStyle = '#e74c3c';
+          ctx.lineWidth = Math.max(2, Math.round(H * 0.008));
+          const r = Math.round(boxH * 0.18);
+          ctx.beginPath();
+          ctx.moveTo(x + r, y); ctx.lineTo(x + boxW - r, y);
+          ctx.arcTo(x + boxW, y, x + boxW, y + r, r);
+          ctx.lineTo(x + boxW, y + boxH - r);
+          ctx.arcTo(x + boxW, y + boxH, x + boxW - r, y + boxH, r);
+          ctx.lineTo(x + r, y + boxH);
+          ctx.arcTo(x, y + boxH, x, y + boxH - r, r);
+          ctx.lineTo(x, y + r);
+          ctx.arcTo(x, y, x + r, y, r);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          // Número en rojo
+          ctx.fillStyle = '#e74c3c';
+          ctx.font = `bold ${fontSize}px "Bebas Neue", Arial, sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(String(num).padStart(4, '0'), x + boxW / 2, y + boxH / 2);
+        });
+        ctx.restore();
+      }
+
+      // 1. Canvas ya pintado en el modal → copiar y superponer números
+      const cvDom = document.getElementById('cuentacv-' + b.key);
+      if (cvDom && cvDom.tagName === 'CANVAS' && cvDom.width > 0) {
+        try {
+          const cv2 = document.createElement('canvas');
+          cv2.width = cvDom.width; cv2.height = cvDom.height;
+          cv2.getContext('2d').drawImage(cvDom, 0, 0);
+          superponerNums(cv2);
+          resolve(cv2.toDataURL('image/jpeg', 0.93));
+          return;
+        } catch(e) { /* cross-origin fallback */ }
+      }
+
+      // 2. anverso_img individual de la boleta en plantilla
+      const n1pad = String(nums[0] || '').padStart(4, '0');
+      const bpEntry = Object.entries(allBoletasPlantilla || {}).find(([, bp]) =>
+        String(bp.n1).padStart(4, '0') === n1pad
+      );
+      const srcImg = bpEntry?.[1]?.anverso_img || null;
+
+      const drawOnCanvas = (srcElement) => {
+        const W = srcElement.naturalWidth  || srcElement.width  || 800;
+        const H = srcElement.naturalHeight || srcElement.height || 347;
+        const cv  = document.createElement('canvas');
+        cv.width  = W; cv.height = H;
+        cv.getContext('2d').drawImage(srcElement, 0, 0, W, H);
+        superponerNums(cv);
+        resolve(cv.toDataURL('image/jpeg', 0.93));
+      };
+
+      if (srcImg) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload  = () => drawOnCanvas(img);
+        img.onerror = () => drawFromPlantilla();
+        img.src = srcImg;
+        return;
+      }
+
+      drawFromPlantilla();
+
+      function drawFromPlantilla() {
+        // 3. Plantilla global tiendaPlantilla
+        if (tiendaPlantilla && tiendaPlantilla.img) {
+          const p = tiendaPlantilla.img;
+          const doIt = () => drawOnCanvas(p);
+          if (p.complete) { doIt(); } else { p.onload = doIt; }
+          return;
+        }
+        // 4. Sin imagen: degradado de marca + números centrados
+        const W = 800, H = 347;
+        const cv = document.createElement('canvas');
+        cv.width = W; cv.height = H;
+        const ctx = cv.getContext('2d');
+        const grad = ctx.createLinearGradient(0, 0, W, H);
+        grad.addColorStop(0, '#1a7a28');
+        grad.addColorStop(1, '#7a0d40');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = 'rgba(255,255,255,0.1)';
+        ctx.font = 'bold 140px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🎫', W / 2, H * 0.45);
+        superponerNums(cv);
+        resolve(cv.toDataURL('image/jpeg', 0.93));
+      }
+    });
+  }
+
+  // ── Modal ──
+  let modal = document.getElementById('modal-enviar-jpg');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'modal-enviar-jpg';
+    modal.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:2000;overflow-y:auto;-webkit-overflow-scrolling:touch';
+    modal.innerHTML = `
+      <div style="min-height:100%;display:flex;align-items:flex-end;justify-content:center">
+        <div style="background:white;border-radius:20px 20px 0 0;width:100%;max-width:500px;padding:20px 18px 36px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <span style="font-size:16px;font-weight:800;color:#1a202c">📲 Enviar boletas</span>
+            <button onclick="document.getElementById('modal-enviar-jpg').style.display='none'"
+              style="width:32px;height:32px;border-radius:50%;background:#f1f5f0;border:none;font-size:20px;cursor:pointer;color:#718096;display:flex;align-items:center;justify-content:center">×</button>
+          </div>
+          <div id="enviar-jpg-body"></div>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e => { if (e.target === modal) modal.style.display = 'none'; });
+  }
+
+  const body = document.getElementById('enviar-jpg-body');
+  body.innerHTML = '<div style="text-align:center;padding:28px 0;color:#a0aec0;font-size:14px">⏳ Preparando imágenes…</div>';
+  modal.style.display = 'block';
+
+  // ── Generar dataURLs ──
+  const jpgs = [];
+  for (const b of boletas) {
+    const dataUrl = await extraerDataURL(b);
+    const nums = (b.numeros || '').split(',').map(n => n.trim()).filter(Boolean);
+    jpgs.push({ dataUrl, nums, key: b.key });
+  }
+
+  const nombreSlug = nombre.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+
+  // ── Convertir dataURLs a File objects para Web Share API ──
+  function dataURLtoFile(dataUrl, filename) {
+    const arr = dataUrl.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) u8arr[n] = bstr.charCodeAt(n);
+    return new File([u8arr], filename, { type: mime });
+  }
+
+  const canShare = typeof navigator.share === 'function' && typeof navigator.canShare === 'function';
+  const shareFiles = jpgs.map(({ dataUrl }, i) =>
+    dataURLtoFile(dataUrl, `boleta_${nombreSlug}_${i + 1}.jpg`)
+  );
+  const canShareFiles = canShare && navigator.canShare({ files: shareFiles });
+
+  const previewsHtml = jpgs.map(({ dataUrl, nums, key }, i) => `
+    <div style="margin-bottom:14px;border:1.5px solid #e2e8f0;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+      <img src="${dataUrl}" style="width:100%;display:block">
+      <div style="padding:10px 12px;background:#f8fafc;display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <span style="font-size:12px;font-weight:700;color:#718096">
+          ${nums.map(n => `<span style="background:#fff5f5;border:1.5px solid #fecaca;border-radius:5px;padding:2px 7px;color:#e74c3c;font-family:'Bebas Neue',cursive;font-size:15px;letter-spacing:1px">${n}</span>`).join(' ')}
+        </span>
+        <a href="${dataUrl}" download="boleta_${nombreSlug}_${i + 1}.jpg"
+          style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;background:#6c3fc5;color:white;text-decoration:none;border-radius:9px;padding:9px 14px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;white-space:nowrap">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Guardar${jpgs.length > 1 ? ' ' + (i + 1) : ''}
+        </a>
+      </div>
+    </div>`).join('');
+
+  // Pre-construir array de dataURLs para pasarlo al PDF
+  const anversoDataURLs = jpgs.map(j => j.dataUrl);
+
+  body.innerHTML = `
+    ${previewsHtml}
+    <div style="margin-top:6px;display:flex;flex-direction:column;gap:10px">
+      <button id="btn-gen-pdf"
+        style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#e53e3e;color:white;border:none;border-radius:14px;padding:15px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(229,62,62,0.35)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        📄 Descargar PDF con reverso
+      </button>
+      ${canShareFiles
+        ? `<button id="btn-share-wa"
+            style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#25d366;color:white;border:none;border-radius:14px;padding:15px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(37,211,102,0.35)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            📎 Compartir imagen${jpgs.length > 1 ? 's' : ''} a WhatsApp
+          </button>`
+        : ''
+      }
+      ${waLink
+        ? `<a href="${waLink}" target="_blank"
+            style="display:flex;align-items:center;justify-content:center;gap:10px;background:${canShareFiles ? '#128C7E' : '#25d366'};color:white;text-decoration:none;border-radius:14px;padding:15px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;box-shadow:0 4px 14px rgba(37,211,102,0.3)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            💬 Abrir chat de ${nombre}
+          </a>`
+        : `<div style="text-align:center;background:#f8fafc;border-radius:10px;padding:12px;font-size:12px;color:#a0aec0">Sin número de teléfono registrado</div>`
+      }
+      ${canShareFiles && waLink
+        ? `<p style="font-size:11px;color:#a0aec0;text-align:center;margin-top:2px">① Toca "Compartir imagen" → elige WhatsApp → selecciona al cliente<br>② O toca "Abrir chat" para ir directo al chat</p>`
+        : waLink
+          ? `<p style="font-size:11px;color:#a0aec0;text-align:center;margin-top:2px">Guarda las imágenes → abre el chat → adjúntalas</p>`
+          : ''
+      }
+    </div>`;
+
+  // ── Listener botón PDF ──
+  document.getElementById('btn-gen-pdf').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-gen-pdf');
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Generando PDF…'; }
+    try {
+      await generarPDFBoletas(boletas, c, anversoDataURLs);
+    } catch(e) {
+      toast('Error al generar PDF: ' + e.message, 'rojo');
+    } finally {
+      if (btn) { btn.disabled = false; btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> 📄 Descargar PDF con reverso'; }
+    }
+  });
+
+  // ── Listener del botón Share (necesita gesto del usuario) ──
+  if (canShareFiles) {
+    const btnShare = document.getElementById('btn-share-wa');
+    if (btnShare) {
+      btnShare.addEventListener('click', async () => {
+        try {
+          await navigator.share({ files: shareFiles });
+        } catch (e) {
+          if (e.name !== 'AbortError') {
+            if (waLink) window.open(waLink, '_blank');
+          }
+        }
+      });
+    }
+  }
+}
+
+// ===== GENERAR PDF DE BOLETAS =====
+async function generarPDFBoletas(boletas, cuenta, anversoDataURLs) {
+  // Cargar jsPDF dinámicamente si no está disponible
+  if (!window.jspdf) {
+    await new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+      s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+  const { jsPDF } = window.jspdf;
+
+  const anv = window._anv || {};
+  const nombre    = cuenta.comprador || 'Cliente';
+  const telefono  = cuenta.telefono  || '—';
+  const vendedor  = cuenta.vendedor_nombre || '';
+
+  // Página tamaño carta horizontal: 279.4 × 215.9 mm
+  // Cada boleta ocupa media página (anverso arriba, reverso abajo)
+  // Cabemos 1 boleta por página con espacio cómodo para leer
+  const PW = 279.4, PH = 215.9; // mm
+  const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'letter' });
+
+  // Paleta
+  const VERDE  = [42, 140, 56];
+  const ROJO   = [231, 76, 60];
+  const DARK   = [26, 46, 28];
+  const GRIS   = [244, 248, 244];
+  const NEGRO  = [30, 30, 30];
+  const BLANCO = [255, 255, 255];
+
+  function hex(r,g,b) { return [r,g,b]; }
+
+  boletas.forEach((b, idx) => {
+    if (idx > 0) pdf.addPage();
+
+    const nums = (b.numeros || '').split(',').map(n => n.trim()).filter(Boolean);
+    const [n1, n2, n3, n4] = nums;
+    const dataUrl = anversoDataURLs[idx];
+
+    // ── ANVERSO: imagen de la boleta (mitad superior) ──
+    const anvH = PH * 0.48; // 48% de la altura
+    const anvY = 6;
+    if (dataUrl) {
+      pdf.addImage(dataUrl, 'JPEG', 6, anvY, PW - 12, anvH, '', 'FAST');
+    } else {
+      // Fallback sin imagen: degradado simulado con rectángulo verde
+      pdf.setFillColor(...VERDE);
+      pdf.roundedRect(6, anvY, PW - 12, anvH, 4, 4, 'F');
+      pdf.setFontSize(14);
+      pdf.setTextColor(...BLANCO);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('SORTEOS JIMÉNEZ', PW / 2, anvY + anvH / 2, { align: 'center' });
+    }
+
+    // ── REVERSO: información del cliente (mitad inferior) ──
+    const revY = anvY + anvH + 4;
+    const revH = PH - revY - 4;
+    const revX = 6;
+    const revW = PW - 12;
+
+    // Fondo blanco con borde
+    pdf.setFillColor(...BLANCO);
+    pdf.setDrawColor(200, 220, 202);
+    pdf.setLineWidth(0.5);
+    pdf.roundedRect(revX, revY, revW, revH, 3, 3, 'FD');
+
+    // Franja verde izquierda con "REVERSO"
+    pdf.setFillColor(...VERDE);
+    pdf.roundedRect(revX, revY, 18, revH, 3, 3, 'F');
+    pdf.setFillColor(...VERDE); // tapar borde derecho redondeado
+    pdf.rect(revX + 12, revY, 6, revH, 'F');
+    pdf.setFontSize(6);
+    pdf.setTextColor(...BLANCO);
+    pdf.setFont('helvetica', 'bold');
+    // Texto vertical "REVERSO"
+    pdf.saveGraphicsState();
+    pdf.text('REVERSO / BOLETA DEL CLIENTE', revX + 9, revY + revH - 4, { angle: 90 });
+    pdf.restoreGraphicsState();
+
+    const cx = revX + 22; // inicio contenido después de franja
+    const cw = revW - 24;
+    const cy = revY + 4;
+
+    // ── Columna izquierda: premios ──
+    const colW = cw * 0.52;
+    pdf.setFontSize(7);
+    pdf.setTextColor(...DARK);
+    pdf.setFont('helvetica', 'bold');
+
+    // Números arriba izq
+    pdf.setFontSize(8);
+    pdf.setTextColor(...ROJO);
+    nums.forEach((n, i) => {
+      const nx = cx + i * 22;
+      pdf.setFillColor(255, 245, 245);
+      pdf.setDrawColor(...ROJO);
+      pdf.setLineWidth(0.4);
+      pdf.roundedRect(nx, cy, 18, 7, 1.5, 1.5, 'FD');
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(String(n).padStart(4,'0'), nx + 9, cy + 5, { align: 'center' });
+    });
+
+    let py = cy + 11;
+
+    // Premio anticipado
+    pdf.setFillColor(248, 252, 248);
+    pdf.setDrawColor(180, 210, 180);
+    pdf.setLineWidth(0.4);
+    const antH = 22;
+    pdf.roundedRect(cx, py, colW, antH, 2, 2, 'FD');
+    pdf.setFontSize(5.5);
+    pdf.setTextColor(100, 100, 100);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('ANTICIPADO:', cx + 3, py + 5);
+    pdf.setFontSize(8);
+    pdf.setTextColor(...DARK);
+    pdf.text(anv.antNombre || 'AKT SPECIAL 110', cx + 3, py + 10);
+    pdf.setFontSize(6);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(anv.antModelo || 'MODELO 2027', cx + 3, py + 14.5);
+    pdf.setFontSize(5);
+    pdf.setTextColor(80, 80, 80);
+    pdf.setFont('helvetica', 'normal');
+    const antDets = [anv.antDet1||'', anv.antDet2||'', anv.antDet3||''].filter(Boolean);
+    antDets.forEach((d, i) => pdf.text(d, cx + 3, py + 17 + i * 3.5));
+
+    py += antH + 3;
+
+    // Premio mayor
+    pdf.setFillColor(248, 252, 248);
+    pdf.setDrawColor(180, 210, 180);
+    const mayH = 22;
+    pdf.roundedRect(cx, py, colW, mayH, 2, 2, 'FD');
+    pdf.setFontSize(5.5);
+    pdf.setTextColor(100, 100, 100);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('PREMIO MAYOR:', cx + 3, py + 5);
+    pdf.setFontSize(8);
+    pdf.setTextColor(...DARK);
+    pdf.text(anv.mayNombre || 'PICANTO VIBRANT', cx + 3, py + 10);
+    pdf.setFontSize(6);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(anv.mayModelo || 'MODELO 2027', cx + 3, py + 14.5);
+    pdf.setFontSize(5);
+    pdf.setTextColor(80, 80, 80);
+    pdf.setFont('helvetica', 'normal');
+    const mayDets = [anv.mayDet1||'', anv.mayDet2||'', anv.mayDet3||''].filter(Boolean);
+    mayDets.forEach((d, i) => pdf.text(d, cx + 3, py + 17 + i * 3.5));
+
+    // ── Columna derecha: datos del cliente ──
+    const dercX = cx + colW + 6;
+    const dercW = cw - colW - 6;
+    let dy = cy;
+
+    // Título "DATOS DEL COMPRADOR"
+    pdf.setFillColor(...VERDE);
+    pdf.roundedRect(dercX, dy, dercW, 8, 2, 2, 'F');
+    pdf.setFontSize(6.5);
+    pdf.setTextColor(...BLANCO);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('DATOS DEL COMPRADOR', dercX + dercW / 2, dy + 5.5, { align: 'center' });
+    dy += 11;
+
+    // Filas de datos
+    const filas = [
+      { label: 'NOMBRE', valor: nombre },
+      { label: 'TELÉFONO', valor: telefono },
+      { label: 'ABONO', valor: (() => {
+        const abonosArr = cuenta.abonos ? Object.values(cuenta.abonos) : [];
+        const total = abonosArr.reduce((s,a) => s + (Number(a.monto)||0), 0);
+        return total > 0 ? '$' + total.toLocaleString('es-CO') : '—';
+      })() },
+      { label: 'ESTADO', valor: (cuenta.estado === 'pagado' ? '✓ PAGADO' : cuenta.estado === 'abonado' ? '⬤ ABONADO' : 'PENDIENTE') },
+    ];
+    if (vendedor) filas.push({ label: 'VENDEDOR', valor: vendedor });
+
+    filas.forEach(({ label, valor }) => {
+      pdf.setFillColor(...GRIS);
+      pdf.setDrawColor(210, 230, 212);
+      pdf.setLineWidth(0.3);
+      pdf.roundedRect(dercX, dy, dercW, 9, 1.5, 1.5, 'FD');
+      pdf.setFontSize(5.5);
+      pdf.setTextColor(100, 100, 100);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(label + ':', dercX + 3, dy + 4);
+      pdf.setFontSize(7);
+      pdf.setTextColor(...NEGRO);
+      pdf.setFont('helvetica', 'bold');
+      // Truncar si es muy largo
+      const maxW = dercW - 6;
+      let txt = valor;
+      while (pdf.getTextWidth(txt) > maxW && txt.length > 1) txt = txt.slice(0, -1);
+      pdf.text(txt, dercX + 3, dy + 7.5);
+      dy += 11;
+    });
+
+    // Números abajo derecha
+    dy += 2;
+    pdf.setFontSize(8);
+    pdf.setTextColor(...ROJO);
+    nums.forEach((n, i) => {
+      const nx = dercX + i * 22;
+      if (nx + 18 > dercX + dercW) return;
+      pdf.setFillColor(255, 245, 245);
+      pdf.setDrawColor(...ROJO);
+      pdf.setLineWidth(0.4);
+      pdf.roundedRect(nx, dy, 18, 7, 1.5, 1.5, 'FD');
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(String(n).padStart(4,'0'), nx + 9, dy + 5, { align: 'center' });
+    });
+  });
+
+  // Descargar el PDF
+  const nombreSlug = nombre.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+  pdf.save(`boletas_${nombreSlug}.pdf`);
+}
+
+window.abrirCuenta = abrirCuenta;
+window.guardarAbonoCuenta = guardarAbonoCuenta;
+window.eliminarAbonoCuenta = eliminarAbonoCuenta;
+window.marcarCuentaPagada = marcarCuentaPagada;
+window.eliminarCuenta = eliminarCuenta;
+window.enviarBoletaJPG = enviarBoletaJPG;
+window.generarPDFBoletas = generarPDFBoletas;
 
 // ===== EDITAR BOLETA (admin) =====
 function abrirEditar(key) {
@@ -4442,7 +5845,8 @@ async function agregarAbono(key) {
 }
 
 async function eliminarAbono(key, abonoKey) {
-  if (!confirm('¿Eliminar este abono?')) return;
+  const ok = await sjConfirm('Eliminar abono', '¿Seguro que deseas eliminar este abono? Esta acción no se puede deshacer.', { icon: '🗑️', iconClass: 'danger', okLabel: 'Eliminar' });
+  if (!ok) return;
   const db = window._db, ref = window._ref, update = window._update, get = window._get;
   await window._remove(ref(db, 'boletas/' + key + '/abonos/' + abonoKey));
 
@@ -4489,7 +5893,8 @@ async function guardarEdicion(key) {
 }
 
 async function eliminarBoleta(key) {
-  if (!confirm('¿Eliminar esta boleta?')) return;
+  const ok = await sjConfirm('Eliminar boleta', '¿Seguro que deseas eliminar esta boleta? Esta acción no se puede deshacer.', { icon: '🗑️', iconClass: 'danger', okLabel: 'Eliminar' });
+  if (!ok) return;
   const db = window._db, ref = window._ref, remove = window._remove;
   await remove(ref(db, 'boletas/' + key));
   cerrarModal('modal-boleta');
@@ -4788,6 +6193,11 @@ function actualizarSelectorBoletasVendedor() {
   if (!sel) return;
   const valorActual = sel.value;
   sel.innerHTML = '<option value=""><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Todos los vendedores</option>';
+  // Opción La Oficina (boletas sin vendedor_id asignado)
+  const optOficina = document.createElement('option');
+  optOficina.value = '__oficina__';
+  optOficina.textContent = '🏢 La Oficina';
+  sel.appendChild(optOficina);
   Object.entries(allVendedores).forEach(([id, v]) => {
     const opt = document.createElement('option');
     opt.value = id;
@@ -4990,50 +6400,132 @@ function vdRenderPedidosVendedor(vid) {
     return `<div class="empty-state" style="padding:28px 16px"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><p>Sin pedidos de este vendedor</p></div>`;
   }
 
-  return pedidos.map(([id, p]) => {
-    const estadoBadge = p.estado === 'confirmado'
-      ? `<span class="estado-badge estado-pagada">Confirmado</span>`
-      : p.estado === 'cancelado'
-        ? `<span class="estado-badge estado-libre" style="background:#fed7d7;color:var(--rojo)">Cancelado</span>`
-        : `<span class="estado-badge" style="background:#fef3c7;color:#d97706;border:1px solid #fcd34d">Pendiente</span>`;
+  const _n1ToBp = {};
+  Object.entries(window.allBoletasPlantilla || {}).forEach(([pk, bp]) => {
+    if (bp.n1) _n1ToBp[String(bp.n1).padStart(4,'0')] = { pk, bp };
+  });
+
+  // Helper: renderiza una tarjeta de pedido
+  function renderCard([id, p]) {
+    const fecha = p.fecha_ts
+      ? new Date(p.fecha_ts).toLocaleDateString('es-CO', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' })
+      : (p.fecha || '');
+    const esConfirmado = p.estado === 'confirmado';
+    const esCancelado  = p.estado === 'cancelado';
+    const esPendiente  = !esConfirmado && !esCancelado;
+    const borderCard   = esConfirmado ? '#c6f6d5' : esCancelado ? '#fed7d7' : '#fcd34d';
+    const bgHeader     = esConfirmado ? '#f0fff4' : esCancelado ? '#fff5f5' : '#fffdf0';
+    const borderHeader = esConfirmado ? '#c6f6d5' : esCancelado ? '#fed7d7' : '#fef3c7';
+    const estadoHTML   = esConfirmado
+      ? `<span style="background:#c6f6d5;border:1.5px solid #9ae6b4;color:#276749;border-radius:12px;font-size:10px;font-weight:800;padding:3px 8px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Confirmado</span>`
+      : esCancelado
+        ? `<span style="background:#fed7d7;border:1.5px solid #fca5a5;color:#c53030;border-radius:12px;font-size:10px;font-weight:800;padding:3px 8px">Cancelado</span>`
+        : `<span style="background:#fef3c7;border:1.5px solid #fcd34d;color:#d97706;border-radius:12px;font-size:10px;font-weight:800;padding:3px 8px">Pendiente</span>`;
+
+    // Minicards boletas
     const grupos = p.boletas_grupos || [];
     const numsFlat = grupos.length ? [].concat(...grupos) : (p.numeros || []);
-    const numsBadges = numsFlat.length
-      ? numsFlat.map(n => `<span class="num-badge">${n}</span>`).join('')
-      : '<span style="font-size:11px;color:#a0aec0;font-style:italic">Sin números</span>';
-    const telLimpio = (p.telefono || '').replace(/\D/g, '');
-    const waNumeros = numsFlat.length ? `\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="2" x2="9" y2="22"/></svg> Boletas: ${numsFlat.join(', ')}` : '';
-    const waMensaje = encodeURIComponent(`Hola ${p.nombre||''}, tu pedido en Sorteos Jiménez está listo.${waNumeros}\n¿Confirmas el pago?`);
-    const waLink = telLimpio ? `https://wa.me/57${telLimpio}?text=${waMensaje}` : '';
-    const dirEntrega = p.dir_entrega || p.dir_casa || '';
-    const tipoEntrega = p.tipo_entrega === 'trabajo' ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/><path d="M13 7h2M13 11h2M13 15h2M5 7h2M5 11h2M5 15h2"/></svg> Trabajo' : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Casa';
+    const _pedidoId = id.slice(-6);
+    const _miniCanvasData = [];
+    let minicardsHTML = '';
+    if (grupos.length > 0) {
+      minicardsHTML = grupos.map((g, gi) => {
+        const nums = g.filter(Boolean);
+        const n1key = String(nums[0] || '').padStart(4,'0');
+        const match = _n1ToBp[n1key];
+        const bp = match ? match.bp : null;
+        const cvId = `vdped2-${_pedidoId}-${gi}`;
+        let imgHTML = '';
+        if (tiendaPlantilla) {
+          imgHTML = `<canvas id="${cvId}" style="width:100%;height:auto;display:block;border-radius:6px 6px 0 0"></canvas>`;
+          _miniCanvasData.push({ cvId });
+        } else if (bp && bp.anverso_img) {
+          imgHTML = `<img src="${bp.anverso_img}" loading="lazy" style="width:100%;height:auto;display:block;border-radius:6px 6px 0 0">`;
+        } else {
+          imgHTML = `<div style="width:100%;height:36px;display:flex;align-items:center;justify-content:center;background:var(--gris);border-radius:6px 6px 0 0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#a0aec0" stroke-width="2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="2" x2="9" y2="22"/></svg></div>`;
+        }
+        return `<div style="display:inline-flex;flex-direction:column;background:white;border:1.5px solid #e8f9eb;border-radius:8px;overflow:hidden;flex:1;min-width:0">
+          ${imgHTML}
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:4px 4px">
+            ${nums.map(n => `<span style="font-size:10px;font-weight:800;color:var(--rojo);background:#fff5f5;border:1px solid #fecaca;border-radius:4px;padding:2px 2px;text-align:center">${n}</span>`).join('')}
+          </div>
+        </div>`;
+      }).join('');
+      if (_miniCanvasData.length) {
+        requestAnimationFrame(() => {
+          const tp = tiendaPlantilla;
+          if (!tp) return;
+          _miniCanvasData.forEach(({ cvId }) => {
+            const cv = document.getElementById(cvId);
+            if (!cv) return;
+            cv.width  = tp.img.naturalWidth  || tp.img.width  || 800;
+            cv.height = tp.img.naturalHeight || tp.img.height || 347;
+            cv.getContext('2d').drawImage(tp.img, 0, 0, cv.width, cv.height);
+          });
+        });
+      }
+    } else if (numsFlat.length) {
+      minicardsHTML = `<div style="display:flex;flex-wrap:wrap;gap:3px">${numsFlat.map(n => `<span class="num-badge" style="font-size:10px;padding:2px 5px">${n}</span>`).join('')}</div>`;
+    } else {
+      minicardsHTML = '<span style="font-size:10px;color:#a0aec0;font-style:italic">Sin números</span>';
+    }
 
-    return `<div style="background:white;border:2px solid var(--borde);border-radius:14px;padding:14px;margin-bottom:10px">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px">
-        <div style="flex:1;min-width:0">
-          <div class="boleta-numeros" style="flex-wrap:wrap;gap:5px;margin-bottom:4px">${numsBadges}</div>
-          <span style="font-size:10px;color:#a0aec0;font-weight:600">${p.fecha||''}</span>
-        </div>
-        <div>${estadoBadge}</div>
+    // WhatsApp + dirección
+    const telLimpio = (p.telefono || '').replace(/\D/g, '');
+    const waLink = telLimpio ? `https://wa.me/${_waNum(telLimpio)}` : '';
+    const dirEntrega = p.dir_entrega || p.dir_casa || '';
+    const tipoEntrega = p.tipo_entrega === 'trabajo' ? '🏢 Trabajo' : '🏠 Casa';
+
+    return `<div style="background:white;border:2px solid ${borderCard};border-radius:14px;overflow:hidden;margin-bottom:10px;box-shadow:0 1px 6px rgba(0,0,0,0.05)">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:${bgHeader};border-bottom:1.5px solid ${borderHeader}">
+        <span style="font-size:10px;color:#a0aec0;font-weight:600">${fecha}</span>
+        ${estadoHTML}
       </div>
-      <div style="background:#f8fafc;border:1.5px solid var(--borde);border-radius:10px;padding:10px 12px;margin-bottom:10px;display:flex;flex-direction:column;gap:5px">
-        <div style="font-size:13px;font-weight:800;color:var(--dark)">${p.nombre||'—'}${p.ciudad ? ` · <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${p.ciudad}` : ''}</div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <span style="font-size:12px;color:#4a5568;font-weight:700"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.78a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> ${p.telefono||'—'}</span>
-          ${waLink ? `<a href="${waLink}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;background:#25d366;color:white;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;text-decoration:none;font-family:'Nunito',sans-serif">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            WhatsApp
-          </a>` : ''}
-        </div>
-        ${dirEntrega ? `<div style="font-size:11px;color:#718096">${tipoEntrega}: ${dirEntrega}</div>` : ''}
-        ${p.nota ? `<div style="font-size:11px;color:#975a16;background:#fffaf0;border-radius:6px;padding:3px 8px;border:1px solid #feebc8"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> ${p.nota}</div>` : ''}
+      <div style="padding:8px 10px;border-bottom:1.5px solid var(--borde)">
+        <div style="display:flex;flex-wrap:wrap;gap:5px">${minicardsHTML}</div>
       </div>
-      ${p.estado === 'pendiente' ? `<div style="display:flex;gap:8px">
-        <button class="btn-sm btn-azul" onclick="confirmarPedido('${id}')" style="flex:1;padding:9px;font-size:13px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Confirmar</button>
-        <button class="btn-sm btn-danger" onclick="cancelarPedido('${id}')" style="flex:1;padding:9px;font-size:13px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#e53e3e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Cancelar</button>
+      <div style="padding:8px 10px;${esPendiente ? 'border-bottom:1.5px solid var(--borde);' : ''}display:flex;flex-direction:column;gap:4px">
+        <div style="font-size:12px;font-weight:800;color:var(--dark)">${p.nombre||'—'}${p.ciudad ? `<span style="font-size:10px;font-weight:600;color:#718096"> · ${p.ciudad}</span>` : ''}</div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span style="font-size:11px;color:#4a5568;font-weight:600">📞 ${p.telefono||'—'}</span>
+          ${waLink ? `<a href="${waLink}" target="_blank" style="display:inline-flex;align-items:center;gap:3px;background:#25d366;color:white;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;text-decoration:none;font-family:'Nunito',sans-serif"><svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WA</a>` : ''}
+        </div>
+        ${dirEntrega ? `<div style="font-size:10px;color:#718096">${tipoEntrega}: ${dirEntrega}</div>` : ''}
+        ${p.nota ? `<div style="font-size:10px;color:#975a16;background:#fffaf0;border-radius:5px;padding:3px 6px;border:1px solid #feebc8">${p.nota}</div>` : ''}
+      </div>
+      ${esPendiente ? `<div style="display:flex;gap:6px;padding:8px 10px">
+        <button class="btn-sm btn-azul" onclick="confirmarPedido('${id}')" style="flex:1;padding:7px 4px;font-size:11px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Confirmar</button>
+        <button class="btn-sm btn-danger" onclick="cancelarPedido('${id}')" style="flex:1;padding:7px 4px;font-size:11px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#e53e3e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Cancelar</button>
       </div>` : ''}
     </div>`;
-  }).join('');
+  }
+
+  const pendientes   = pedidos.filter(([,p]) => p.estado !== 'confirmado' && p.estado !== 'cancelado');
+  const confirmados  = pedidos.filter(([,p]) => p.estado === 'confirmado' || p.estado === 'cancelado');
+
+  const colPendientes  = pendientes.length
+    ? pendientes.map(renderCard).join('')
+    : `<div style="font-size:11px;color:#a0aec0;text-align:center;padding:16px 0;font-style:italic">Sin pendientes</div>`;
+  const colConfirmados = confirmados.length
+    ? confirmados.map(renderCard).join('')
+    : `<div style="font-size:11px;color:#a0aec0;text-align:center;padding:16px 0;font-style:italic">Sin confirmados</div>`;
+
+  return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start;padding:4px 0">
+    <div>
+      <div style="font-size:11px;font-weight:800;color:#d97706;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:flex;align-items:center;gap:5px">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Pendientes (${pendientes.length})
+      </div>
+      ${colPendientes}
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:800;color:#276749;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:flex;align-items:center;gap:5px">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Confirmados (${confirmados.length})
+      </div>
+      ${colConfirmados}
+    </div>
+  </div>`;
 }
 
 function vdRenderDisponibles(vid) {
@@ -5068,76 +6560,64 @@ function vdRenderDisponibles(vid) {
 let _vdAddAbonoKey = null;
 
 function vdRenderBoletasTile(lista, estadoDefault) {
-  const html = `<div class="vd-flip-grid">
-    ${lista.map(([k, bp]) => {
-      const nums = [bp.n1, bp.n2, bp.n3, bp.n4].filter(Boolean);
-      const estado = bp.estadoVenta || estadoDefault || 'libre';
-      const boletaKey = bp._boletaKey || '';
+  if (!lista.length) return '';
 
-      // Badge de estado
-      const badgeColor = (estado === 'pagada' || estado === 'vendida') ? '#e74c3c'
-        : estado === 'abonado' ? '#f39c12' : '#3ab54a';
-      const badgeLabel = (estado === 'pagada' || estado === 'vendida') ? 'Vendida'
-        : estado === 'abonado' ? 'Abonado' : 'Disponible';
+  const svgCheck = `<svg width="13" height="13" viewBox="0 0 14 14" style="vertical-align:middle;margin-right:3px"><circle cx="7" cy="7" r="7" fill="#3ab54a"/><polyline points="3.5,7 6,9.5 10.5,4.5" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const svgCoin  = `<svg width="13" height="13" viewBox="0 0 13 13" style="vertical-align:middle;margin-right:3px"><circle cx="6.5" cy="6.5" r="6" fill="#ff9f43" stroke="#e67e22" stroke-width="0.8"/><text x="6.5" y="9.5" text-anchor="middle" font-size="7" font-weight="900" fill="white" font-family="Arial">$</text></svg>`;
+  const svgHome  = `<svg width="12" height="12" viewBox="0 0 13 13" style="vertical-align:middle;margin-right:3px"><path d="M1.5 7L6.5 2L11.5 7" fill="none" stroke="#a0aec0" stroke-width="1.4" stroke-linecap="round"/><rect x="3.5" y="6.5" width="6" height="5" rx="1" fill="none" stroke="#a0aec0" stroke-width="1.4"/><rect x="5.2" y="9" width="2.6" height="2.5" rx="0.5" fill="#a0aec0"/></svg>`;
+  const svgEdit  = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
 
-      // Imagen anverso
-      const imgEl = tiendaPlantilla
-        ? `<canvas id="vdcv-${boletaKey || k}" width="800" height="347" style="width:100%;height:auto;display:block;border-radius:10px 10px 0 0"></canvas>`
-        : (bp.anverso_img
-            ? `<img src="${bp.anverso_img}" loading="lazy" draggable="false" style="width:100%;height:auto;display:block;border-radius:10px 10px 0 0">`
-            : `<div style="width:100%;height:80px;display:flex;align-items:center;justify-content:center;font-size:32px;background:var(--gris);border-radius:10px 10px 0 0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="2" x2="9" y2="22"/></svg></div>`);
+  const cards = lista.map(([k, bp]) => {
+    const nums = [bp.n1, bp.n2, bp.n3, bp.n4].filter(Boolean);
+    const estado = bp.estadoVenta || estadoDefault || 'libre';
+    const boletaKey = bp._boletaKey || k;
 
-      const numsHtml = nums.map(n => `<span class="vd-flip-num">${n}</span>`).join('');
+    // Colores según estado
+    const isAbonada = estado === 'abonado';
+    const isVendida = estado === 'pagada' || estado === 'vendida';
+    const borderColor = isVendida ? '#feb2b2' : isAbonada ? '#fbd38d' : '#c6f6d5';
+    const bgColor     = isVendida ? '#fff5f5' : isAbonada ? '#fffaf0' : '#f0fff4';
+    const badgeBg     = isVendida ? '#e74c3c' : isAbonada ? '#f39c12' : '#3ab54a';
+    const badgeLabel  = isVendida ? 'Vendida'  : isAbonada ? 'Abonada'  : 'Disponible';
+    const numColor    = isVendida ? '#c53030'  : isAbonada ? '#975a16'  : '#276749';
 
-      // Cara trasera: info del cliente + abonos si aplica
-      const svgCheck = `<svg width="14" height="14" viewBox="0 0 14 14" style="vertical-align:middle"><circle cx="7" cy="7" r="7" fill="#3ab54a"/><polyline points="3.5,7 6,9.5 10.5,4.5" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-      const svgCoin  = `<svg width="13" height="13" viewBox="0 0 13 13" style="vertical-align:middle;margin-right:3px"><circle cx="6.5" cy="6.5" r="6" fill="#ff9f43" stroke="#e67e22" stroke-width="0.8"/><text x="6.5" y="9.5" text-anchor="middle" font-size="7" font-weight="900" fill="white" font-family="Arial">$</text></svg>`;
-      const svgPlus  = `<svg width="12" height="12" viewBox="0 0 12 12" style="vertical-align:middle;margin-right:4px"><circle cx="6" cy="6" r="6" fill="#3ab54a"/><line x1="6" y1="3" x2="6" y2="9" stroke="white" stroke-width="1.8" stroke-linecap="round"/><line x1="3" y1="6" x2="9" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>`;
-      const svgHome  = `<svg width="13" height="13" viewBox="0 0 13 13" style="vertical-align:middle;margin-right:3px"><path d="M1.5 7L6.5 2L11.5 7" fill="none" stroke="#718096" stroke-width="1.4" stroke-linecap="round"/><rect x="3.5" y="6.5" width="6" height="5" rx="1" fill="none" stroke="#718096" stroke-width="1.4"/><rect x="5.2" y="9" width="2.6" height="2.5" rx="0.5" fill="#718096"/></svg>`;
-      const backContent = (estado === 'abonado' || estado === 'pagada' || estado === 'vendida') && bp._comprador
-        ? `<div class="vd-back-nombre">${bp._comprador}</div>
-           <div class="vd-back-tel">${bp._telefono || ''}${bp._fecha ? ' · ' + bp._fecha : ''}</div>
-           ${bp._direccion ? `<div style="font-size:10px;color:#718096;margin-bottom:6px;display:flex;align-items:center">${svgHome}${bp._direccion}</div>` : ''}
-           ${estado === 'abonado'
-             ? `<div class="vd-back-total" id="vdbt-${boletaKey}">${svgCoin}Abonado: $${Number(bp._monto||0).toLocaleString('es-CO')}</div>`
-             : `<div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:800;color:var(--verde);background:#f0fff4;border-radius:8px;padding:8px;text-align:center">${svgCheck} Pagada completo</div>`
-           }
-           ${bp._editKey ? `<button onclick="event.stopPropagation();abrirEditar('${bp._editKey}')" style="width:100%;margin-top:8px;padding:7px;background:#ebf8ff;border:1.5px solid #90cdf4;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;color:#2b6cb0;cursor:pointer"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar boleta</button>` : ''}`
-        : `<div style="font-size:12px;color:#a0aec0;text-align:center;padding:20px 0">Sin información de cliente</div>
-           ${bp._editKey ? `<button onclick="event.stopPropagation();abrirEditar('${bp._editKey}')" style="width:100%;margin-top:8px;padding:7px;background:#ebf8ff;border:1.5px solid #90cdf4;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;color:#2b6cb0;cursor:pointer"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Editar boleta</button>` : ''}`;
+    // Buscar imagen de anverso en allBoletasPlantilla por n1
+    const n1pad = String(nums[0] || '').padStart(4, '0');
+    const bpEntry = Object.values(allBoletasPlantilla).find(bpe =>
+      String(bpe.n1).padStart(4,'0') === n1pad
+    );
+    const anversoImg = bpEntry?.anverso_img || bp.anverso_img || null;
+    let imgHTML = '';
+    if (anversoImg) {
+      imgHTML = `<img src="${anversoImg}" loading="lazy" style="width:100%;height:auto;display:block;border-radius:8px 8px 0 0;margin:-10px -10px 0 -10px;width:calc(100% + 20px)">`;
+    } else if (tiendaPlantilla?.img?.src) {
+      imgHTML = `<img src="${tiendaPlantilla.img.src}" loading="lazy" style="width:100%;height:auto;display:block;border-radius:8px 8px 0 0;margin:-10px -10px 0 -10px;width:calc(100% + 20px)">`;
+    }
 
-      return `
-        <div class="vd-flip-wrap">
-          <div class="vd-flip-card" id="vdfc-${boletaKey || k}" onclick="vdToggleFlip('${boletaKey || k}')">
-            <div class="vd-flip-face vd-flip-face-front">
-              ${imgEl}
-              <span class="vd-flip-hint">tap · girar</span>
-              <span class="vd-flip-badge" style="background:${badgeColor};color:white">${badgeLabel}</span>
-              <div class="vd-flip-nums">${numsHtml}</div>
-            </div>
-            <div class="vd-flip-face vd-flip-face-back">
-              ${backContent}
-            </div>
-          </div>
-        </div>`;
-    }).join('')}
-  </div>`;
+    // Grid 2×2 de números
+    const numsGrid = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:8px 0">
+      ${nums.map(n => `<div style="background:white;border:1.5px solid ${borderColor};border-radius:7px;padding:5px 4px;text-align:center;font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:1px;color:${numColor};line-height:1">${n}</div>`).join('')}
+    </div>`;
 
-  // Dibujar canvas tras render
-  requestAnimationFrame(() => {
-    if (!tiendaPlantilla) return;
-    const p = tiendaPlantilla;
-    lista.forEach(([k, bp]) => {
-      const boletaKeyDraw = bp._boletaKey || k;
-      const cv = document.getElementById('vdcv-' + boletaKeyDraw);
-      if (!cv) return;
-      cv.width  = p.img.naturalWidth  || p.img.width  || 800;
-      cv.height = p.img.naturalHeight || p.img.height || 347;
-      cv.getContext('2d').drawImage(p.img, 0, 0, cv.width, cv.height);
-    });
-  });
+    // Info del cliente
+    let clienteHtml = '';
+    if (bp._comprador) {
+      clienteHtml = `<div style="border-top:1px solid ${borderColor};padding-top:8px;margin-top:2px">
+        <div style="font-size:12px;font-weight:800;color:var(--dark);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${bp._comprador}</div>
+        ${bp._telefono ? `<div style="font-size:11px;color:#718096;font-weight:600;margin-bottom:3px">📞 ${bp._telefono}</div>` : ''}
+        ${bp._direccion ? `<div style="font-size:10px;color:#a0aec0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${svgHome}${bp._direccion}</div>` : ''}
+      </div>`;
+    }
 
-  return html;
+    return `<div class="vd-flip-tile" data-nums="${nums.join(',')}" style="background:${bgColor};border:2px solid ${borderColor};border-radius:12px;padding:10px;position:relative;min-width:0;overflow:hidden">
+      ${imgHTML}
+      <span style="position:absolute;top:8px;right:8px;background:${badgeBg};color:white;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;letter-spacing:.3px">${badgeLabel}</span>
+      ${numsGrid}
+      ${clienteHtml}
+    </div>`;
+  }).join('');
+
+  return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:4px 0">${cards}</div>`;
 }
 
 function vdToggleFlip(k) {
@@ -5353,14 +6833,14 @@ async function eliminarVendedor(vid) {
   const asignadas = v.boletasAsignadas || [];
   const boletasConVenta = Object.entries(allBoletas).filter(([, b]) => b.vendedor_id === vid);
 
-  let msg = `¿Eliminar a ${nombre}?\n\n`;
-  msg += `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="2" x2="9" y2="22"/></svg> Sus ${asignadas.length} boletas asignadas regresarán automáticamente a La Oficina.\n`;
+  let bodyMsg = `Sus ${asignadas.length} boletas asignadas regresarán automáticamente a La Oficina.`;
   if (boletasConVenta.length) {
-    msg += `\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#d69e2e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Tiene ${boletasConVenta.length} boleta(s) vendidas/abonadas — se conservan pero quedarán sin vendedor asignado.`;
+    bodyMsg += `\n\n⚠️ Tiene ${boletasConVenta.length} boleta(s) vendidas/abonadas — se conservan pero quedarán sin vendedor asignado.`;
   }
-  msg += '\n\nEsta acción no se puede deshacer.';
+  bodyMsg += '\n\nEsta acción no se puede deshacer.';
 
-  if (!confirm(msg)) return;
+  const ok = await sjConfirm(`¿Eliminar a ${nombre}?`, bodyMsg, { icon: '🗑️', iconClass: 'danger', okLabel: 'Eliminar' });
+  if (!ok) return;
 
   const db = window._db, ref = window._ref, remove = window._remove, update = window._update;
 
@@ -5455,7 +6935,11 @@ async function resetPinVendedor() {
   const pinDefecto = (cfgPinSnap.exists() ? cfgPinSnap.val() : null) || '1234';
 
   const nombre = allVendedores[vid]?.nombre || vid;
-  const confirmar = window.confirm(`¿Resetear el PIN de ${nombre} al PIN por defecto (${pinDefecto})?\n\nAl ingresar nuevamente se le pedirá que lo cambie.`);
+  const confirmar = await sjConfirm(
+    `Resetear PIN de ${nombre}`,
+    `El PIN se cambiará al valor por defecto (${pinDefecto}).\n\nAl ingresar nuevamente se le pedirá que lo cambie.`,
+    { icon: '🔄', iconClass: 'warning', okLabel: 'Resetear', okClass: 'amarillo' }
+  );
   if (!confirmar) return;
 
   await update(ref(db, 'vendedores/' + vid), { pin: pinDefecto, pin_es_defecto: true });
@@ -5749,11 +7233,26 @@ function renderPedidos(pedidos) {
   const badge = document.getElementById('pedidos-count-badge');
   if (badge) badge.textContent = lista.length ? lista.length + ' pedido' + (lista.length > 1 ? 's' : '') : '';
 
+  const contPend = document.getElementById('lista-pedidos-pendientes');
+  const contConf = document.getElementById('lista-pedidos-confirmados');
+  if (!contPend || !contConf) return;
+
+  const listaPendientes  = lista.filter(([, p]) => p.estado !== 'confirmado' && p.estado !== 'cancelado');
+  const listaConfirmados = lista.filter(([, p]) => p.estado === 'confirmado' || p.estado === 'cancelado');
+
+  // Actualizar badges de pestañas
+  const badgePend = document.getElementById('ptab-badge-pend');
+  const badgeConf = document.getElementById('ptab-badge-conf');
+  if (badgePend) badgePend.textContent = listaPendientes.length;
+  if (badgeConf) badgeConf.textContent = listaConfirmados.length;
+
   if (!lista.length) {
-    cont.innerHTML = '<div class="empty-state"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><p>Sin pedidos' + (filtroVendedor ? ' para este vendedor' : ' aún') + '</p></div>';
+    contPend.innerHTML = '<div class="empty-state"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><p>Sin pedidos' + (filtroVendedor ? ' para este vendedor' : ' aún') + '</p></div>';
+    contConf.innerHTML = contPend.innerHTML;
     return;
   }
-  cont.innerHTML = lista.map(([id, p]) => {
+
+  function renderCard([id, p]) {
     // ── Estado ──
     const esConfirmado = p.estado === 'confirmado';
     const esCancelado  = p.estado === 'cancelado';
@@ -5859,9 +7358,9 @@ function renderPedidos(pedidos) {
 
     // ── WhatsApp ──
     const telLimpio = (p.telefono || '').replace(/\D/g, '');
-    const waNumeros = numsFlat.length ? `\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="2" x2="9" y2="22"/></svg> Boletas: ${numsFlat.join(', ')}` : '';
-    const waMensaje = encodeURIComponent(`Hola ${p.nombre||''}, tu pedido en Sorteos Jiménez está listo.${waNumeros}\n¿Confirmas el pago?`);
-    const waLink = telLimpio ? `https://wa.me/57${telLimpio}?text=${waMensaje}` : '';
+    const waNumeros = numsFlat.length ? `\n🎫 Boletas: ${numsFlat.join(', ')}` : '';
+    // waMensaje eliminado — WhatsApp sin mensaje de texto
+    const waLink = telLimpio ? `https://wa.me/${_waNum(telLimpio)}` : '';
     const waBtn = waLink
       ? `<a href="${waLink}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;background:#25d366;color:white;font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;text-decoration:none;font-family:'Nunito',sans-serif">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
@@ -5916,7 +7415,37 @@ function renderPedidos(pedidos) {
       </div>` : ''}
 
     </div>`;
-  }).join('');
+  }
+
+  // ── Escribir en cada pestaña ──
+  contPend.innerHTML = listaPendientes.length
+    ? listaPendientes.map(renderCard).join('')
+    : '<div class="empty-state"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><p>Sin pedidos pendientes</p></div>';
+
+  contConf.innerHTML = listaConfirmados.length
+    ? listaConfirmados.map(renderCard).join('')
+    : '<div class="empty-state"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#a0aec0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span><p style="color:#a0aec0">Sin pedidos confirmados</p></div>';
+}
+
+function switchPedidosTab(tab) {
+  const isPend = tab === 'pendientes';
+  document.getElementById('lista-pedidos-pendientes').style.display  = isPend ? '' : 'none';
+  document.getElementById('lista-pedidos-confirmados').style.display = isPend ? 'none' : '';
+
+  const btnP = document.getElementById('ptab-pendientes');
+  const btnC = document.getElementById('ptab-confirmados');
+  if (isPend) {
+    btnP.style.color = '#d97706'; btnP.style.borderBottomColor = '#f59e0b';
+    btnC.style.color = '#a0aec0'; btnC.style.borderBottomColor = 'transparent';
+    // actualizar ícono activo/inactivo
+    btnP.querySelector('svg').setAttribute('stroke','#d97706');
+    btnC.querySelector('svg').setAttribute('stroke','#a0aec0');
+  } else {
+    btnC.style.color = '#38a169'; btnC.style.borderBottomColor = '#38a169';
+    btnP.style.color = '#a0aec0'; btnP.style.borderBottomColor = 'transparent';
+    btnC.querySelector('svg').setAttribute('stroke','#38a169');
+    btnP.querySelector('svg').setAttribute('stroke','#a0aec0');
+  }
 }
 
 function filtrarPedidosPorVendedor() {
@@ -6360,7 +7889,10 @@ let tiendaPagActual = 1;
 let tiendaListaFiltrada = [];
 
 function renderTiendaGrid(boletas) {
-  tiendaListaFiltrada = Object.entries(boletas).sort(([,a],[,b]) => (a.idx||0)-(b.idx||0));
+  // Solo mostrar boletas libres (no vendidas ni abonadas)
+  tiendaListaFiltrada = Object.entries(boletas)
+    .filter(([, b]) => (b.estadoVenta || 'libre') === 'libre')
+    .sort(([,a],[,b]) => (a.idx||0)-(b.idx||0));
   tiendaPagActual = 1;
   renderTiendaPagina();
 }
@@ -6441,6 +7973,156 @@ function tiendaCambiarPag(pag) {
   renderTiendaPagina();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+function escogerAlAzar() {
+  const libres = tiendaListaFiltrada.filter(([k]) => !carritoSeleccion.includes(k));
+  if (!libres.length) { toast('No hay boletas disponibles', 'amarillo'); return; }
+  const maxDisp = libres.length;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'modal-azar-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(10,6,30,0.72);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)';
+  overlay.innerHTML =
+    '<div style="animation:azarFadeIn 0.4s cubic-bezier(0.34,1.3,0.64,1) both;background:linear-gradient(160deg,#1e0a40 0%,#2d1260 50%,#1a0830 100%);border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center;box-shadow:0 24px 80px rgba(108,63,197,0.6);border:1.5px solid rgba(180,120,255,0.25);position:relative;overflow:hidden">'
+    + '<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(150,80,255,0.18) 0%,transparent 70%);pointer-events:none"></div>'
+    // dice icon animated
+    + '<div style="animation:azarPulse 1.8s ease infinite;display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#6c3fc5,#9b59b6);margin-bottom:14px;box-shadow:0 8px 24px rgba(108,63,197,0.5)">'
+    + '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="4"/><circle cx="8" cy="8" r="1.5" fill="white" stroke="none"/><circle cx="16" cy="8" r="1.5" fill="white" stroke="none"/><circle cx="8" cy="16" r="1.5" fill="white" stroke="none"/><circle cx="16" cy="16" r="1.5" fill="white" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="white" stroke="none"/></svg>'
+    + '</div>'
+    + '<div style="font-size:20px;font-weight:900;color:white;letter-spacing:-0.5px;margin-bottom:6px;font-family:Nunito,sans-serif">¡Suerte al azar!</div>'
+    + '<div style="font-size:13px;color:rgba(200,170,255,0.85);margin-bottom:22px;font-family:Nunito,sans-serif">¿Cuántas boletas quieres que la suerte elija por ti?</div>'
+    + '<div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:10px">'
+    + '<button onclick="var i=document.getElementById(\'azar-cant\');i.value=Math.max(1,+(i.value||1)-1);azarActualizarLabel()" style="width:42px;height:42px;border-radius:50%;border:2px solid rgba(180,120,255,0.4);background:rgba(255,255,255,0.08);font-size:22px;font-weight:800;cursor:pointer;color:white;font-family:Nunito,sans-serif;line-height:1">−</button>'
+    + '<input id="azar-cant" type="number" value="1" min="1" max="' + maxDisp + '" oninput="azarActualizarLabel()" style="width:70px;text-align:center;font-size:28px;font-weight:900;background:rgba(255,255,255,0.1);border:2px solid rgba(180,120,255,0.5);border-radius:14px;padding:8px 4px;font-family:Nunito,sans-serif;outline:none;color:white">'
+    + '<button onclick="var i=document.getElementById(\'azar-cant\');i.value=Math.min(' + maxDisp + ',+(i.value||1)+1);azarActualizarLabel()" style="width:42px;height:42px;border-radius:50%;border:2px solid rgba(180,120,255,0.4);background:rgba(255,255,255,0.08);font-size:22px;font-weight:800;cursor:pointer;color:white;font-family:Nunito,sans-serif;line-height:1">+</button>'
+    + '</div>'
+    + '<div id="azar-label" style="font-size:11px;color:rgba(200,170,255,0.7);margin-bottom:22px;font-family:Nunito,sans-serif">' + maxDisp + ' boletas disponibles · 1 seleccionada</div>'
+    + '<div style="display:flex;gap:10px">'
+    + '<button onclick="document.getElementById(\'modal-azar-overlay\').remove()" style="flex:1;padding:13px;border:1.5px solid rgba(255,255,255,0.15);border-radius:14px;background:rgba(255,255,255,0.07);font-family:Nunito,sans-serif;font-size:13px;font-weight:800;cursor:pointer;color:rgba(255,255,255,0.6)">Cancelar</button>'
+    + '<button onclick="confirmarAzar()" style="flex:2;padding:13px;border:none;border-radius:14px;background:linear-gradient(135deg,#7c4dcc,#b06aff);color:white;font-family:Nunito,sans-serif;font-size:14px;font-weight:900;cursor:pointer;box-shadow:0 6px 20px rgba(108,63,197,0.5);letter-spacing:0.3px">🎲 ¡Que la suerte decida!</button>'
+    + '</div></div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+}
+
+function azarActualizarLabel() {
+  const maxDisp = tiendaListaFiltrada.filter(([k]) => !carritoSeleccion.includes(k)).length;
+  const v = Math.min(Math.max(1, +(document.getElementById('azar-cant')?.value||1)), maxDisp);
+  const lbl = document.getElementById('azar-label');
+  if (lbl) lbl.textContent = maxDisp + ' boletas disponibles · ' + v + ' seleccionada' + (v!==1?'s':'');
+}
+
+function confirmarAzar() {
+  const overlay = document.getElementById('modal-azar-overlay');
+  const libres = tiendaListaFiltrada.filter(([k]) => !carritoSeleccion.includes(k));
+  const cant = Math.min(Math.max(1, +(document.getElementById('azar-cant')?.value || 1)), libres.length);
+  if (overlay) overlay.remove();
+
+  const mezcladas = libres.slice().sort(() => Math.random() - 0.5);
+  const elegidas = mezcladas.slice(0, cant);
+
+  // Mostrar show de revelación animado
+  mostrarShowAzar(elegidas, cant);
+}
+
+function mostrarShowAzar(elegidas, cant) {
+  // Construir HTML de tarjetas con números
+  const cardsHtml = elegidas.map(([k, b], i) => {
+    const nums = [b.n1, b.n2, b.n3, b.n4].filter(Boolean);
+    const delay = i * 0.18;
+    const numsHtml = nums.map((n, ni) =>
+      '<span class="azar-num-anim" style="animation-delay:' + (delay + 0.35 + ni*0.07) + 's;display:inline-block;background:white;border:2px solid #fecaca;color:#e53e3e;border-radius:8px;padding:5px 10px;font-size:14px;font-weight:900;font-family:Nunito,sans-serif;min-width:48px;text-align:center">' + n + '</span>'
+    ).join('');
+    return '<div class="azar-card-anim" style="animation-delay:' + delay + 's;background:white;border-radius:16px;overflow:hidden;border:2px solid rgba(180,120,255,0.35);box-shadow:0 8px 24px rgba(108,63,197,0.2)">'
+      + (tiendaPlantilla
+          ? '<canvas id="azarcv-' + k + '" style="width:100%;height:auto;display:block;border-radius:12px 12px 0 0"></canvas>'
+          : (tiendaBoletas[k]?.anverso_img
+              ? '<img src="' + tiendaBoletas[k].anverso_img + '" style="width:100%;display:block;border-radius:12px 12px 0 0">'
+              : '<div style="height:52px;background:linear-gradient(135deg,#6c3fc5,#9b59b6);border-radius:12px 12px 0 0"></div>'))
+      + '<div style="padding:8px 10px;display:flex;flex-wrap:wrap;gap:5px;justify-content:center">' + numsHtml + '</div>'
+      + '</div>';
+  }).join('');
+
+  const show = document.createElement('div');
+  show.id = 'azar-show-overlay';
+  show.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:0;overflow-y:auto;-webkit-overflow-scrolling:touch';
+
+  // Fondo con partículas
+  show.innerHTML =
+    '<div style="position:fixed;inset:0;background:linear-gradient(160deg,#0d0520 0%,#1a0840 50%,#0a0318 100%);z-index:0"></div>'
+    // estrellas decorativas fijas
+    + '<div style="position:fixed;inset:0;z-index:0;pointer-events:none" id="azar-stars-bg"></div>'
+    + '<div style="position:relative;z-index:1;width:100%;max-width:420px;padding:24px 16px 32px;text-align:center">'
+    // header animado
+    + '<div style="animation:azarFadeIn 0.5s ease both;margin-bottom:6px">'
+    + '<div style="display:inline-flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#6c3fc5,#b06aff);margin-bottom:12px;box-shadow:0 12px 32px rgba(108,63,197,0.6);animation:azarPulse 2s ease infinite">'
+    + '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="4"/><circle cx="8" cy="8" r="1.5" fill="white" stroke="none"/><circle cx="16" cy="8" r="1.5" fill="white" stroke="none"/><circle cx="8" cy="16" r="1.5" fill="white" stroke="none"/><circle cx="16" cy="16" r="1.5" fill="white" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="white" stroke="none"/></svg>'
+    + '</div>'
+    + '<div style="font-size:26px;font-weight:900;color:white;letter-spacing:-1px;font-family:Nunito,sans-serif;line-height:1">¡La suerte habló!</div>'
+    + '<div style="font-size:14px;color:rgba(200,170,255,0.85);margin-top:6px;font-family:Nunito,sans-serif">'
+    + (cant === 1 ? 'Esta es tu boleta elegida al azar' : 'Estas son tus <strong style="color:#c084fc">' + cant + ' boletas</strong> elegidas al azar')
+    + '</div></div>'
+    // tarjetas
+    + '<div style="display:grid;grid-template-columns:' + (cant === 1 ? '1fr' : 'repeat(auto-fill,minmax(150px,1fr))') + ';gap:12px;margin:20px 0 24px" id="azar-cards-container">'
+    + cardsHtml
+    + '</div>'
+    // botón confirmar
+    + '<button onclick="azarConfirmarShow()" style="animation:azarFadeIn 0.5s 0.6s ease both;width:100%;padding:16px;border:none;border-radius:16px;background:linear-gradient(135deg,#3ab54a,#27ae60);color:white;font-family:Nunito,sans-serif;font-size:16px;font-weight:900;cursor:pointer;box-shadow:0 8px 24px rgba(58,181,74,0.45);letter-spacing:0.3px">'
+    + '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px;margin-right:6px"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>'
+    + '¡Agregar al carrito!</button>'
+    + '<button onclick="document.getElementById(\'azar-show-overlay\').remove()" style="margin-top:10px;background:none;border:none;color:rgba(255,255,255,0.45);font-family:Nunito,sans-serif;font-size:13px;font-weight:700;cursor:pointer;padding:8px">Volver a elegir</button>'
+    + '</div>';
+
+  // Guardar elegidas en variable global para confirmar después
+  window._azarElegidas = elegidas;
+  document.body.appendChild(show);
+
+  // Dibujar canvas plantilla
+  if (tiendaPlantilla) {
+    requestAnimationFrame(() => {
+      elegidas.forEach(([k]) => {
+        const cv = document.getElementById('azarcv-' + k);
+        if (!cv) return;
+        const p = tiendaPlantilla;
+        cv.width  = p.img.naturalWidth  || p.img.width  || 800;
+        cv.height = p.img.naturalHeight || p.img.height || 347;
+        cv.getContext('2d').drawImage(p.img, 0, 0, cv.width, cv.height);
+      });
+    });
+  }
+
+  // Generar estrellitas de fondo
+  const starsBg = document.getElementById('azar-stars-bg');
+  if (starsBg) {
+    let starsHtml = '';
+    for (let i = 0; i < 55; i++) {
+      const x = Math.random()*100, y = Math.random()*100;
+      const s = 1 + Math.random()*2.5;
+      const op = 0.2 + Math.random()*0.6;
+      const dur = 1.5 + Math.random()*3;
+      starsHtml += '<div style="position:absolute;left:' + x + '%;top:' + y + '%;width:' + s + 'px;height:' + s + 'px;border-radius:50%;background:white;opacity:' + op + ';animation:azarPulse ' + dur + 's ease infinite"></div>';
+    }
+    starsBg.innerHTML = starsHtml;
+  }
+}
+
+function azarConfirmarShow() {
+  const elegidas = window._azarElegidas || [];
+  const show = document.getElementById('azar-show-overlay');
+  if (show) {
+    show.style.transition = 'opacity 0.3s';
+    show.style.opacity = '0';
+    setTimeout(() => show.remove(), 300);
+  }
+  elegidas.forEach(([k]) => {
+    if (!carritoSeleccion.includes(k)) carritoSeleccion.push(k);
+  });
+  actualizarCarritoBar();
+  renderTiendaPagina();
+  const cant = elegidas.length;
+  toast('¡' + cant + ' boleta' + (cant!==1?'s':'') + ' agregada' + (cant!==1?'s':'') + ' al carrito! 🎉', 'verde');
+}
+
 
 function tiendaBuscar() {
   const q = (document.getElementById('tienda-buscar').value || '').trim();
@@ -6633,7 +8315,9 @@ async function enviarPedido() {
   _guardEnviarPedido = true;
   try {
   const nombre = document.getElementById('co-nombre').value.trim();
-  const tel = document.getElementById('co-tel').value.trim();
+  const telRaw = document.getElementById('co-tel').value.trim();
+  const telPrefix = document.getElementById('co-tel-prefix')?.value || '+57';
+  const tel = telRaw ? (telPrefix + telRaw) : '';
   const dirCasa = document.getElementById('co-dir-casa').value.trim();
   if (!nombre) { toast('Ingresa tu nombre', 'rojo'); return; }
   if (!tel) { toast('Ingresa tu teléfono', 'rojo'); return; }
@@ -7370,7 +9054,12 @@ async function editorGenerarTodasBoletas() {
   if (editorNumerosBD.length < 4) { toast('Primero importa el .txt con los números', 'rojo'); return; }
 
   const totalBoletas = Math.floor(editorNumerosBD.length / 4);
-  if (!confirm(`¿Generar y publicar ${totalBoletas} boletas en la tienda? Esto sobreescribirá las boletas actuales.`)) return;
+  const ok = await sjConfirm(
+    `Generar ${totalBoletas} boletas`,
+    'Esto sobreescribirá las boletas actuales en la tienda. ¿Deseas continuar?',
+    { icon: '🎫', iconClass: 'warning', okLabel: 'Generar', okClass: 'verde' }
+  );
+  if (!ok) return;
 
   const btn = document.getElementById('btn-generar-todas');
   btn.disabled = true;
@@ -7560,11 +9249,13 @@ window.imprimirBoleta = imprimirBoleta;
 window.actualizarInfoCuarteto = actualizarInfoCuarteto;
 
 async function borrarBaseDatosBoletas() {
-  const confirmacion = prompt(
-    '⚠ ACCIÓN IRREVERSIBLE\n\nEscribe BORRAR para confirmar que deseas eliminar todas las boletas y ventas registradas:'
+  const confirmacion = await sjPrompt(
+    '⚠️ ACCIÓN IRREVERSIBLE',
+    'Esto eliminará todas las boletas y ventas registradas.\n\nEscribe BORRAR para confirmar:',
+    { icon: '🗑️', iconClass: 'danger', okLabel: 'Borrar todo', placeholder: 'Escribe BORRAR' }
   );
   if ((confirmacion || '').trim().toUpperCase() !== 'BORRAR') {
-    toast('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#e53e3e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Cancelado — escribe BORRAR para confirmar', 'rojo');
+    toast('❌ Cancelado — escribe BORRAR para confirmar', 'rojo');
     return;
   }
 
@@ -7643,11 +9334,13 @@ async function borrarBaseDatosBoletas() {
 }
 
 async function resetCampanaCompleta() {
-  const confirmacion = prompt(
-    '⟳ RESET CAMPAÑA COMPLETA\n\nEsto borrará boletas, pedidos y configuración del sorteo.\nLos vendedores y sus PINs se conservan (solo se limpian sus boletas asignadas).\nEl PIN de admin se conserva.\n\nEscribe NUEVA CAMPAÑA para confirmar:'
+  const confirmacion = await sjPrompt(
+    '🔄 Reset Campaña Completa',
+    'Esto borrará boletas, pedidos y configuración del sorteo.\nLos vendedores y sus PINs se conservan.\nEl PIN de admin se conserva.\n\nEscribe NUEVA CAMPAÑA para confirmar:',
+    { icon: '🔄', iconClass: 'danger', okLabel: 'Resetear', placeholder: 'Escribe NUEVA CAMPAÑA' }
   );
   if ((confirmacion || '').trim().toUpperCase() !== 'NUEVA CAMPAÑA') {
-    toast('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#e53e3e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Cancelado — escribe NUEVA CAMPAÑA para confirmar', 'rojo');
+    toast('❌ Cancelado — escribe NUEVA CAMPAÑA para confirmar', 'rojo');
     return;
   }
 
@@ -7769,7 +9462,12 @@ window.resetCampanaCompleta = resetCampanaCompleta;
 async function limpiarBoletasDuplicadas() {
   const db = window._db, ref = window._ref, get = window._get, remove = window._remove, push = window._push, set = window._set;
 
-  if (!confirm('¿Limpiar boletas duplicadas o mal agrupadas en Firebase? Se agruparán por comprador y se eliminarán los registros individuales.')) return;
+  const ok = await sjConfirm(
+    'Limpiar boletas duplicadas',
+    'Se agruparán por comprador y se eliminarán los registros individuales duplicados o mal agrupados en Firebase.\n\n¿Deseas continuar?',
+    { icon: '🧹', iconClass: 'warning', okLabel: 'Limpiar', okClass: 'amarillo' }
+  );
+  if (!ok) return;
 
   toast('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Analizando boletas...', 'verde');
 
@@ -8589,6 +10287,96 @@ window.vendedorConfirmarEntrega = vendedorConfirmarEntrega;
 window.cerrarModalPagoEntrega = cerrarModalPagoEntrega;
 window.seleccionarTipoPago = seleccionarTipoPago;
 window.ejecutarConfirmarEntrega = ejecutarConfirmarEntrega;
+
+// ===== MODAL CUSTOM CONFIRM / PROMPT =====
+(function() {
+  const overlay = document.getElementById('sj-modal-overlay');
+  const box     = document.getElementById('sj-modal-box');
+  const iconEl  = document.getElementById('sj-modal-icon');
+  const titleEl = document.getElementById('sj-modal-title');
+  const bodyEl  = document.getElementById('sj-modal-body');
+  const inputWrap = document.getElementById('sj-modal-input-wrap');
+  const inputEl   = document.getElementById('sj-modal-input');
+  const btnCancel = document.getElementById('sj-btn-cancel');
+  const btnOk     = document.getElementById('sj-btn-ok');
+
+  let _resolve = null;
+  let _mode    = 'confirm'; // 'confirm' | 'prompt'
+
+  function _open(opts) {
+    // opts: { mode, icon, iconClass, title, body, okLabel, okClass, cancelLabel, placeholder, defaultValue }
+    _mode = opts.mode || 'confirm';
+    iconEl.textContent  = opts.icon  || '';
+    iconEl.className    = opts.iconClass || 'danger';
+    titleEl.textContent = opts.title || '';
+    bodyEl.textContent  = opts.body  || '';
+    btnOk.textContent   = opts.okLabel || 'Aceptar';
+    btnOk.className     = opts.okClass || '';
+    btnCancel.textContent = opts.cancelLabel || 'Cancelar';
+
+    if (_mode === 'prompt') {
+      inputWrap.style.display = 'block';
+      inputEl.placeholder = opts.placeholder || '';
+      inputEl.value       = opts.defaultValue || '';
+      setTimeout(() => inputEl.focus(), 80);
+    } else {
+      inputWrap.style.display = 'none';
+    }
+
+    overlay.classList.add('open');
+    return new Promise(res => { _resolve = res; });
+  }
+
+  function _close(val) {
+    overlay.classList.remove('open');
+    if (_resolve) { _resolve(val); _resolve = null; }
+  }
+
+  btnCancel.addEventListener('click', () => _close(_mode === 'prompt' ? null : false));
+  btnOk.addEventListener('click', () => {
+    if (_mode === 'prompt') {
+      _close(inputEl.value);
+    } else {
+      _close(true);
+    }
+  });
+  inputEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter')  { e.preventDefault(); _close(inputEl.value); }
+    if (e.key === 'Escape') { e.preventDefault(); _close(null); }
+  });
+  overlay.addEventListener('click', e => { if (e.target === overlay) _close(_mode === 'prompt' ? null : false); });
+
+  // Public API
+  window.sjConfirm = function(title, body, opts) {
+    opts = opts || {};
+    return _open({
+      mode:      'confirm',
+      icon:      opts.icon      || '⚠️',
+      iconClass: opts.iconClass || 'warning',
+      title:     title,
+      body:      body,
+      okLabel:   opts.okLabel   || 'Aceptar',
+      okClass:   opts.okClass   || '',
+      cancelLabel: opts.cancelLabel || 'Cancelar',
+    });
+  };
+
+  window.sjPrompt = function(title, body, opts) {
+    opts = opts || {};
+    return _open({
+      mode:        'prompt',
+      icon:        opts.icon        || '⚠️',
+      iconClass:   opts.iconClass   || 'danger',
+      title:       title,
+      body:        body,
+      okLabel:     opts.okLabel     || 'Confirmar',
+      okClass:     opts.okClass     || '',
+      cancelLabel: opts.cancelLabel || 'Cancelar',
+      placeholder: opts.placeholder || '',
+      defaultValue: opts.defaultValue || '',
+    });
+  };
+})();
 </script>
 </body>
 </html>
