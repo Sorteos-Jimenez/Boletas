@@ -7548,6 +7548,9 @@ function abrirDetalleVendedor(vid) {
   const v = allVendedores[vid];
   if (!v) return;
 
+  // Resetear paginación al abrir este vendedor
+  ['disponibles','abonadas','vendidas'].forEach(tab => { _vdPag[vid + '_' + tab] = 0; });
+
   // Boletas asignadas a este vendedor (por boletasAsignadas idx)
   const asignadas = v.boletasAsignadas || [];
   // Boletas con datos de venta para este vendedor
@@ -7738,10 +7741,10 @@ function abrirDetalleVendedor(vid) {
       ${vdRenderDisponibles(vid)}
     </div>
     <div id="vd-tab-panel-abonadas" class="vd-tab-panel">
-      ${vdRenderBoletas(abonadas, 'abonada')}
+      ${vdRenderBoletas(abonadas, 'abonada', vid, 'abonadas')}
     </div>
     <div id="vd-tab-panel-vendidas" class="vd-tab-panel">
-      ${vdRenderBoletas(vendidas, 'vendida')}
+      ${vdRenderBoletas(vendidas, 'vendida', vid, 'vendidas')}
     </div>
     <div id="vd-tab-panel-pedidos" class="vd-tab-panel">
       ${vdRenderPedidosVendedor(vid)}
@@ -7986,21 +7989,51 @@ function vdRenderDisponibles(vid) {
 
   if (!boletasCompletas.length) return '<div class="empty-state" style="padding:24px"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span><p>Todas las boletas asignadas han sido vendidas</p></div>';
 
-  return vdRenderBoletasTile(boletasCompletas, 'libre');
+  return vdRenderBoletasTile(boletasCompletas, 'libre', vid, 'disponibles');
 }
 
 // clave de boleta activa para el modal de agregar abono
 let _vdAddAbonoKey = null;
 
-function vdRenderBoletasTile(lista, estadoDefault) {
+// Paginación de tiles de vendedor: { "vid_tab": pag }
+const _vdPag = {};
+const VD_PAG_SIZE = 10;
+
+// Llama cuando el usuario cambia de página en el panel de boletas del vendedor
+function vdCambiarPagTile(vid, tab, pag) {
+  _vdPag[vid + '_' + tab] = pag;
+  const panel = document.getElementById('vd-tab-panel-' + tab);
+  if (!panel) return;
+  // Re-renderizar solo el contenido del panel
+  if (tab === 'disponibles') {
+    panel.innerHTML = vdRenderDisponibles(vid);
+  } else if (tab === 'abonadas') {
+    const abonadas = Object.entries(allBoletas).filter(([, b]) => b.vendedor_id === vid && b.estado === 'abonado');
+    panel.innerHTML = vdRenderBoletas(abonadas, 'abonada', vid, 'abonadas');
+  } else if (tab === 'vendidas') {
+    const vendidas = Object.entries(allBoletas).filter(([, b]) => b.vendedor_id === vid && (b.estado === 'pagada' || b.estado === 'vendida'));
+    panel.innerHTML = vdRenderBoletas(vendidas, 'vendida', vid, 'vendidas');
+  }
+  // Scroll al inicio del panel
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function vdRenderBoletasTile(lista, estadoDefault, vid, tab) {
   if (!lista.length) return '';
+
+  // --- Paginación ---
+  const pagKey = vid && tab ? (vid + '_' + tab) : null;
+  const totalPags = Math.ceil(lista.length / VD_PAG_SIZE);
+  const pagActual = pagKey ? Math.min(Math.max(_vdPag[pagKey] || 0, 0), totalPags - 1) : 0;
+  const listaVisible = pagKey ? lista.slice(pagActual * VD_PAG_SIZE, (pagActual + 1) * VD_PAG_SIZE) : lista;
+  // --- Fin paginación ---
 
   const svgCheck = `<svg width="13" height="13" viewBox="0 0 14 14" style="vertical-align:middle;margin-right:3px"><circle cx="7" cy="7" r="7" fill="#3ab54a"/><polyline points="3.5,7 6,9.5 10.5,4.5" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   const svgCoin  = `<svg width="13" height="13" viewBox="0 0 13 13" style="vertical-align:middle;margin-right:3px"><circle cx="6.5" cy="6.5" r="6" fill="#ff9f43" stroke="#e67e22" stroke-width="0.8"/><text x="6.5" y="9.5" text-anchor="middle" font-size="7" font-weight="900" fill="white" font-family="Arial">$</text></svg>`;
   const svgHome  = `<svg width="12" height="12" viewBox="0 0 13 13" style="vertical-align:middle;margin-right:3px"><path d="M1.5 7L6.5 2L11.5 7" fill="none" stroke="#a0aec0" stroke-width="1.4" stroke-linecap="round"/><rect x="3.5" y="6.5" width="6" height="5" rx="1" fill="none" stroke="#a0aec0" stroke-width="1.4"/><rect x="5.2" y="9" width="2.6" height="2.5" rx="0.5" fill="#a0aec0"/></svg>`;
   const svgEdit  = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
 
-  const cards = lista.map(([k, bp]) => {
+  const cards = listaVisible.map(([k, bp]) => {
     const nums = [bp.n1, bp.n2, bp.n3, bp.n4].filter(Boolean);
     const estado = bp.estadoVenta || estadoDefault || 'libre';
     const boletaKey = bp._boletaKey || k;
@@ -8050,7 +8083,28 @@ function vdRenderBoletasTile(lista, estadoDefault) {
     </div>`;
   }).join('');
 
-  return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:4px 0">${cards}</div>`;
+  const gridHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:4px 0">${cards}</div>`;
+
+  if (!pagKey || totalPags <= 1) return gridHTML;
+
+  // Control de paginación
+  const desde = pagActual * VD_PAG_SIZE + 1;
+  const hasta = Math.min((pagActual + 1) * VD_PAG_SIZE, lista.length);
+  const btnBase = `style="padding:7px 13px;border:2px solid var(--borde);border-radius:9px;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;cursor:pointer;background:white;color:var(--dark)"`;
+  const btnPrev = pagActual > 0
+    ? `<button ${btnBase} onclick="vdCambiarPagTile('${vid}','${tab}',${pagActual - 1})">‹ Ant</button>`
+    : `<button ${btnBase} style="opacity:0.3;cursor:default;padding:7px 13px;border:2px solid var(--borde);border-radius:9px;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;background:white;color:var(--dark)" disabled>‹ Ant</button>`;
+  const btnNext = pagActual < totalPags - 1
+    ? `<button ${btnBase} onclick="vdCambiarPagTile('${vid}','${tab}',${pagActual + 1})">Sig ›</button>`
+    : `<button ${btnBase} style="opacity:0.3;cursor:default;padding:7px 13px;border:2px solid var(--borde);border-radius:9px;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;background:white;color:var(--dark)" disabled>Sig ›</button>`;
+
+  const paginador = `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0 4px;gap:8px">
+    ${btnPrev}
+    <span style="font-size:12px;color:#718096;font-weight:700;text-align:center">${desde}–${hasta} de ${lista.length}</span>
+    ${btnNext}
+  </div>`;
+
+  return gridHTML + paginador;
 }
 
 function vdToggleFlip(k) {
@@ -8058,7 +8112,7 @@ function vdToggleFlip(k) {
   if (card) card.classList.toggle('flipped');
 }
 
-function vdRenderBoletas(boletas, tipo) {
+function vdRenderBoletas(boletas, tipo, vid, tab) {
   if (!boletas.length) return `<div class="empty-state" style="padding:24px"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="2" x2="9" y2="22"/></svg></span><p>Sin boletas ${tipo === 'abonada' ? 'abonadas' : 'vendidas'}</p></div>`;
 
   const numToPlantilla = {};
@@ -8076,7 +8130,7 @@ function vdRenderBoletas(boletas, tipo) {
     return [key, { n1: nums[0], n2: nums[1], n3: nums[2], n4: nums[3], estadoVenta: tipo === 'abonada' ? 'abonado' : 'pagada', _boletaKey: key, _comprador: b.comprador, _telefono: b.telefono, _fecha: b.fecha, _monto: b.monto_pagado, _direccion: b.direccion_casa || b.dir_casa || b.direccion || '', _entregada: b.entregada || false, _fechaEntrega: b.fecha_entrega || '', _editKey: key }];
   });
 
-  return vdRenderBoletasTile(lista, tipo === 'abonada' ? 'abonado' : 'pagada');
+  return vdRenderBoletasTile(lista, tipo === 'abonada' ? 'abonado' : 'pagada', vid, tab);
 }
 
 async function vdAbrirAddAbono(key) {
