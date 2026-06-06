@@ -9856,13 +9856,14 @@ async function abrirTienda(codigoVendedor) {
     return !visConfigTieneEntradas;
   };
 
-  // Set de índices asignados a este vendedor (para filtrar)
-  const indicesVendedor = vendedorFiltro && (vendedorFiltro.boletasAsignadas||[]).length > 0
-    ? new Set(vendedorFiltro.boletasAsignadas)
-    : null; // null = sin filtro (todos)
+  // Set de n1 asignados a este vendedor (para filtrar en tienda)
+  // boletasAsignadas puede guardar strings n1 ('0001') o índices numéricos (1)
+  // Normalizamos todo a string padStart(4,'0') para comparar con b.n1
+  const n1Vendedor = vendedorFiltro && (vendedorFiltro.boletasAsignadas||[]).length > 0
+    ? new Set((vendedorFiltro.boletasAsignadas).map(n => String(n).padStart(4,'0')))
+    : null; // null = sin filtro (mostrar todos)
 
   // Mapa n1 → vendedorId construido desde boletasAsignadas de cada vendedor
-  // boletasAsignadas guarda números de boleta (n1 con padStart 4), no índices numéricos
   const n1ToVendedor = {};
   if (vendsSnapVis.exists()) {
     Object.entries(vendsSnapVis.val()).forEach(([vid, v]) => {
@@ -9879,11 +9880,11 @@ async function abrirTienda(codigoVendedor) {
       const vidBoleta = n1 ? (n1ToVendedor[n1] || null) : null;
       // Filtro por oficina: solo boletas NO asignadas a ningún vendedor
       if (esOficinaFiltro && vidBoleta) return;
-      // Si hay filtro por vendedor URL, solo incluir boletas de su lista
-      if (indicesVendedor !== null && !indicesVendedor.has(b.idx)) return;
+      // Si hay filtro por vendedor URL, solo incluir boletas cuyo n1 esté en su lista
+      if (n1Vendedor !== null && (!n1 || !n1Vendedor.has(n1))) return;
       const nums = [b.n1, b.n2, b.n3, b.n4].filter(Boolean);
       // Aplicar filtro de visibilidad (solo cuando NO hay filtro de vendedor por URL)
-      if (!esOficinaFiltro && indicesVendedor === null && !visiblePara(vidBoleta)) return;
+      if (!esOficinaFiltro && n1Vendedor === null && !visiblePara(vidBoleta)) return;
       // keysPedidas tiene prioridad: si la boleta tiene un pedido activo, marcarla vendida
       let estadoVenta = keysPedidas.has(k) ? 'vendida' : (nums.map(n => numEstado[n]).find(e => e) || 'libre');
       tiendaBoletas[k] = { ...b, estadoVenta };
