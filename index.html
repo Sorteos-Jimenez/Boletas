@@ -3273,7 +3273,7 @@
           <!-- Campo valor (porcentaje / precio fijo) -->
           <div class="form-group" id="cfg-com-grupo-valor">
             <label id="cfg-com-label">Porcentaje de comisión (%)</label>
-            <input type="number" id="cfg-com-valor" placeholder="10" min="0"
+            <input type="text" id="cfg-com-valor" placeholder="10" inputmode="numeric"
               style="width:100%;padding:11px 14px;border:2px solid var(--borde);border-radius:10px;font-size:15px;font-family:'Nunito',sans-serif;font-weight:700;outline:none">
           </div>
           <!-- Panel tramos (solo visible cuando tipo=tramos) -->
@@ -3471,6 +3471,9 @@
               <input type="file" id="file-img-sorteo" accept="image/*" style="display:none" onchange="cargarImagenSorteo(this)">
             </div>
             <div id="img-info" style="font-size:12px;color:var(--verde);font-weight:700;margin-top:6px;display:none"></div>
+            <div id="img-preview-wrap" style="display:none;margin-top:10px;border-radius:10px;overflow:hidden;border:2px solid var(--borde);max-height:120px">
+              <img id="img-preview" src="" alt="Vista previa" style="width:100%;height:120px;object-fit:cover;display:block">
+            </div>
           </div>
         </div>
 
@@ -3682,6 +3685,7 @@
       </div>
     </div>
 
+    <!-- ======== TAB: ANULAR BOLETA (admin) ======== -->
     <!-- ======== TAB: MIS PEDIDOS PENDIENTES (vendedor) ======== -->
     <div class="tab-panel" id="tab-mis-pedidos">
       <div id="mis-pedidos-stats" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
@@ -4701,7 +4705,7 @@ async function abrirTab(id) {
     venta: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="display:inline-block;vertical-align:-3px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Venta', vendedores: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Vendedores',
     pedidos: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> Pedidos', 'mis-ventas': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> Mis ventas', 'mis-pedidos': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M5 22h14M5 2h14M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22M7 2v4.172a2 2 0 0 1 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg> Pendientes',
     'mi-perfil': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Mi perfil',
-    config: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Config', editor: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg> Editor', distribuir: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg> Distribuir'
+    config: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Config', editor: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg> Editor', distribuir: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg> Distribuir',
   };
   const tabs = document.getElementById('tabs-container');
   [...tabs.children].forEach(b => {
@@ -4858,6 +4862,7 @@ function cargarDatos() {
         comisionConfig = { tipo: c.tipo || 'porcentaje', valor: Number(c.valor) || 0, tramos: c.tramos || null };
       }
       cargarUIComision();
+      renderVendedores(); // re-renderizar para que las tarjetas muestren la comisión correcta
     });
     // Cargar imagen del anverso para las minicards de pedidos
     get(ref(db, 'config/boleta_plantilla')).then(snap => {
@@ -8753,7 +8758,7 @@ function actualizarPreviewComision() {
     prev.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:3px"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="8"/></svg> <b>1–${t1h} boletas:</b> $${v1.toLocaleString('es-CO')} por boleta &nbsp;|&nbsp; <b>${t1h+1}–${t2h}:</b> $${v2.toLocaleString('es-CO')} &nbsp;|&nbsp; <b>${t2h+1}+:</b> $${v3.toLocaleString('es-CO')}`;
     return;
   }
-  const val = Number(document.getElementById('cfg-com-valor')?.value) || 0;
+  const val = Number((document.getElementById('cfg-com-valor')?.value || '').replace(/\./g, '')) || 0;
   if (!val) { prev.style.display = 'none'; return; }
   const precioBoleta = Number((window.tiendaConfig?.precio || '0').toString().replace(/[.\s]/g,'').replace(',','.')) || 0;
   prev.style.display = 'block';
@@ -8768,8 +8773,18 @@ function actualizarPreviewComision() {
 function cargarUIComision() {
   const inp = document.getElementById('cfg-com-valor');
   if (!inp) return;
-  inp.value = comisionConfig.valor || '';
-  inp.oninput = actualizarPreviewComision;
+  inp.value = comisionConfig.valor ? Number(comisionConfig.valor).toLocaleString('es-CO') : '';
+  inp.oninput = function() {
+    const pos = this.selectionStart;
+    const prev = this.value;
+    const raw = prev.replace(/[^\d]/g, '');
+    const formatted = raw.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    this.value = formatted;
+    // mantener posición del cursor ajustada al cambio de largo
+    const diff = formatted.length - prev.length;
+    this.setSelectionRange(pos + diff, pos + diff);
+    actualizarPreviewComision();
+  };
   // Cargar tramos si existen
   if (comisionConfig.tramos) {
     const tr = comisionConfig.tramos;
@@ -8792,7 +8807,7 @@ async function guardarConfigComision() {
     ];
     comisionConfig = { tipo: 'tramos', valor: 0, tramos };
   } else {
-    const valor = Number(document.getElementById('cfg-com-valor').value) || 0;
+    const valor = Number((document.getElementById('cfg-com-valor').value || '').replace(/\./g, '')) || 0;
     comisionConfig = { tipo: comisionConfig.tipo, valor };
   }
   await set(ref(db, 'config/comision'), comisionConfig);
@@ -10638,6 +10653,9 @@ function cargarImagenSorteo(input) {
       editorImgSorteo = img;
       document.getElementById('img-info').style.display = 'block';
       document.getElementById('img-info').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Imagen cargada: ' + file.name + ' (' + img.width + '×' + img.height + 'px)';
+      const prevImg = document.getElementById('img-preview');
+      const prevWrap = document.getElementById('img-preview-wrap');
+      if (prevImg && prevWrap) { prevImg.src = e.target.result; prevWrap.style.display = 'block'; }
       document.getElementById('canvas-placeholder').style.display = 'none';
       document.getElementById('boleta-canvas').style.display = 'block';
       renderEditorCanvas();
@@ -11353,6 +11371,9 @@ async function cargarEstadoEditor() {
         document.getElementById('boleta-canvas').style.display = 'block';
         const imgInfo = document.getElementById('img-info');
         if (imgInfo) { imgInfo.style.display = 'block'; imgInfo.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Imagen restaurada desde Firebase'; }
+        const prevImg2 = document.getElementById('img-preview');
+        const prevWrap2 = document.getElementById('img-preview-wrap');
+        if (prevImg2 && prevWrap2) { prevImg2.src = pc.img; prevWrap2.style.display = 'block'; }
         renderEditorCanvas();
         editorActualizarReverso();
       };
@@ -11956,6 +11977,9 @@ function _distribuirCargarColumna(lado) {
       }
     });
     const lista = [];
+    // Mapa n1 → anulada (boletas_plantilla con anulada:true no aparecen en lista)
+    const n1Anulada = new Set();
+    Object.values(allBoletasPlantilla || {}).forEach(b => { if (b.anulada === true && b.n1) n1Anulada.add(b.n1); });
     if (editorNumerosBD.length >= 4) {
       for (let i = 0; i + 3 < editorNumerosBD.length; i += 4) {
         const nums = [editorNumerosBD[i], editorNumerosBD[i+1], editorNumerosBD[i+2], editorNumerosBD[i+3]];
@@ -11963,6 +11987,7 @@ function _distribuirCargarColumna(lado) {
         if (nums.some(n => numsPagadas.has(n))) continue;
         const bkey = n1ToKey[nums[0]];
         if (bkey && keysPedidasDist.has(bkey)) continue;
+        if (n1Anulada.has(nums[0])) continue; // excluir anuladas
         lista.push({ nums, checked: false, id: nums.join('-') });
       }
     }
@@ -11983,6 +12008,7 @@ function _distribuirCargarColumna(lado) {
         if (nums.some(n => numsPagadas.has(n))) continue;
         const bkey = n1ToKey[nums[0]];
         if (bkey && keysPedidasDist.has(bkey)) continue;
+        if (n1Anulada.has(nums[0])) continue; // excluir anuladas
         lista.push({ nums, checked: false, id: nums.join('-') });
       }
     } else {
@@ -11992,6 +12018,7 @@ function _distribuirCargarColumna(lado) {
         if (nums.some(n => numsPagadas.has(n))) continue;
         const bkey = n1ToKey[nums[0]];
         if (bkey && keysPedidasDist.has(bkey)) continue;
+        if (n1Anulada.has(nums[0])) continue; // excluir anuladas
         lista.push({ nums, checked: false, id: nums.join('-') });
       }
     }
@@ -12357,10 +12384,8 @@ function distribuirBuscarNum(query) {
   }
 
   el.innerHTML = resultados.map(r => {
-    const boleta = numABoleta[qPad] || [...boletasMatch].map(i => {
-      const base = i * 4;
-      return { idx: i, nums: [editorNumerosBD[base], editorNumerosBD[base+1], editorNumerosBD[base+2], editorNumerosBD[base+3]] };
-    }).find(b => b.idx === r.idx);
+    const base = r.idx * 4;
+    const boleta = { idx: r.idx, nums: [editorNumerosBD[base], editorNumerosBD[base+1], editorNumerosBD[base+2], editorNumerosBD[base+3]] };
     const nums = boleta ? boleta.nums.filter(Boolean) : [];
     const numsHTML = nums.map(n => `<span style="font-family:'Bebas Neue',cursive;font-size:15px;background:#fff5f5;color:#e74c3c;border:1px solid #fcc;border-radius:5px;padding:2px 7px">${n}</span>`).join(' ');
     const icono = r.tipo === 'oficina'
@@ -12369,14 +12394,73 @@ function distribuirBuscarNum(query) {
     const bg = r.tipo === 'oficina' ? '#e8f9eb' : '#fdf2f8';
     const borde = r.tipo === 'oficina' ? 'var(--verde)' : 'var(--magenta)';
     const color = r.tipo === 'oficina' ? 'var(--azul-dark)' : 'var(--magenta)';
-    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:${bg};border:1.5px solid ${borde};border-radius:10px;margin-bottom:4px">
-      <div style="flex:1">
-        <div style="font-size:12px;font-weight:800;color:${color};margin-bottom:3px">${icono} ${r.vendedor}</div>
-        <div style="display:flex;gap:5px;flex-wrap:wrap">${numsHTML}</div>
+    // Estado anulada desde allBoletasPlantilla
+    const bpKey = nums.length ? Object.keys(allBoletasPlantilla || {}).find(k => String(allBoletasPlantilla[k].n1).padStart(4,'0') === String(nums[0]).padStart(4,'0')) : null;
+    const esAnulada = bpKey && allBoletasPlantilla[bpKey]?.anulada === true;
+    const estadoBadge = esAnulada
+      ? `<span style="font-size:10px;font-weight:800;color:#c53030;background:#fff5f5;border:1px solid #fed7d7;border-radius:12px;padding:2px 8px;margin-left:6px">🚫 ANULADA</span>`
+      : `<span style="font-size:10px;font-weight:800;color:#276749;background:#e6fffa;border:1px solid #9ae6b4;border-radius:12px;padding:2px 8px;margin-left:6px">✅ DISPONIBLE</span>`;
+    const btnAccion = bpKey
+      ? (esAnulada
+          ? `<button onclick="distReactivarBoleta('${bpKey}')" style="display:inline-block;margin-top:6px;padding:5px 12px;background:linear-gradient(135deg,#38a169,#276749);color:white;border:none;border-radius:20px;font-family:'Nunito',sans-serif;font-weight:800;font-size:11px;cursor:pointer">🔓 Quitar anulación</button>`
+          : `<button onclick="distAnularBoleta('${bpKey}')" style="display:inline-block;margin-top:6px;padding:5px 12px;background:linear-gradient(135deg,#e53e3e,#9b2c2c);color:white;border:none;border-radius:20px;font-family:'Nunito',sans-serif;font-weight:800;font-size:11px;cursor:pointer">🚫 Anular boleta</button>`)
+      : '';
+    return `<div style="padding:10px 12px;background:${bg};border:1.5px solid ${borde};border-radius:10px;margin-bottom:6px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="font-size:12px;font-weight:800;color:${color}">${icono} ${r.vendedor}</div>
+        ${estadoBadge}
       </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:4px">${numsHTML}</div>
+      ${btnAccion}
     </div>`;
   }).join('');
   el.style.display = 'block';
+}
+
+async function distAnularBoleta(bpKey) {
+  const b = allBoletasPlantilla[bpKey];
+  if (!b) return;
+  const nums = [b.n1,b.n2,b.n3,b.n4].filter(Boolean).join(', ');
+  const ok = await sjConfirm('Anular boleta', '¿Anular la boleta con números <b>' + nums + '</b>?<br>No aparecerá en la lista de disponibles. Se puede quitar la anulación con PIN de administrador.', { icon: '🚫', iconClass: 'danger', okLabel: 'Sí, anular', okClass: 'danger' });
+  if (!ok) return;
+  try {
+    const db = window._db, ref = window._ref, update = window._update;
+    await update(ref(db, 'boletas_plantilla/' + bpKey), { anulada: true });
+    if (allBoletasPlantilla[bpKey]) allBoletasPlantilla[bpKey].anulada = true;
+    toast('🚫 Boleta anulada (' + nums + ')', 'rojo');
+    distribuirBuscarNum(document.getElementById('dist-buscar-num').value);
+    _distribuirCargarColumna('izq');
+    if (_distIdDer) _distribuirCargarColumna('der');
+  } catch(e) { toast('❌ Error: ' + e.message, 'rojo'); }
+}
+
+async function distReactivarBoleta(bpKey) {
+  const b = allBoletasPlantilla[bpKey];
+  if (!b) return;
+  const nums = [b.n1,b.n2,b.n3,b.n4].filter(Boolean).join(', ');
+  // Pedir PIN del administrador
+  const pinIngresado = await sjPrompt('PIN de administrador', 'Ingresa el PIN de administrador para quitar la anulación de la boleta <b>' + nums + '</b>.');
+  if (pinIngresado === null) return;
+  // Verificar PIN contra config/admin (hash SHA-256)
+  const db = window._db, ref = window._ref, get = window._get, update = window._update;
+  let pinOk = false;
+  try {
+    const adminSnap = await get(ref(db, 'config/admin'));
+    if (adminSnap.exists()) {
+      const pinHash = adminSnap.val().pin || '';
+      const hash = await sha256(pinIngresado);
+      pinOk = hash === pinHash || pinIngresado === pinHash;
+    }
+  } catch(e) {}
+  if (!pinOk) { toast('❌ PIN incorrecto', 'rojo'); return; }
+  try {
+    await update(ref(db, 'boletas_plantilla/' + bpKey), { anulada: false });
+    if (allBoletasPlantilla[bpKey]) allBoletasPlantilla[bpKey].anulada = false;
+    toast('✅ Boleta reactivada (' + nums + ')', 'verde');
+    distribuirBuscarNum(document.getElementById('dist-buscar-num').value);
+    _distribuirCargarColumna('izq');
+    if (_distIdDer) _distribuirCargarColumna('der');
+  } catch(e) { toast('❌ Error: ' + e.message, 'rojo'); }
 }
 
 window.distribuirInit = distribuirInit;
@@ -12835,16 +12919,18 @@ window.ejecutarConfirmarEntrega = ejecutarConfirmarEntrega;
       </div>
       <button onclick="cerrarQRTienda()" style="background:none;border:none;cursor:pointer;color:#a0aec0;font-size:20px;line-height:1;padding:2px 6px">✕</button>
     </div>
-    <div style="font-size:11px;color:#718096;margin-bottom:12px;word-break:break-all;background:#f4f8f4;border-radius:8px;padding:8px 10px;font-weight:700" id="qr-tienda-url-label"></div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
+      <div style="flex:1;font-size:11px;color:#718096;word-break:break-all;background:#f4f8f4;border-radius:8px;padding:8px 10px;font-weight:700;text-align:left" id="qr-tienda-url-label"></div>
+      <button id="btn-copiar-link-qr" onclick="copiarLinkQRTienda()" title="Copiar link" style="flex-shrink:0;padding:8px 10px;background:linear-gradient(135deg,#718096,#4a5568);color:white;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:800;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:4px">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copiar
+      </button>
+    </div>
     <canvas id="qr-tienda-canvas" style="border-radius:12px;max-width:100%;display:block;margin:0 auto"></canvas>
     <div style="display:flex;gap:10px;margin-top:16px">
       <button onclick="descargarQRTienda()" style="flex:1;padding:11px;background:linear-gradient(135deg,#3ab54a,#2a8c38);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Descargar PNG
-      </button>
-      <button id="btn-copiar-link-qr" onclick="copiarLinkQRTienda()" style="flex:1;padding:11px;background:linear-gradient(135deg,#718096,#4a5568);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        Copiar link
       </button>
       <button onclick="compartirQRTienda()" id="btn-compartir-qr" style="flex:1;padding:11px;background:linear-gradient(135deg,#25d366,#128c7e);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
@@ -13022,3 +13108,6 @@ window.copiarLinkQRTienda = copiarLinkQRTienda;
 </body>
 </html>
 
+<script>
+// ===== ANULAR BOLETA =====
+</script>
