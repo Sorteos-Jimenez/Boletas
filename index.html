@@ -9467,7 +9467,14 @@ async function abrirTienda(codigoVendedor) {
   // Cargar vendedores para resolver código
   let vendedorFiltro = null;
   let vendedorIdFiltro = null;
+  let esOficinaFiltro = false;
   if (codigoVendedor) {
+    if (codigoVendedor === '__oficina__') {
+      esOficinaFiltro = true;
+      document.getElementById('tienda-vendedor-badge').style.display = '';
+      document.getElementById('tienda-vendedor-nombre').textContent = '🏠 La Oficina';
+      tiendaVendedorActivo = { id: '__oficina__', codigo: '__oficina__', nombre: 'La Oficina', whatsapp: '' };
+    } else {
     const vendsSnap = await get(ref(db, 'vendedores'));
     if (vendsSnap.exists()) {
       Object.entries(vendsSnap.val()).forEach(([id, v]) => {
@@ -9490,6 +9497,7 @@ async function abrirTienda(codigoVendedor) {
       }
     } else {
       tiendaVendedorActivo = { id: '', codigo: '', nombre: '' };
+    }
     }
   }
 
@@ -9648,6 +9656,8 @@ async function abrirTienda(codigoVendedor) {
 
   if (plantSnap.exists()) {
     Object.entries(plantSnap.val()).forEach(([k, b]) => {
+      // Filtro por oficina: solo boletas NO asignadas a ningún vendedor
+      if (esOficinaFiltro && idxToVendedor[b.idx]) return;
       // Si hay filtro por vendedor URL, solo incluir boletas de su lista
       if (indicesVendedor !== null && !indicesVendedor.has(b.idx)) return;
       const nums = [b.n1, b.n2, b.n3, b.n4].filter(Boolean);
