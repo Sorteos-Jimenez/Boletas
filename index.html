@@ -4548,7 +4548,7 @@ async function doLogin() {
       snap.forEach(v => {
         const d = v.val();
         if ((d.username || d.codigo || '').toLowerCase() === codigo && d.pin === pin) {
-          currentUser = { rol: 'vendedor', id: v.key, nombre: d.nombre, username: d.username || d.codigo || v.key, boletasAsignadas: d.boletasAsignadas || [] };
+          currentUser = { rol: 'vendedor', id: v.key, nombre: d.nombre, boletasAsignadas: d.boletasAsignadas || [] };
           encontrado = true;
         }
       });
@@ -5337,23 +5337,23 @@ async function vpCargarPerfil() {
 
   // Mostrar mi link personal
   const linkEl = document.getElementById('mi-link-url');
-  if (linkEl) linkEl.textContent = TIENDA_URL + '?v=' + (currentUser.username || currentUser.id);
+  if (linkEl) linkEl.textContent = TIENDA_URL + '?v=' + currentUser.id;
   // Renderizar QR del link personal
   const qrCanvas = document.getElementById('mi-link-qr-canvas');
   if (qrCanvas && window.renderQROnCanvas) {
-    renderQROnCanvas(qrCanvas, TIENDA_URL + '?v=' + (currentUser.username || currentUser.id), { size: 200 });
+    renderQROnCanvas(qrCanvas, TIENDA_URL + '?v=' + currentUser.id, { size: 200 });
   }
 }
 
 function miLinkCopiar() {
-  const url = TIENDA_URL + '?v=' + (currentUser.username || currentUser.id);
+  const url = TIENDA_URL + '?v=' + currentUser.id;
   navigator.clipboard.writeText(url).then(() => toast('🔗 Link copiado', 'verde')).catch(() => {
     mostrarModalCopiarLink(url);
   });
 }
 
 async function miLinkCompartir() {
-  const url = TIENDA_URL + '?v=' + (currentUser.username || currentUser.id);
+  const url = TIENDA_URL + '?v=' + currentUser.id;
   const nombre = currentUser.nombre || 'mi tienda';
   if (navigator.share) {
     try { await navigator.share({ title: 'Sorteos — ' + nombre, url }); return; } catch(e) {}
@@ -7757,9 +7757,9 @@ function abrirDetalleVendedor(vid) {
       </div>
       <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
         <canvas id="vd-qr-canvas-${vid}" style="border-radius:10px;max-width:180px;display:block"></canvas>
-        <div style="font-size:11px;color:#718096;font-weight:700;word-break:break-all;text-align:center;background:#f4f8f4;border-radius:8px;padding:8px 10px;width:100%">${TIENDA_URL}?v=${v.username || v.codigo}</div>
+        <div style="font-size:11px;color:#718096;font-weight:700;word-break:break-all;text-align:center;background:#f4f8f4;border-radius:8px;padding:8px 10px;width:100%">${TIENDA_URL}?v=${vid}</div>
         <div style="display:flex;gap:8px;width:100%">
-          <button onclick="navigator.clipboard&&navigator.clipboard.writeText('${TIENDA_URL}?v=${v.username || v.codigo}').then(()=>toast('🔗 Link copiado','verde'))" style="flex:1;padding:9px;background:white;color:var(--dark);border:2px solid var(--borde);border-radius:10px;font-size:12px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px">
+          <button onclick="navigator.clipboard&&navigator.clipboard.writeText('${TIENDA_URL}?v=${vid}').then(()=>toast('🔗 Link copiado','verde'))" style="flex:1;padding:9px;background:white;color:var(--dark);border:2px solid var(--borde);border-radius:10px;font-size:12px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             Copiar link
           </button>
@@ -7782,7 +7782,7 @@ function abrirDetalleVendedor(vid) {
   // Renderizar QR del vendedor
   if (window.renderQROnCanvas) {
     const qc = document.getElementById('vd-qr-canvas-' + vid);
-    if (qc) renderQROnCanvas(qc, TIENDA_URL + '?v=' + (v.username || v.codigo), { size: 180 });
+    if (qc) renderQROnCanvas(qc, TIENDA_URL + '?v=' + vid, { size: 180 });
   }
 }
 
