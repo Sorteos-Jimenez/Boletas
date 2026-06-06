@@ -4404,12 +4404,29 @@ let comisionConfig = { tipo: 'porcentaje', valor: 0 }; // config global de comis
 let metodoSeleccionado = 'efectivo';
 let filtroEstado = '';
 
-// ===== AUTO-DETECT TIENDA POR VENDEDOR (?v=CODIGO) =====
+// ===== AUTO-DETECT TIENDA POR VENDEDOR (?v=CODIGO o /Boletas/usuario) =====
 (function() {
+  // 1. Leer ?v= o ?vendedor= de la query string
   const params = new URLSearchParams(window.location.search);
-  const codigoV = params.get('v') || params.get('vendedor') || '';
+  let codigoV = params.get('v') || params.get('vendedor') || '';
+
+  // 2. Si no hay query string, leer el segmento de path despues de /Boletas/
+  //    Ej: /Boletas/juan  ->  codigoV = 'juan'
+  if (!codigoV) {
+    const pathMatch = window.location.pathname.match(/\/Boletas\/([^\/\?#]+)/i);
+    if (pathMatch && pathMatch[1]) {
+      codigoV = decodeURIComponent(pathMatch[1]);
+    }
+  }
+
+  // 3. Leer segmento guardado por el 404.html de GitHub Pages
+  //    (tecnica estandar para SPA en GitHub Pages)
+  if (!codigoV && sessionStorage.getItem('ghpages_vendor')) {
+    codigoV = sessionStorage.getItem('ghpages_vendor');
+    sessionStorage.removeItem('ghpages_vendor');
+  }
+
   if (codigoV) {
-    // Esperar a que Firebase esté listo antes de abrir tienda
     const timer = setInterval(() => {
       if (window._db) {
         clearInterval(timer);
