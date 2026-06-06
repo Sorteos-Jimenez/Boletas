@@ -3180,6 +3180,22 @@
         </div>
       </div>
 
+      <!-- FILTRO VISIBILIDAD VENDEDORES EN TIENDA -->
+      <div class="card">
+        <div class="card-header"><h3><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Visibilidad de boletas en tienda</h3></div>
+        <div class="card-body">
+          <p style="font-size:12px;color:#718096;margin-bottom:14px">Selecciona qué vendedores (y la oficina) son visibles en la tienda pública. Solo se mostrarán las boletas de los marcados.</p>
+          <div id="cfg-filtro-vendedores-lista" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+            <div style="font-size:12px;color:#a0aec0;font-style:italic;text-align:center;padding:10px 0">Cargando vendedores…</div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:14px">
+            <button type="button" onclick="cfgFiltroSelAll(true)" style="flex:1;padding:8px;border:2px solid var(--borde);border-radius:8px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:var(--azul);background:white;cursor:pointer">✓ Todos</button>
+            <button type="button" onclick="cfgFiltroSelAll(false)" style="flex:1;padding:8px;border:2px solid var(--borde);border-radius:8px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:#718096;background:white;cursor:pointer">✗ Ninguno</button>
+          </div>
+          <button class="btn-primary" onclick="guardarFiltroVendedoresTienda()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Guardar visibilidad</button>
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-header"><h3><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> PIN del administrador</h3></div>
         <div class="card-body">
@@ -3606,10 +3622,13 @@
               <div id="dist-titulo-izq" style="font-size:13px;font-weight:800">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> La Oficina
               </div>
-              <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11px;font-weight:700">
-                <input type="checkbox" id="dist-sel-all-oficina" onchange="distribuirSeleccionarTodas('izq',this.checked)" style="accent-color:#3ab54a;width:16px;height:16px">
-                Todas
-              </label>
+              <div style="display:flex;align-items:center;gap:8px">
+
+                <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11px;font-weight:700">
+                  <input type="checkbox" id="dist-sel-all-oficina" onchange="distribuirSeleccionarTodas('izq',this.checked)" style="accent-color:#3ab54a;width:16px;height:16px">
+                  Todas
+                </label>
+              </div>
             </div>
             <div class="dist-dropdown" id="dist-dd-izq">
               <button class="dist-dropdown-btn" id="dist-dd-btn-izq" onclick="distDdToggle('izq')">
@@ -4565,6 +4584,7 @@ function construirTabs() {
       { id: 'pedidos', label: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> Pedidos', tabId: 'tab-btn-pedidos' },
       { id: 'editor', label: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg> Editor' },
       { id: 'distribuir', label: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg> Distribuir' },
+      { id: 'qr-tienda', label: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><rect x="19" y="14" width="2" height="2"/><rect x="14" y="19" width="2" height="2"/><rect x="19" y="19" width="2" height="2"/></svg> QR' },
       { id: 'config', label: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Config' },
     ];
   } else {
@@ -4597,6 +4617,7 @@ function construirTabs() {
       pedidos: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
       editor: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>',
       distribuir: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>',
+      'qr-tienda': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><rect x="19" y="14" width="2" height="2"/><rect x="14" y="19" width="2" height="2"/><rect x="19" y="19" width="2" height="2"/></svg>',
       config: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
       'mis-ventas': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>',
       'mis-pedidos': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14M5 2h14M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22M7 2v4.172a2 2 0 0 1 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg>',
@@ -4604,7 +4625,7 @@ function construirTabs() {
     };
     const drawerLabels = {
       dashboard: 'Dashboard', boletas: 'Boletas', vendedores: 'Vendedores',
-      pedidos: 'Pedidos', editor: 'Editor', distribuir: 'Distribuir', config: 'Config',
+      pedidos: 'Pedidos', editor: 'Editor', distribuir: 'Distribuir', 'qr-tienda': 'QR Tienda', config: 'Config',
       'mis-ventas': 'Mis ventas', 'mis-pedidos': 'Pendientes', 'mi-perfil': 'Mi perfil'
     };
     tabs.forEach((t, i) => {
@@ -4657,12 +4678,16 @@ async function abrirTab(id) {
     _distModificado = false;
   }
 
+  // El tab QR abre directamente el modal, sin cambiar panel
+  if (id === 'qr-tienda') { mostrarQRTienda(); return; }
+
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + id)?.classList.add('active');
   if (id === 'editor' && !editorImgSorteo) cargarEstadoEditor();
   if (id === 'distribuir') distribuirInit();
   if (id === 'mi-perfil') vpCargarPerfil();
+  if (id === 'config') cfgRenderFiltroVendedores();
   if (id === 'boletas' && currentUser?.rol === 'vendedor' && !Object.keys(allBoletasPlantilla).length) {
     const db = window._db, ref = window._ref, get = window._get;
     if (db) get(ref(db, 'boletas_plantilla')).then(snap => {
@@ -4749,6 +4774,7 @@ function cargarDatos() {
       renderVendedores();
       llenarSelectorVendedor();
       llenarSelectorConfigVendedor();
+      cfgRenderFiltroVendedores();
     });
     onValue(ref(db, 'pedidos'), snap => {
       const todos = snap.exists() ? snap.val() : {};
@@ -8569,6 +8595,85 @@ async function guardarConfigTienda() {
   toast('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Configuración de tienda guardada', 'verde');
 }
 
+// ===== FILTRO VISIBILIDAD VENDEDORES EN TIENDA =====
+// Renderiza los checks en Config > Visibilidad. Llamar cuando allVendedores cambie.
+function cfgRenderFiltroVendedores() {
+  const cont = document.getElementById('cfg-filtro-vendedores-lista');
+  if (!cont) return;
+
+  // Leer configuración guardada
+  const db = window._db, ref = window._ref, get = window._get;
+  get(ref(db, 'config/tienda_visibilidad')).then(snap => {
+    // vendedores_visibles: objeto { __oficina__: true/false, [vendedorId]: true/false }
+    // Si una key no existe → se asume visible (true) para no romper setups anteriores
+    const vis = snap.exists() ? (snap.val() || {}) : {};
+
+    const items = [];
+    // La Oficina (boletas sin vendedor_id)
+    items.push({ id: '__oficina__', nombre: '🏠 La Oficina', sub: 'Boletas sin vendedor asignado' });
+    // Vendedores reales
+    Object.entries(allVendedores || {})
+      .sort((a, b) => (a[1].nombre || '').localeCompare(b[1].nombre || ''))
+      .forEach(([id, v]) => {
+        items.push({ id, nombre: v.nombre || id, sub: v.username || v.codigo || '' });
+      });
+
+    cont.innerHTML = items.map(item => {
+      const checked = (item.id in vis) ? vis[item.id] : true; // default visible
+      return `<label style="display:flex;align-items:center;gap:12px;padding:10px 12px;border:2px solid ${checked ? 'var(--verde)' : 'var(--borde)'};border-radius:10px;cursor:pointer;background:${checked ? '#f0fff4' : 'white'};transition:all 0.2s" onclick="cfgFiltroToggle(this)">
+        <input type="checkbox" data-vid="${item.id}" ${checked ? 'checked' : ''} style="display:none">
+        <span style="width:22px;height:22px;border-radius:6px;border:2px solid ${checked ? 'var(--verde)' : 'var(--borde)'};background:${checked ? 'var(--verde)' : 'white'};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s" class="cfg-filtro-check-icon">
+          ${checked ? '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+        </span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:800;color:var(--dark)">${item.nombre}</div>
+          ${item.sub ? `<div style="font-size:11px;color:#718096;font-weight:600">${item.sub}</div>` : ''}
+        </div>
+        <span style="font-size:11px;font-weight:800;color:${checked ? 'var(--verde)' : '#a0aec0'}" class="cfg-filtro-estado">${checked ? 'Visible' : 'Oculto'}</span>
+      </label>`;
+    }).join('');
+  }).catch(() => {
+    cont.innerHTML = '<div style="font-size:12px;color:#e53e3e;text-align:center;padding:8px">Error al cargar</div>';
+  });
+}
+
+function cfgFiltroToggle(label) {
+  const cb = label.querySelector('input[type="checkbox"]');
+  const icon = label.querySelector('.cfg-filtro-check-icon');
+  const estado = label.querySelector('.cfg-filtro-estado');
+  const checked = !cb.checked;
+  cb.checked = checked;
+  label.style.borderColor = checked ? 'var(--verde)' : 'var(--borde)';
+  label.style.background   = checked ? '#f0fff4' : 'white';
+  icon.style.borderColor   = checked ? 'var(--verde)' : 'var(--borde)';
+  icon.style.background    = checked ? 'var(--verde)' : 'white';
+  icon.innerHTML = checked ? '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : '';
+  estado.textContent  = checked ? 'Visible' : 'Oculto';
+  estado.style.color  = checked ? 'var(--verde)' : '#a0aec0';
+}
+
+function cfgFiltroSelAll(val) {
+  const cont = document.getElementById('cfg-filtro-vendedores-lista');
+  if (!cont) return;
+  cont.querySelectorAll('label').forEach(label => {
+    const cb = label.querySelector('input[type="checkbox"]');
+    if (!cb) return;
+    if (cb.checked !== val) cfgFiltroToggle(label);
+  });
+}
+
+async function guardarFiltroVendedoresTienda() {
+  const cont = document.getElementById('cfg-filtro-vendedores-lista');
+  if (!cont) return;
+  const db = window._db, ref = window._ref, set = window._set;
+  const vis = {};
+  cont.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    vis[cb.dataset.vid] = cb.checked;
+  });
+  await set(ref(db, 'config/tienda_visibilidad'), vis);
+  toast('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Visibilidad guardada', 'verde');
+}
+
 
 // Helper: formatea input de tramo con punto de miles mientras escribe
 function fmtTramoValor(el) {
@@ -8777,6 +8882,19 @@ function renderPedidos(pedidos) {
       bspan.textContent = listaPendientes.length;
       bspan.style.cssText = 'position:absolute;top:-6px;right:-6px;background:#ea5455;color:white;border-radius:50%;min-width:18px;height:18px;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;border:2px solid white;padding:0 3px;animation:badgePop 0.25s cubic-bezier(0.34,1.56,0.64,1)';
       tabBtnPedidos.appendChild(bspan);
+    }
+  }
+
+  // Badge rojo en el ítem "Pedidos" del drawer móvil
+  const drawerPedidos = document.getElementById('drawer-tab-btn-pedidos');
+  if (drawerPedidos) {
+    drawerPedidos.style.position = 'relative';
+    drawerPedidos.querySelector('.nav-drawer-badge')?.remove();
+    if (listaPendientes.length > 0) {
+      const db2 = document.createElement('span');
+      db2.className = 'nav-drawer-badge';
+      db2.textContent = listaPendientes.length > 99 ? '99+' : listaPendientes.length;
+      drawerPedidos.appendChild(db2);
     }
   }
 
@@ -9361,10 +9479,13 @@ async function abrirTienda(codigoVendedor) {
   }
 
   // Cargar boletas del editor (boletas_plantilla) + config plantilla en paralelo
-  const [plantSnap, ventasSnap, plantillaSnap] = await Promise.all([
+  const [plantSnap, ventasSnap, plantillaSnap, pedidosSnapTienda, visSnap, vendsSnapVis] = await Promise.all([
     get(ref(db, 'boletas_plantilla')),
     get(ref(db, 'boletas')),
-    get(ref(db, 'config/boleta_plantilla'))
+    get(ref(db, 'config/boleta_plantilla')),
+    get(ref(db, 'pedidos')),
+    get(ref(db, 'config/tienda_visibilidad')),
+    get(ref(db, 'vendedores'))
   ]);
 
   // Cargar imagen plantilla una sola vez
@@ -9472,17 +9593,55 @@ async function abrirTienda(codigoVendedor) {
     });
   }
 
+  // Set de boleta_keys ocupadas por pedidos activos (pendiente o confirmado)
+  // Esto oculta en la tienda boletas que ya fueron pedidas por otros clientes.
+  const keysPedidas = new Set();
+  if (pedidosSnapTienda.exists()) {
+    const hace24h = Date.now() - 24 * 60 * 60 * 1000;
+    Object.values(pedidosSnapTienda.val()).forEach(p => {
+      if (p.estado === 'cancelado') return;
+      if (!p.boleta_keys || !p.boleta_keys.length) return;
+      // Descartar pendientes muy viejos (>24h) como basura
+      if (p.estado === 'pendiente' && p.fecha_ts && p.fecha_ts < hace24h) return;
+      p.boleta_keys.forEach(bk => keysPedidas.add(bk));
+    });
+  }
+
+  // Mapa de visibilidad: { __oficina__: bool, [vendedorId]: bool }
+  // Si no hay config guardada, todo es visible por defecto.
+  const visConfig = visSnap.exists() ? (visSnap.val() || {}) : {};
+  const visiblePara = (vendedorId) => {
+    const key = vendedorId ? vendedorId : '__oficina__';
+    return (key in visConfig) ? visConfig[key] : true;
+  };
+
   // Set de índices asignados a este vendedor (para filtrar)
   const indicesVendedor = vendedorFiltro && (vendedorFiltro.boletasAsignadas||[]).length > 0
     ? new Set(vendedorFiltro.boletasAsignadas)
     : null; // null = sin filtro (todos)
 
+  // Mapa idx → vendedorId construido desde boletasAsignadas de cada vendedor
+  // Esta es la fuente correcta: una boleta pertenece a un vendedor si su idx está en su lista
+  const idxToVendedor = {};
+  if (vendsSnapVis.exists()) {
+    Object.entries(vendsSnapVis.val()).forEach(([vid, v]) => {
+      (v.boletasAsignadas || []).forEach(idx => {
+        idxToVendedor[idx] = vid;
+      });
+    });
+  }
+
   if (plantSnap.exists()) {
     Object.entries(plantSnap.val()).forEach(([k, b]) => {
-      // Si hay filtro por vendedor, solo incluir boletas cuyo idx esté en su lista
+      // Si hay filtro por vendedor URL, solo incluir boletas de su lista
       if (indicesVendedor !== null && !indicesVendedor.has(b.idx)) return;
       const nums = [b.n1, b.n2, b.n3, b.n4].filter(Boolean);
-      const estadoVenta = nums.map(n => numEstado[n]).find(e => e) || 'libre';
+      // Determinar a qué vendedor pertenece la boleta por su idx (null = oficina)
+      const vidBoleta = (b.idx !== undefined && b.idx !== null) ? (idxToVendedor[b.idx] || null) : null;
+      // Aplicar filtro de visibilidad (solo cuando NO hay filtro de vendedor por URL)
+      if (indicesVendedor === null && !visiblePara(vidBoleta)) return;
+      // keysPedidas tiene prioridad: si la boleta tiene un pedido activo, marcarla vendida
+      let estadoVenta = keysPedidas.has(k) ? 'vendida' : (nums.map(n => numEstado[n]).find(e => e) || 'libre');
       tiendaBoletas[k] = { ...b, estadoVenta };
     });
   }
@@ -11369,7 +11528,7 @@ async function resetCampanaCompleta() {
     return;
   }
 
-  const db = window._db, ref = window._ref, remove = window._remove, get = window._get;
+  const db = window._db, ref = window._ref, remove = window._remove, get = window._get, update = window._update, set = window._set;
   const btn = document.getElementById('btn-reset-campana');
   const statusEl = document.getElementById('reset-camp-status');
   const progressWrap = document.getElementById('reset-camp-progress');
@@ -11383,25 +11542,29 @@ async function resetCampanaCompleta() {
   statusEl.style.color = '#c53030';
 
   try {
+    const safeRemove = async (path) => { try { await remove(ref(db, path)); } catch(e) { console.warn('reset skip:', path, e.message); } };
+
     // 1. Boletas plantilla
     statusEl.textContent = '① Borrando boletas generadas...';
     bar.style.width = '14%';
-    await remove(ref(db, 'boletas_plantilla'));
+    await safeRemove('boletas_plantilla');
 
     // 2. Boletas de venta
     statusEl.textContent = '② Borrando ventas registradas...';
     bar.style.width = '28%';
-    await remove(ref(db, 'boletas'));
+    await safeRemove('boletas');
 
     // 3. Pedidos
     statusEl.textContent = '③ Borrando pedidos de tienda...';
     bar.style.width = '42%';
-    await remove(ref(db, 'pedidos'));
+    await safeRemove('pedidos');
+    await safeRemove('cuentas_cliente');
+    await safeRemove('tienda_reservas');
 
     // 4. Números disponibles
     statusEl.textContent = '④ Borrando base de números (.txt)...';
     bar.style.width = '56%';
-    await remove(ref(db, 'numeros_disponibles'));
+    await safeRemove('numeros_disponibles');
 
     // 5. Limpiar boletas asignadas de vendedores (conservar vendedores)
     statusEl.textContent = '⑤ Limpiando boletas asignadas a vendedores...';
@@ -11417,8 +11580,8 @@ async function resetCampanaCompleta() {
     // 6. Config tienda y boleta (NO config/admin para conservar PIN)
     statusEl.textContent = '⑥ Borrando configuración del sorteo...';
     bar.style.width = '85%';
-    await remove(ref(db, 'config/tienda'));
-    await remove(ref(db, 'config/boleta_plantilla'));
+    try { await set(ref(db, 'config/tienda'), {}); } catch(e) { console.warn('reset skip config/tienda:', e.message); }
+    try { await set(ref(db, 'config/boleta_plantilla'), {}); } catch(e) { console.warn('reset skip config/boleta_plantilla:', e.message); }
 
     // Limpiar cachés en memoria
     allBoletas = {};
@@ -11760,6 +11923,30 @@ function _distribuirCargarColumna(lado) {
   const otraLista = lado === 'izq' ? distVendedor : distOficina;
   const otrasNums = new Set(otraLista.flatMap(b => b.nums));
 
+  // ── Mismo criterio de exclusión que la tienda ──────────────────────────────
+  // 1) Keys de boletas con pedido activo (pendiente reciente o confirmado)
+  const keysPedidasDist = new Set();
+  const hace24h = Date.now() - 24 * 60 * 60 * 1000;
+  Object.values(window._allPedidos || {}).forEach(p => {
+    if (p.estado === 'cancelado') return;
+    if (!p.boleta_keys || !p.boleta_keys.length) return;
+    if (p.estado === 'pendiente' && p.fecha_ts && p.fecha_ts < hace24h) return;
+    p.boleta_keys.forEach(bk => keysPedidasDist.add(bk));
+  });
+
+  // 2) Números de boletas pagadas (vendidas directamente por el admin)
+  const numsPagadas = new Set();
+  Object.values(allBoletas || {}).forEach(b => {
+    if (b.estado === 'pagada' || b.estado === 'abonado') {
+      (b.numeros || '').split(',').forEach(n => { const t = n.trim(); if (t) numsPagadas.add(t); });
+    }
+  });
+
+  // Mapa n1 → boleta_key de plantilla (para cruzar con keysPedidasDist)
+  const n1ToKey = {};
+  Object.entries(allBoletasPlantilla || {}).forEach(([k, b]) => { if (b.n1) n1ToKey[b.n1] = k; });
+  // ──────────────────────────────────────────────────────────────────────────
+
   // Si es La Oficina: boletas sin asignar (excluyendo todos los vendedores EXCEPTO el de la otra columna si lo hay)
   if (id === '__oficina__') {
     const asignadasTotal = new Set();
@@ -11772,9 +11959,11 @@ function _distribuirCargarColumna(lado) {
     if (editorNumerosBD.length >= 4) {
       for (let i = 0; i + 3 < editorNumerosBD.length; i += 4) {
         const nums = [editorNumerosBD[i], editorNumerosBD[i+1], editorNumerosBD[i+2], editorNumerosBD[i+3]];
-        if (!nums.some(n => asignadasTotal.has(n)) && !nums.some(n => otrasNums.has(n))) {
-          lista.push({ nums, checked: false, id: nums.join('-') });
-        }
+        if (nums.some(n => asignadasTotal.has(n)) || nums.some(n => otrasNums.has(n))) continue;
+        if (nums.some(n => numsPagadas.has(n))) continue;
+        const bkey = n1ToKey[nums[0]];
+        if (bkey && keysPedidasDist.has(bkey)) continue;
+        lista.push({ nums, checked: false, id: nums.join('-') });
       }
     }
     if (lado === 'izq') distOficina = lista;
@@ -11789,14 +11978,21 @@ function _distribuirCargarColumna(lado) {
     if (editorNumerosBD.length >= 4) {
       for (let i = 0; i + 3 < editorNumerosBD.length; i += 4) {
         const nums = [editorNumerosBD[i], editorNumerosBD[i+1], editorNumerosBD[i+2], editorNumerosBD[i+3]];
-        if (nums.some(n => asignadasSet.has(String(n).padStart(4,'0'))) && !nums.some(n => otrasNums.has(n))) {
-          lista.push({ nums, checked: false, id: nums.join('-') });
-        }
+        if (!nums.some(n => asignadasSet.has(String(n).padStart(4,'0')))) continue;
+        if (nums.some(n => otrasNums.has(n))) continue;
+        if (nums.some(n => numsPagadas.has(n))) continue;
+        const bkey = n1ToKey[nums[0]];
+        if (bkey && keysPedidasDist.has(bkey)) continue;
+        lista.push({ nums, checked: false, id: nums.join('-') });
       }
     } else {
       for (let i = 0; i + 3 < asignadas.length; i += 4) {
         const nums = [asignadas[i], asignadas[i+1], asignadas[i+2], asignadas[i+3]];
-        if (!nums.some(n => otrasNums.has(n))) lista.push({ nums, checked: false, id: nums.join('-') });
+        if (nums.some(n => otrasNums.has(n))) continue;
+        if (nums.some(n => numsPagadas.has(n))) continue;
+        const bkey = n1ToKey[nums[0]];
+        if (bkey && keysPedidasDist.has(bkey)) continue;
+        lista.push({ nums, checked: false, id: nums.join('-') });
       }
     }
     if (lado === 'izq') distOficina = lista;
@@ -12626,6 +12822,203 @@ window.ejecutarConfirmarEntrega = ejecutarConfirmarEntrega;
     });
   };
 })();
+
+</script>
+
+<!-- ===== MODAL QR TIENDA ===== -->
+<div id="modal-qr-tienda" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.65);align-items:center;justify-content:center;padding:20px">
+  <div style="background:white;border-radius:20px;padding:24px;max-width:340px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.4);font-family:'Nunito',sans-serif;text-align:center">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:800;color:#1a2e1c;display:flex;align-items:center;gap:8px">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#3ab54a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/></svg>
+        QR — Enlace de la Tienda
+      </div>
+      <button onclick="cerrarQRTienda()" style="background:none;border:none;cursor:pointer;color:#a0aec0;font-size:20px;line-height:1;padding:2px 6px">✕</button>
+    </div>
+    <div style="font-size:11px;color:#718096;margin-bottom:12px;word-break:break-all;background:#f4f8f4;border-radius:8px;padding:8px 10px;font-weight:700" id="qr-tienda-url-label"></div>
+    <canvas id="qr-tienda-canvas" style="border-radius:12px;max-width:100%;display:block;margin:0 auto"></canvas>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button onclick="descargarQRTienda()" style="flex:1;padding:11px;background:linear-gradient(135deg,#3ab54a,#2a8c38);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Descargar PNG
+      </button>
+      <button id="btn-copiar-link-qr" onclick="copiarLinkQRTienda()" style="flex:1;padding:11px;background:linear-gradient(135deg,#718096,#4a5568);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copiar link
+      </button>
+      <button onclick="compartirQRTienda()" id="btn-compartir-qr" style="flex:1;padding:11px;background:linear-gradient(135deg,#25d366,#128c7e);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Compartir
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== QR ENGINE (desde cero — ISO/IEC 18004) =====
+(function() {
+  const GF_EXP = new Uint8Array(512);
+  const GF_LOG = new Uint8Array(256);
+  (function(){let x=1;for(let i=0;i<255;i++){GF_EXP[i]=x;GF_LOG[x]=i;x<<=1;if(x&0x100)x^=0x11D;}for(let i=255;i<512;i++)GF_EXP[i]=GF_EXP[i-255];})();
+  function gfMul(a,b){if(!a||!b)return 0;return GF_EXP[GF_LOG[a]+GF_LOG[b]];}
+  function polyMul(p,q){const r=new Array(p.length+q.length-1).fill(0);for(let i=0;i<p.length;i++)for(let j=0;j<q.length;j++)r[i+j]^=gfMul(p[i],q[j]);return r;}
+  function rsGeneratorPoly(d){let g=[1];for(let i=0;i<d;i++)g=polyMul(g,[1,GF_EXP[i]]);return g;}
+  function rsEncode(data,ecLen){const gen=rsGeneratorPoly(ecLen);const msg=[...data,...new Array(ecLen).fill(0)];for(let i=0;i<data.length;i++){const coef=msg[i];if(coef)for(let j=0;j<gen.length;j++)msg[i+j]^=gfMul(gen[j],coef);}return msg.slice(data.length);}
+
+  const EC_BLOCKS={1:{L:[19,7,1],M:[16,10,1],Q:[13,13,1],H:[9,17,1]},2:{L:[34,10,1],M:[28,16,1],Q:[22,22,1],H:[16,28,1]},3:{L:[55,15,1],M:[44,26,1],Q:[34,18,2],H:[26,22,2]},4:{L:[80,20,1],M:[64,18,2],Q:[48,26,2],H:[36,16,4]},5:{L:[108,26,1],M:[86,24,2],Q:[62,18,4],H:[46,22,4]},6:{L:[136,18,2],M:[108,16,4],Q:[76,24,4],H:[60,28,4]},7:{L:[156,20,2],M:[124,18,4],Q:[88,18,6],H:[66,26,5]},8:{L:[194,24,2],M:[154,22,4],Q:[110,22,6],H:[86,26,6]},9:{L:[232,30,2],M:[182,22,5],Q:[132,20,8],H:[100,24,8]},10:{L:[274,18,4],M:[216,26,5],Q:[154,24,8],H:[122,28,8]}};
+  const ALIGN_POS={1:[],2:[6,18],3:[6,22],4:[6,26],5:[6,30],6:[6,34],7:[6,22,38],8:[6,24,42],9:[6,26,46],10:[6,28,50]};
+  const EC_IND={L:0b01,M:0b00,Q:0b11,H:0b10};
+  const FMT_MASK=0b101010000010010;
+
+  function selectVersion(text,ecLevel){const n=new TextEncoder().encode(text).length;for(let v=1;v<=10;v++){const[dc]=EC_BLOCKS[v][ecLevel];if(Math.ceil((4+8+n*8+4)/8)<=dc)return v;}return 10;}
+
+  function encodeData(text,version,ecLevel){const[totalDC,ecPerBlock,blocks]=EC_BLOCKS[version][ecLevel];const bytes=new TextEncoder().encode(text);let bits='0100'+bytes.length.toString(2).padStart(8,'0');for(const b of bytes)bits+=b.toString(2).padStart(8,'0');bits+='0000';while(bits.length%8)bits+='0';const pad=[0xEC,0x11];let pi=0;while(bits.length/8<totalDC)bits+=pad[pi++%2].toString(2).padStart(8,'0');const dc=[];for(let i=0;i<totalDC;i++)dc.push(parseInt(bits.slice(i*8,i*8+8),2));const dcPB=Math.floor(totalDC/blocks),dcB=[],ecB=[];for(let b=0;b<blocks;b++){const s=b*dcPB,e=b===blocks-1?totalDC:s+dcPB;dcB.push(dc.slice(s,e));ecB.push(rsEncode(dc.slice(s,e),ecPerBlock));}const il=[];const mx=Math.max(...dcB.map(b=>b.length));for(let i=0;i<mx;i++)for(const b of dcB)if(i<b.length)il.push(b[i]);for(let i=0;i<ecPerBlock;i++)for(const b of ecB)il.push(b[i]);let fb='';for(const byte of il)fb+=byte.toString(2).padStart(8,'0');fb+='0'.repeat([0,0,7,7,7,7,7,0,0,0][version]||0);return{bits:fb,dataCodewords:totalDC,ecPerBlock,blocks};}
+
+  function getMask(p,r,c){switch(p){case 0:return(r+c)%2===0;case 1:return r%2===0;case 2:return c%3===0;case 3:return(r+c)%3===0;case 4:return(Math.floor(r/2)+Math.floor(c/3))%2===0;case 5:return(r*c)%2+(r*c)%3===0;case 6:return((r*c)%2+(r*c)%3)%2===0;case 7:return((r+c)%2+(r*c)%3)%2===0;}}
+
+  function writeFormatInfo(mat,size,ecLevel,maskPattern){let fmt=(EC_IND[ecLevel]<<3)|maskPattern;let f=fmt;for(let i=0;i<10;i++)f=(f<<1)^((f>>9)?0x537:0);const full=((fmt<<10)|f)^FMT_MASK;const bits=[];for(let i=14;i>=0;i--)bits.push((full>>i)&1);const pos=[[8,0],[8,1],[8,2],[8,3],[8,4],[8,5],[8,7],[8,8],[7,8],[5,8],[4,8],[3,8],[2,8],[1,8],[0,8]];for(let i=0;i<15;i++){const[r,c]=pos[i];mat[r][c]=bits[i];if(i<7)mat[size-1-i][8]=bits[i];else mat[8][size-15+i]=bits[i];}}
+
+  function buildMatrix(version,bits,ecLevel,maskPattern){const size=version*4+17;const mat=Array.from({length:size},()=>new Array(size).fill(null));const res=Array.from({length:size},()=>new Array(size).fill(false));function set(r,c,v){mat[r][c]=v;res[r][c]=true;}function drawFinder(row,col){for(let r=-1;r<=7;r++)for(let c=-1;c<=7;c++){const rr=row+r,cc=col+c;if(rr<0||rr>=size||cc<0||cc>=size)continue;set(rr,cc,(r===0||r===6||c===0||c===6)||(r>=2&&r<=4&&c>=2&&c<=4)?1:0);}}drawFinder(0,0);drawFinder(0,size-7);drawFinder(size-7,0);for(let i=8;i<size-8;i++){set(6,i,i%2===0?1:0);set(i,6,i%2===0?1:0);}set(4*version+9,8,1);const aps=ALIGN_POS[version]||[];for(const r of aps)for(const c of aps){if(res[r][c])continue;for(let dr=-2;dr<=2;dr++)for(let dc=-2;dc<=2;dc++)set(r+dr,c+dc,(Math.abs(dr)===2||Math.abs(dc)===2||(!dr&&!dc))?1:0);}for(let i=0;i<=8;i++){if(!res[8][i])res[8][i]=true;if(!res[i][8])res[i][8]=true;}for(let i=size-8;i<size;i++){res[8][i]=true;res[i][8]=true;}let bi=0,up=true;for(let right=size-1;right>=1;right-=2){if(right===6)right=5;for(let v=0;v<size;v++){const row=up?size-1-v:v;for(let lr=0;lr<2;lr++){const col=right-lr;if(!res[row][col]){const bit=bi<bits.length?parseInt(bits[bi++]):0;mat[row][col]=bit;}}}up=!up;}for(let r=0;r<size;r++)for(let c=0;c<size;c++)if(!res[r][c]&&getMask(maskPattern,r,c))mat[r][c]^=1;writeFormatInfo(mat,size,ecLevel,maskPattern);return{mat,size};}
+
+  function calcPenalty(mat,size){let p=0;for(let r=0;r<size;r++){let run=1;for(let c=1;c<size;c++){if(mat[r][c]===mat[r][c-1]){run++;if(run===5)p+=3;else if(run>5)p++;}else run=1;}}for(let c=0;c<size;c++){let run=1;for(let r=1;r<size;r++){if(mat[r][c]===mat[r-1][c]){run++;if(run===5)p+=3;else if(run>5)p++;}else run=1;}}for(let r=0;r<size-1;r++)for(let c=0;c<size-1;c++)if(mat[r][c]===mat[r][c+1]&&mat[r][c]===mat[r+1][c]&&mat[r][c]===mat[r+1][c+1])p+=3;return p;}
+
+  function selectMask(version,bits,ecLevel){let bm=0,bp=Infinity;for(let m=0;m<8;m++){const{mat,size}=buildMatrix(version,bits,ecLevel,m);const pen=calcPenalty(mat,size);if(pen<bp){bp=pen;bm=m;}}return bm;}
+
+  function renderQROnCanvas(canvas, text, opts) {
+    opts = Object.assign({ colorDark:'#1a2e1c', colorLight:'#ffffff', colorFinder:'#3ab54a', colorFinderInner:'#1a2e1c', dotStyle:'round', size:280 }, opts||{});
+    const ecLevel = 'M';
+    const version = selectVersion(text, ecLevel);
+    const { bits } = encodeData(text, version, ecLevel);
+    const mask = selectMask(version, bits, ecLevel);
+    const { mat, size } = buildMatrix(version, bits, ecLevel, mask);
+
+    const cs = opts.size;
+    canvas.width = cs; canvas.height = cs;
+    const ctx = canvas.getContext('2d');
+    const quiet = 4;
+    const totalM = size + quiet*2;
+    const ms = cs / totalM;
+
+    ctx.fillStyle = opts.colorLight;
+    ctx.fillRect(0,0,cs,cs);
+
+    const finders = [{r:0,c:0},{r:0,c:size-7},{r:size-7,c:0}];
+    function inFinder(r,c){return finders.some(f=>r>=f.r&&r<f.r+7&&c>=f.c&&c<f.c+7);}
+
+    function drawModule(r,c) {
+      const x=(c+quiet)*ms, y=(r+quiet)*ms;
+      function has(dr,dc){const nr=r+dr,nc=c+dc;if(nr<0||nr>=size||nc<0||nc>=size)return false;if(inFinder(nr,nc))return false;return mat[nr][nc]===1;}
+      const top=has(-1,0),bot=has(1,0),left=has(0,-1),right=has(0,1);
+      const R=ms*0.38;
+      const rTL=(top||left)?0:R, rTR=(top||right)?0:R, rBR=(bot||right)?0:R, rBL=(bot||left)?0:R;
+      const bl=0.6, x0=left?x-bl:x, y0=top?y-bl:y, x1=right?x+ms+bl:x+ms, y1=bot?y+ms+bl:y+ms;
+      ctx.beginPath();
+      ctx.moveTo(x0+rTL,y0); ctx.lineTo(x1-rTR,y0);
+      if(rTR>0)ctx.quadraticCurveTo(x1,y0,x1,y0+rTR);else ctx.lineTo(x1,y0);
+      ctx.lineTo(x1,y1-rBR);
+      if(rBR>0)ctx.quadraticCurveTo(x1,y1,x1-rBR,y1);else ctx.lineTo(x1,y1);
+      ctx.lineTo(x0+rBL,y1);
+      if(rBL>0)ctx.quadraticCurveTo(x0,y1,x0,y1-rBL);else ctx.lineTo(x0,y1);
+      ctx.lineTo(x0,y0+rTL);
+      if(rTL>0)ctx.quadraticCurveTo(x0,y0,x0+rTL,y0);else ctx.lineTo(x0,y0);
+      ctx.closePath(); ctx.fill();
+    }
+
+    ctx.fillStyle = opts.colorDark;
+    for(let r=0;r<size;r++) for(let c=0;c<size;c++) if(!inFinder(r,c)&&mat[r][c]===1) drawModule(r,c);
+
+    // Finders estilizados
+    for(const f of finders) {
+      const fx=(f.c+quiet)*ms, fy=(f.r+quiet)*ms, fw=7*ms, bR=ms*1.6;
+      ctx.fillStyle=opts.colorFinder;
+      ctx.beginPath();ctx.moveTo(fx+bR,fy);ctx.lineTo(fx+fw-bR,fy);ctx.quadraticCurveTo(fx+fw,fy,fx+fw,fy+bR);ctx.lineTo(fx+fw,fy+fw-bR);ctx.quadraticCurveTo(fx+fw,fy+fw,fx+fw-bR,fy+fw);ctx.lineTo(fx+bR,fy+fw);ctx.quadraticCurveTo(fx,fy+fw,fx,fy+fw-bR);ctx.lineTo(fx,fy+bR);ctx.quadraticCurveTo(fx,fy,fx+bR,fy);ctx.closePath();ctx.fill();
+      const gp=ms, i1={x:fx+gp,y:fy+gp,w:fw-gp*2,r:bR*0.6};
+      ctx.fillStyle=opts.colorLight;
+      ctx.beginPath();ctx.moveTo(i1.x+i1.r,i1.y);ctx.lineTo(i1.x+i1.w-i1.r,i1.y);ctx.quadraticCurveTo(i1.x+i1.w,i1.y,i1.x+i1.w,i1.y+i1.r);ctx.lineTo(i1.x+i1.w,i1.y+i1.w-i1.r);ctx.quadraticCurveTo(i1.x+i1.w,i1.y+i1.w,i1.x+i1.w-i1.r,i1.y+i1.w);ctx.lineTo(i1.x+i1.r,i1.y+i1.w);ctx.quadraticCurveTo(i1.x,i1.y+i1.w,i1.x,i1.y+i1.w-i1.r);ctx.lineTo(i1.x,i1.y+i1.r);ctx.quadraticCurveTo(i1.x,i1.y,i1.x+i1.r,i1.y);ctx.closePath();ctx.fill();
+      ctx.fillStyle=opts.colorFinderInner;
+      ctx.beginPath();ctx.arc(fx+fw/2,fy+fw/2,ms*1.5,0,Math.PI*2);ctx.fill();
+    }
+  }
+
+  window.renderQROnCanvas = renderQROnCanvas;
+})();
+
+// ===== MODAL QR TIENDA =====
+const TIENDA_URL = 'https://sorteos-jimenez.github.io/Boletas/';
+const TIENDA_URL_OFICINA = TIENDA_URL + '?v=__oficina__';
+
+function mostrarQRTienda() {
+  const modal = document.getElementById('modal-qr-tienda');
+  const canvas = document.getElementById('qr-tienda-canvas');
+  const label = document.getElementById('qr-tienda-url-label');
+  label.textContent = TIENDA_URL_OFICINA;
+  renderQROnCanvas(canvas, TIENDA_URL_OFICINA, { size: 280 });
+  modal.style.display = 'flex';
+}
+
+function cerrarQRTienda() {
+  document.getElementById('modal-qr-tienda').style.display = 'none';
+}
+
+function descargarQRTienda() {
+  const canvas = document.getElementById('qr-tienda-canvas');
+  const a = document.createElement('a');
+  a.download = 'qr-tienda-sorteos-jimenez.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+
+async function compartirQRTienda() {
+  const canvas = document.getElementById('qr-tienda-canvas');
+  if (navigator.share && navigator.canShare) {
+    try {
+      canvas.toBlob(async (blob) => {
+        const file = new File([blob], 'qr-tienda.png', { type: 'image/png' });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: 'QR Tienda Sorteos Jiménez', text: TIENDA_URL_OFICINA });
+        } else {
+          await navigator.share({ title: 'Tienda Sorteos Jiménez', url: TIENDA_URL_OFICINA });
+        }
+      }, 'image/png');
+      return;
+    } catch(e) { /* fallback */ }
+  }
+  // Fallback: copiar URL
+  try {
+    await navigator.clipboard.writeText(TIENDA_URL_OFICINA);
+    toast('✅ Enlace copiado al portapapeles', 'verde');
+  } catch(e) {
+    toast('🔗 ' + TIENDA_URL_OFICINA, 'verde');
+  }
+}
+
+async function copiarLinkQRTienda() {
+  try {
+    await navigator.clipboard.writeText(TIENDA_URL_OFICINA);
+    toast('✅ Enlace copiado al portapapeles', 'verde');
+    const btn = document.getElementById('btn-copiar-link-qr');
+    if (btn) {
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ¡Copiado!';
+      btn.style.background = 'linear-gradient(135deg,#3ab54a,#2a8c38)';
+      setTimeout(() => { btn.innerHTML = orig; btn.style.background = 'linear-gradient(135deg,#718096,#4a5568)'; }, 2000);
+    }
+  } catch(e) {
+    toast('🔗 ' + TIENDA_URL_OFICINA, 'verde');
+  }
+}
+
+// Cerrar modal al click fuera
+document.getElementById('modal-qr-tienda').addEventListener('click', function(e) {
+  if (e.target === this) cerrarQRTienda();
+});
+
+window.mostrarQRTienda = mostrarQRTienda;
+window.cerrarQRTienda = cerrarQRTienda;
+window.descargarQRTienda = descargarQRTienda;
+window.compartirQRTienda = compartirQRTienda;
+window.copiarLinkQRTienda = copiarLinkQRTienda;
 </script>
 </body>
 </html>
+
