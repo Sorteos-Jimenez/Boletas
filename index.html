@@ -9653,12 +9653,18 @@ async function abrirTienda(codigoVendedor) {
       });
     });
   }
+  // DEBUG — quitar después
+  console.log('[FILTRO] visConfig:', JSON.stringify(visConfig));
+  console.log('[FILTRO] n1ToVendedor muestra:', Object.entries(n1ToVendedor).slice(0,8).map(([k,v])=>k+'→'+v).join(', '));
+  console.log('[FILTRO] esOficinaFiltro:', esOficinaFiltro, '| indicesVendedor:', indicesVendedor ? 'Set('+indicesVendedor.size+')' : 'null');
 
+  let _dbgCount = 0;
   if (plantSnap.exists()) {
     Object.entries(plantSnap.val()).forEach(([k, b]) => {
       const n1 = b.n1 ? String(b.n1).padStart(4, '0') : null;
       // Determinar a qué vendedor pertenece la boleta por su n1
       const vidBoleta = n1 ? (n1ToVendedor[n1] || null) : null;
+      if (_dbgCount < 5) { console.log('[BOLETA]', n1, '→ vidBoleta:', vidBoleta, '| visible:', visiblePara(vidBoleta)); _dbgCount++; }
       // Filtro por oficina: solo boletas NO asignadas a ningún vendedor
       if (esOficinaFiltro && vidBoleta) return;
       // Si hay filtro por vendedor URL, solo incluir boletas de su lista
