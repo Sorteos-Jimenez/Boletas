@@ -9675,7 +9675,7 @@ async function abrirTienda(codigoVendedor) {
     const vendsSnap = await get(ref(db, 'vendedores'));
     if (vendsSnap.exists()) {
       Object.entries(vendsSnap.val()).forEach(([id, v]) => {
-        if ((v.username || v.codigo || '').toLowerCase() === codigoVendedor.toLowerCase() || (v.codigo || '').toUpperCase() === codigoVendedor.toUpperCase()) {
+        if (id === codigoVendedor || (v.username || '').toLowerCase() === codigoVendedor.toLowerCase() || (v.codigo || '').toLowerCase() === codigoVendedor.toLowerCase()) {
           vendedorFiltro = v;
           vendedorIdFiltro = id;
         }
