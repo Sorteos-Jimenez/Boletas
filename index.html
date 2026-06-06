@@ -2524,6 +2524,150 @@
   #sj-btn-ok.verde    { background: linear-gradient(135deg,#3ab54a,#2a8c38); }
   #sj-btn-ok.amarillo { background: linear-gradient(135deg,#ff9f43,#e08a2a); }
 
+  /* ===== HAMBURGER MENU (solo mobile) ===== */
+  .hamburger-btn {
+    display: none;
+    width: 40px; height: 40px;
+    border: 2px solid var(--borde);
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+    padding: 0;
+  }
+  .hamburger-btn span {
+    display: block;
+    width: 18px; height: 2px;
+    background: var(--dark);
+    border-radius: 2px;
+    transition: all 0.25s;
+  }
+  .hamburger-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .hamburger-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* Drawer overlay */
+  .nav-drawer-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 990;
+    backdrop-filter: blur(2px);
+  }
+  .nav-drawer-overlay.open { display: block; }
+
+  /* Drawer panel */
+  .nav-drawer {
+    position: fixed;
+    top: 0; right: -280px;
+    width: 260px; height: 100%;
+    background: white;
+    z-index: 991;
+    display: flex;
+    flex-direction: column;
+    transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: -4px 0 24px rgba(0,0,0,0.12);
+  }
+  .nav-drawer.open { right: 0; }
+
+  .nav-drawer-header {
+    padding: 20px 16px 14px;
+    border-bottom: 2px solid var(--borde);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-drawer-header .drawer-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 20px;
+    background: linear-gradient(135deg, var(--verde), var(--magenta));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 1.5px;
+  }
+  .nav-drawer-close {
+    width: 32px; height: 32px;
+    border: none; background: #f1f5f0;
+    border-radius: 8px; cursor: pointer;
+    font-size: 16px; color: #718096;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .nav-drawer-list {
+    flex: 1;
+    padding: 10px 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .nav-drawer-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: none;
+    background: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #4a5568;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    position: relative;
+    transition: background 0.15s, color 0.15s;
+  }
+  .nav-drawer-item:active { background: var(--gris); }
+  .nav-drawer-item.active {
+    background: linear-gradient(135deg, #e8f9eb, #f0fdf4);
+    color: var(--azul-dark);
+    border: 1.5px solid #c6f6d5;
+  }
+  .nav-drawer-item .drawer-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--gris);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .nav-drawer-item.active .drawer-icon {
+    background: var(--verde);
+    color: white;
+  }
+  .nav-drawer-item.active .drawer-icon svg { stroke: white !important; }
+  .nav-drawer-badge {
+    position: absolute;
+    top: 8px; right: 10px;
+    background: #ea5455;
+    color: white;
+    border-radius: 50%;
+    width: 18px; height: 18px;
+    font-size: 10px;
+    font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid white;
+  }
+
+  .nav-current-tab-label {
+    display: none;
+    font-size: 12px;
+    font-weight: 700;
+    color: #718096;
+    margin-left: 4px;
+  }
+
+  @media (max-width: 767px) {
+    .hamburger-btn { display: flex; }
+    .tabs { display: none !important; }
+    .nav-current-tab-label { display: inline; }
+  }
+
   /* ===== RESPONSIVE: TABLET (768px+) ===== */
   @media (min-width: 768px) {
     /* Login centrado con más aire */
@@ -2769,7 +2913,22 @@
     <div class="topbar-user">
       <span class="user-badge" id="topbar-rol">ADMIN</span>
       <button class="btn-logout" onclick="logout()">Salir</button>
+      <button class="hamburger-btn" id="hamburger-btn" onclick="toggleNavDrawer()" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
     </div>
+  </div>
+
+  <!-- DRAWER OVERLAY -->
+  <div class="nav-drawer-overlay" id="nav-drawer-overlay" onclick="cerrarNavDrawer()"></div>
+
+  <!-- DRAWER PANEL -->
+  <div class="nav-drawer" id="nav-drawer">
+    <div class="nav-drawer-header">
+      <span class="drawer-title">Sorteos Jiménez</span>
+      <button class="nav-drawer-close" onclick="cerrarNavDrawer()">✕</button>
+    </div>
+    <div class="nav-drawer-list" id="nav-drawer-list"></div>
   </div>
 
   <div class="main-content">
@@ -2954,7 +3113,7 @@
           </div>
           <div class="form-group">
             <label>Precio por boleta</label>
-            <input type="text" id="cfg-tienda-precio" placeholder="Ej: 80.000">
+            <input type="text" id="cfg-tienda-precio" placeholder="Ej: 80.000" oninput="formatearMiles(this)">
           </div>
 
           <div class="form-group">
@@ -2998,6 +3157,23 @@
                   <span style="font-size:20px">🏦</span> Transferencia bancaria
                 </button>
               </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>WhatsApp de la oficina</label>
+            <div style="display:flex;gap:0;border:2px solid var(--borde);border-radius:10px;overflow:hidden;background:white;width:100%">
+              <select id="cfg-tienda-whatsapp-prefix" style="padding:12px 8px 12px 10px;border:none;border-right:2px solid var(--borde);background:#f8fafc;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:var(--dark);outline:none;cursor:pointer;width:90px;flex-shrink:0">
+                <option value="+57">🇨🇴 +57</option>
+                <option value="+1">🇺🇸 +1</option>
+                <option value="+52">🇲🇽 +52</option>
+                <option value="+34">🇪🇸 +34</option>
+                <option value="+593">🇪🇨 +593</option>
+                <option value="+51">🇵🇪 +51</option>
+                <option value="+58">🇻🇪 +58</option>
+                <option value="+56">🇨🇱 +56</option>
+                <option value="+54">🇦🇷 +54</option>
+              </select>
+              <input type="tel" id="cfg-tienda-whatsapp" placeholder="3XX XXX XXXX" style="flex:1;padding:12px 14px;border:none;font-size:15px;font-family:'Nunito',sans-serif;outline:none;min-width:0">
             </div>
           </div>
           <button class="btn-primary" onclick="guardarConfigTienda()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Guardar configuración tienda</button>
@@ -3400,6 +3576,27 @@
         </div>
       </div>
 
+      <!-- Buscador global de boletas -->
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-body" style="padding:12px 16px">
+          <div style="font-size:12px;font-weight:800;color:var(--dark);margin-bottom:8px">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Buscar a quién pertenece un número
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" id="dist-buscar-num" placeholder="Ej: 0347" maxlength="10"
+              oninput="distribuirBuscarNum(this.value)"
+              style="flex:1;padding:9px 12px;border:2px solid var(--borde);border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;outline:none;transition:border-color 0.2s"
+              onfocus="this.style.borderColor='var(--verde)'" onblur="this.style.borderColor='var(--borde)'">
+            <button onclick="distribuirBuscarNum(document.getElementById('dist-buscar-num').value)"
+              style="padding:9px 14px;background:linear-gradient(135deg,#3ab54a,#2a8c38);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer">
+              Buscar
+            </button>
+          </div>
+          <div id="dist-buscar-resultado" style="margin-top:8px;display:none"></div>
+        </div>
+      </div>
+
       <!-- Dos columnas -->
       <div id="dist-columnas-wrap" style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:start">
         <!-- COLUMNA IZQUIERDA -->
@@ -3518,6 +3715,54 @@
       </div>
     </div>
 
+    <!-- TAB: MI PERFIL (vendedor) -->
+    <div class="tab-panel" id="tab-mi-perfil">
+      <!-- Info del vendedor -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-header">
+          <h3><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Información de contacto</h3>
+        </div>
+        <div class="card-body">
+          <p style="font-size:12px;color:#718096;margin-bottom:12px">Tu WhatsApp y método de pago aparecerán en las boletas que te correspondan, para que los compradores puedan contactarte directamente.</p>
+          <div class="input-group">
+            <label>WhatsApp del vendedor</label>
+            <div style="display:flex;gap:0;border:2px solid var(--borde);border-radius:10px;overflow:hidden;background:white">
+              <select id="vp-wa-prefix" style="padding:10px 8px 10px 10px;border:none;border-right:2px solid var(--borde);background:#f8fafc;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:var(--dark);outline:none;cursor:pointer;width:90px;flex-shrink:0">
+                <option value="+57">🇨🇴 +57</option>
+                <option value="+1">🇺🇸 +1</option>
+                <option value="+52">🇲🇽 +52</option>
+                <option value="+34">🇪🇸 +34</option>
+                <option value="+593">🇪🇨 +593</option>
+                <option value="+51">🇵🇪 +51</option>
+                <option value="+58">🇻🇪 +58</option>
+              </select>
+              <input type="tel" id="vp-wa-numero" placeholder="3XX XXX XXXX" style="flex:1;padding:10px 14px;border:none;font-size:14px;font-family:'Nunito',sans-serif;outline:none;min-width:0">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Medios de pago del vendedor -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-header" style="justify-content:space-between">
+          <h3><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Mis medios de pago</h3>
+          <button onclick="vpAgregarMedio()" style="padding:5px 10px;background:var(--verde);color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;gap:4px">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Agregar
+          </button>
+        </div>
+        <div class="card-body">
+          <p style="font-size:12px;color:#718096;margin-bottom:10px">Los compradores de tus boletas verán estas instrucciones al hacer su pedido en la tienda.</p>
+          <div id="vp-medios-lista" style="display:flex;flex-direction:column;gap:10px;margin-bottom:4px"></div>
+          <div id="vp-medios-empty" style="font-size:12px;color:#a0aec0;text-align:center;padding:16px 0">Sin medios de pago configurados.<br>Agrega al menos uno para que tus compradores sepan cómo pagarte.</div>
+        </div>
+      </div>
+
+      <button onclick="vpGuardarPerfil()" style="width:100%;padding:13px;background:linear-gradient(135deg,#3ab54a,#2a8c38);color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;box-shadow:0 4px 14px rgba(58,181,74,0.35);display:flex;align-items:center;justify-content:center;gap:8px">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Guardar perfil
+      </button>
+    </div>
+
   </div>
 </div>
 
@@ -3532,7 +3777,7 @@
     <p id="tienda-desc">Escoge tus boletas y participa para ganar</p>
     <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">
       <span style="background:rgba(255,255,255,0.15);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700">4 números por boleta · $<span id="tienda-precio">80.000</span></span>
-      <span id="tienda-vendedor-badge" style="display:none;background:rgba(255,255,255,0.25);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> <span id="tienda-vendedor-nombre"></span></span>
+      <span id="tienda-vendedor-badge" style="display:none;background:rgba(255,255,255,0.25);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> <span id="tienda-vendedor-nombre"></span><span id="tienda-vendedor-wa" style="display:none;margin-left:6px"></span></span>
     </div>
     <div id="tienda-fechas" style="margin-top:10px;display:none;flex-direction:column;gap:6px"></div>
   </div>
@@ -3662,13 +3907,17 @@
 <!-- MODAL PEDIDO CONFIRMADO -->
 <div class="modal-overlay" id="modal-confirmado">
   <div class="modal" style="text-align:center">
-    <div style="font-size:64px;margin-bottom:12px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M5.8 11.3L2 22l10.7-3.79"/><path d="M4 3h.01M22 8h.01M15 2h.01M22 20h.01M18.4 5.6a10 10 0 0 1-2.12 10.66A10 10 0 0 1 5.62 18.4"/></svg></div>
     <h3 style="font-size:20px;font-weight:800;color:var(--dark);margin-bottom:8px">¡Pedido enviado!</h3>
     <p style="font-size:14px;color:#718096;margin-bottom:16px" id="confirmado-texto">Tus boletas han sido reservadas. Un vendedor se pondrá en contacto contigo para confirmar el pago.</p>
+    <div id="confirmado-vendedor-wa" style="display:none;margin-bottom:14px"></div>
     <div style="background:var(--gris);border-radius:10px;padding:12px;margin-bottom:16px">
       <div style="font-size:12px;color:#718096;font-weight:700;margin-bottom:6px">TUS BOLETAS</div>
       <div class="checkout-grid" id="confirmado-nums" style="justify-content:center"></div>
     </div>
+    <button id="btn-pdf-pedido" onclick="descargarPDFPedido()" style="width:100%;margin-bottom:10px;padding:13px;background:linear-gradient(135deg,#c0186a,#a01258);color:white;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(192,24,106,0.35);display:flex;align-items:center;justify-content:center;gap:8px">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+      Descargar mis boletas en PDF
+    </button>
     <button class="btn-primary" onclick="cerrarModal('modal-confirmado');limpiarCarritoPostPedido()">Entendido <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></button>
   </div>
 </div>
@@ -3933,7 +4182,7 @@
 <!-- FIREBASE -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, set, get, onValue, update, remove, push }
+  import { getDatabase, ref, set, get, onValue, update, remove, push, runTransaction }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
   // ===== FIREBASE CONFIG =====
@@ -3957,6 +4206,7 @@
   window._update = update;
   window._remove = remove;
   window._push = push;
+  window._runTransaction = runTransaction;
 
   // Seed admin por defecto si no existe
   const adminRef = ref(db, 'config/admin');
@@ -4322,6 +4572,7 @@ function construirTabs() {
       { id: 'boletas', label: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="2" x2="9" y2="22"/></svg> Boletas' },
       { id: 'mis-ventas', label: 'Mis ventas' },
       { id: 'mis-pedidos', label: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M5 22h14M5 2h14M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22M7 2v4.172a2 2 0 0 1 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg> Pendientes', tabId: 'tab-btn-mis-pedidos' },
+      { id: 'mi-perfil', label: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Mi perfil' },
     ];
   }
 
@@ -4334,7 +4585,62 @@ function construirTabs() {
     c.appendChild(btn);
   });
 
+  // Construir drawer móvil
+  const drawerList = document.getElementById('nav-drawer-list');
+  if (drawerList) {
+    drawerList.innerHTML = '';
+    // Íconos simples para cada tab
+    const drawerIcons = {
+      dashboard: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+      boletas: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="2" x2="9" y2="22"/></svg>',
+      vendedores: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+      pedidos: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+      editor: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>',
+      distribuir: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>',
+      config: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+      'mis-ventas': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>',
+      'mis-pedidos': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14M5 2h14M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22M7 2v4.172a2 2 0 0 1 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg>',
+      'mi-perfil': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+    };
+    const drawerLabels = {
+      dashboard: 'Dashboard', boletas: 'Boletas', vendedores: 'Vendedores',
+      pedidos: 'Pedidos', editor: 'Editor', distribuir: 'Distribuir', config: 'Config',
+      'mis-ventas': 'Mis ventas', 'mis-pedidos': 'Pendientes', 'mi-perfil': 'Mi perfil'
+    };
+    tabs.forEach((t, i) => {
+      const item = document.createElement('button');
+      item.className = 'nav-drawer-item' + (i === 0 ? ' active' : '');
+      item.dataset.tabId = t.id;
+      if (t.tabId) item.id = 'drawer-' + t.tabId;
+      item.innerHTML = `<div class="drawer-icon">${drawerIcons[t.id] || ''}</div><span>${drawerLabels[t.id] || t.id}</span>`;
+      item.onclick = () => { abrirTab(t.id); cerrarNavDrawer(); };
+      drawerList.appendChild(item);
+    });
+  }
+
   abrirTab(tabs[0].id);
+}
+
+function toggleNavDrawer() {
+  const drawer = document.getElementById('nav-drawer');
+  const overlay = document.getElementById('nav-drawer-overlay');
+  const btn = document.getElementById('hamburger-btn');
+  const isOpen = drawer.classList.contains('open');
+  if (isOpen) {
+    drawer.classList.remove('open');
+    overlay.classList.remove('open');
+    btn.classList.remove('open');
+  } else {
+    drawer.classList.add('open');
+    overlay.classList.add('open');
+    btn.classList.add('open');
+  }
+}
+
+function cerrarNavDrawer() {
+  document.getElementById('nav-drawer')?.classList.remove('open');
+  document.getElementById('nav-drawer-overlay')?.classList.remove('open');
+  document.getElementById('hamburger-btn')?.classList.remove('open');
 }
 
 async function abrirTab(id) {
@@ -4356,6 +4662,7 @@ async function abrirTab(id) {
   document.getElementById('tab-' + id)?.classList.add('active');
   if (id === 'editor' && !editorImgSorteo) cargarEstadoEditor();
   if (id === 'distribuir') distribuirInit();
+  if (id === 'mi-perfil') vpCargarPerfil();
   if (id === 'boletas' && currentUser?.rol === 'vendedor' && !Object.keys(allBoletasPlantilla).length) {
     const db = window._db, ref = window._ref, get = window._get;
     if (db) get(ref(db, 'boletas_plantilla')).then(snap => {
@@ -4368,12 +4675,21 @@ async function abrirTab(id) {
     dashboard: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Dashboard', boletas: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="2" x2="9" y2="22"/></svg> Boletas',
     venta: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="display:inline-block;vertical-align:-3px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Venta', vendedores: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Vendedores',
     pedidos: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> Pedidos', 'mis-ventas': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> Mis ventas', 'mis-pedidos': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M5 22h14M5 2h14M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22M7 2v4.172a2 2 0 0 1 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg> Pendientes',
+    'mi-perfil': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Mi perfil',
     config: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Config', editor: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg> Editor', distribuir: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg> Distribuir'
   };
   const tabs = document.getElementById('tabs-container');
   [...tabs.children].forEach(b => {
     if (b.textContent === labels[id]) b.classList.add('active');
   });
+
+  // Sincronizar drawer móvil
+  const drawerList = document.getElementById('nav-drawer-list');
+  if (drawerList) {
+    [...drawerList.children].forEach(item => {
+      item.classList.toggle('active', item.dataset.tabId === id);
+    });
+  }
 }
 
 // ===== CARGAR DATOS =====
@@ -4467,8 +4783,27 @@ function cargarDatos() {
         window.tiendaConfig = c;
         document.getElementById('cfg-tienda-nombre').value = c.nombre || '';
         document.getElementById('cfg-tienda-desc').value = c.descripcion || '';
-        document.getElementById('cfg-tienda-precio').value = c.precio || '';
+        const precioRaw = c.precio || '';
+        const precioDigits = precioRaw.replace(/\D/g,'');
+        document.getElementById('cfg-tienda-precio').value = precioDigits ? Number(precioDigits).toLocaleString('es-CO') : precioRaw;
         document.getElementById('cfg-tienda-fecha').value = c.fecha || '';
+        const waEl = document.getElementById('cfg-tienda-whatsapp');
+        const waPrefEl = document.getElementById('cfg-tienda-whatsapp-prefix');
+        if (waEl && c.whatsapp_oficina) {
+          // Detectar prefijo guardado: buscar la opción cuyo valor (sin +) esté al inicio del número
+          const stored = c.whatsapp_oficina.replace(/\D/g,'');
+          let matchedPrefix = '57'; // default Colombia
+          if (waPrefEl) {
+            Array.from(waPrefEl.options).forEach(opt => {
+              const p = opt.value.replace(/\D/g,'');
+              if (stored.startsWith(p) && p.length > matchedPrefix.length) matchedPrefix = p;
+            });
+            // Asignar prefijo encontrado
+            const prefVal = '+' + matchedPrefix;
+            if (Array.from(waPrefEl.options).some(o => o.value === prefVal)) waPrefEl.value = prefVal;
+          }
+          waEl.value = stored.slice(matchedPrefix.length);
+        }
         cfgCargarMediosPago(c.medios_pago || (c.pago ? [{tipo:'efectivo'}] : [{tipo:'efectivo'}]));
         // Cargar anticipados y sus fechas en Config (sin necesidad de pasar por Editor)
         if (c.anticipados && c.anticipados.length) {
@@ -4782,7 +5117,7 @@ function renderBoletasPagina() {
     const estadoColor = c.estado === 'pagado' ? '#276749' : c.estado === 'abonado' ? '#975a16' : '#718096';
     const estadoBg    = c.estado === 'pagado' ? '#f0fff4' : c.estado === 'abonado' ? '#fffaf0' : '#f7fafc';
     const estadoLabel = c.estado === 'pagado' ? '✅ Pagado' : c.estado === 'abonado' ? '⏳ Abonado' : '⬜ Pendiente';
-    const vendNombre  = allVendedores[c.vendedor_id]?.nombre || c.vendedor_id || 'Sin vendedor';
+    const vendNombre  = allVendedores[c.vendedor_id]?.nombre || c.vendedor_id || 'La Oficina';
 
     return `
     <div style="background:white;border:1.5px solid var(--borde);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:box-shadow .15s"
@@ -4856,6 +5191,162 @@ function filtrarEstado(estado) {
   if (el) { el.style.background = 'var(--azul)'; el.style.color = 'white'; el.style.borderColor = 'var(--azul)'; }
   renderBoletas();
 }
+
+// ===== MI PERFIL (vendedor): medios de pago + WhatsApp =====
+let _vpMedios = []; // copia en memoria de los medios de pago del vendedor
+
+async function vpCargarPerfil() {
+  if (!currentUser?.id) return;
+  const db = window._db, ref = window._ref, get = window._get;
+  const snap = await get(ref(db, 'vendedores/' + currentUser.id));
+  const v = snap.exists() ? snap.val() : {};
+
+  // Cargar WhatsApp
+  const waFull = v.whatsapp || '';
+  const waPrefix = document.getElementById('vp-wa-prefix');
+  const waNum = document.getElementById('vp-wa-numero');
+  if (waFull) {
+    // Detectar prefijo
+    const prefixes = ['+593','+52','+34','+51','+58','+56','+54','+1','+57'];
+    let found = '+57', local = waFull.replace(/\D/g,'');
+    for (const p of prefixes) {
+      const pd = p.replace(/\D/g,'');
+      if (local.startsWith(pd)) { found = p; local = local.slice(pd.length); break; }
+    }
+    if (waPrefix) waPrefix.value = found;
+    if (waNum) waNum.value = local;
+  } else {
+    if (waPrefix) waPrefix.value = '+57';
+    if (waNum) waNum.value = '';
+  }
+
+  // Cargar medios de pago — efectivo por defecto si no hay ninguno
+  _vpMedios = v.medios_pago ? JSON.parse(JSON.stringify(v.medios_pago)) : [{ tipo: 'efectivo' }];
+  vpRenderMedios();
+}
+
+function vpRenderMedios() {
+  const lista = document.getElementById('vp-medios-lista');
+  const empty = document.getElementById('vp-medios-empty');
+  if (!lista) return;
+  if (!_vpMedios.length) {
+    lista.innerHTML = '';
+    if (empty) empty.style.display = '';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+  lista.innerHTML = _vpMedios.map((m, i) => {
+    let icon = '💵', titulo = 'Efectivo', detalle = 'Pago en mano';
+    if (m.tipo === 'billetera') {
+      icon = '📱'; titulo = m.nombre || 'Billetera digital';
+      detalle = [m.telefono, m.titular].filter(Boolean).join(' · ');
+    } else if (m.tipo === 'transferencia') {
+      icon = '🏦'; titulo = m.banco || 'Transferencia';
+      detalle = [m.numero_cuenta, m.nombre_cuenta].filter(Boolean).join(' · ');
+    }
+    return `<div style="background:#f8fafc;border:1.5px solid var(--borde);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:20px">${icon}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:800;color:var(--dark)">${titulo}</div>
+        ${detalle ? `<div style="font-size:11px;color:#718096">${detalle}</div>` : ''}
+      </div>
+      <button onclick="vpEliminarMedio(${i})" style="background:none;border:none;padding:4px;cursor:pointer;color:#e53e3e;font-size:18px;line-height:1;flex-shrink:0" title="Eliminar">×</button>
+    </div>`;
+  }).join('');
+}
+
+function vpAgregarMedio() {
+  const tipos = [
+    { tipo: 'efectivo', label: '💵 Efectivo' },
+    { tipo: 'billetera', label: '📱 Billetera / Nequi / Daviplata' },
+    { tipo: 'transferencia', label: '🏦 Transferencia bancaria' },
+  ];
+
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;display:flex;align-items:flex-end;justify-content:center';
+  let tipoSel = 'efectivo';
+
+  const render = () => {
+    let extraFields = '';
+    if (tipoSel === 'billetera') {
+      extraFields = `
+        <div style="margin-bottom:10px"><label style="font-size:11px;font-weight:700;color:#718096;display:block;margin-bottom:4px;text-transform:uppercase">Nombre (Nequi, Daviplata…)</label><input id="vp-m-nombre" placeholder="Ej: Nequi" style="width:100%;padding:10px 14px;border:2px solid var(--borde);border-radius:10px;font-size:14px;font-family:'Nunito',sans-serif;outline:none;box-sizing:border-box"></div>
+        <div style="margin-bottom:10px"><label style="font-size:11px;font-weight:700;color:#718096;display:block;margin-bottom:4px;text-transform:uppercase">Número de celular</label><input id="vp-m-tel" placeholder="Ej: 3001234567" style="width:100%;padding:10px 14px;border:2px solid var(--borde);border-radius:10px;font-size:14px;font-family:'Nunito',sans-serif;outline:none;box-sizing:border-box"></div>
+        <div style="margin-bottom:10px"><label style="font-size:11px;font-weight:700;color:#718096;display:block;margin-bottom:4px;text-transform:uppercase">Titular</label><input id="vp-m-titular" placeholder="Nombre del titular" style="width:100%;padding:10px 14px;border:2px solid var(--borde);border-radius:10px;font-size:14px;font-family:'Nunito',sans-serif;outline:none;box-sizing:border-box"></div>`;
+    } else if (tipoSel === 'transferencia') {
+      extraFields = `
+        <div style="margin-bottom:10px"><label style="font-size:11px;font-weight:700;color:#718096;display:block;margin-bottom:4px;text-transform:uppercase">Banco</label><input id="vp-m-banco" placeholder="Ej: Bancolombia" style="width:100%;padding:10px 14px;border:2px solid var(--borde);border-radius:10px;font-size:14px;font-family:'Nunito',sans-serif;outline:none;box-sizing:border-box"></div>
+        <div style="margin-bottom:10px"><label style="font-size:11px;font-weight:700;color:#718096;display:block;margin-bottom:4px;text-transform:uppercase">Número de cuenta</label><input id="vp-m-cuenta" placeholder="Ej: 123-456789-00" style="width:100%;padding:10px 14px;border:2px solid var(--borde);border-radius:10px;font-size:14px;font-family:'Nunito',sans-serif;outline:none;box-sizing:border-box"></div>
+        <div style="margin-bottom:10px"><label style="font-size:11px;font-weight:700;color:#718096;display:block;margin-bottom:4px;text-transform:uppercase">Nombre de cuenta</label><input id="vp-m-ncuenta" placeholder="Nombre del titular" style="width:100%;padding:10px 14px;border:2px solid var(--borde);border-radius:10px;font-size:14px;font-family:'Nunito',sans-serif;outline:none;box-sizing:border-box"></div>`;
+    }
+
+    overlay.innerHTML = `<div style="background:white;border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;box-sizing:border-box">
+      <div style="font-size:15px;font-weight:800;color:var(--dark);margin-bottom:14px">Agregar medio de pago</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+        ${tipos.map(x => `<button id="vp-tipo-${x.tipo}" style="padding:10px 14px;border:2px solid ${tipoSel===x.tipo?'var(--verde)':'var(--borde)'};border-radius:10px;background:${tipoSel===x.tipo?'#e8f9eb':'white'};font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;text-align:left">${x.label}</button>`).join('')}
+      </div>
+      ${extraFields}
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="vp-m-cancel" style="flex:1;padding:11px;border:2px solid var(--borde);border-radius:10px;background:white;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:#718096">Cancelar</button>
+        <button id="vp-m-confirm" style="flex:1;padding:11px;background:var(--verde);color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer">Agregar</button>
+      </div>
+    </div>`;
+
+    // Botones tipo
+    tipos.forEach(x => {
+      const btn = document.getElementById('vp-tipo-' + x.tipo);
+      if (btn) btn.onclick = () => { tipoSel = x.tipo; render(); };
+    });
+    document.getElementById('vp-m-cancel').onclick = () => overlay.remove();
+    document.getElementById('vp-m-confirm').onclick = () => {
+      let medio = { tipo: tipoSel };
+      if (tipoSel === 'billetera') {
+        medio.nombre = document.getElementById('vp-m-nombre')?.value.trim() || '';
+        medio.telefono = document.getElementById('vp-m-tel')?.value.trim() || '';
+        medio.titular = document.getElementById('vp-m-titular')?.value.trim() || '';
+      } else if (tipoSel === 'transferencia') {
+        medio.banco = document.getElementById('vp-m-banco')?.value.trim() || '';
+        medio.numero_cuenta = document.getElementById('vp-m-cuenta')?.value.trim() || '';
+        medio.nombre_cuenta = document.getElementById('vp-m-ncuenta')?.value.trim() || '';
+      }
+      _vpMedios.push(medio);
+      vpRenderMedios();
+      overlay.remove();
+    };
+  };
+
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  render();
+}
+
+function vpEliminarMedio(i) {
+  _vpMedios.splice(i, 1);
+  vpRenderMedios();
+}
+
+async function vpGuardarPerfil() {
+  if (!currentUser?.id) return;
+  const db = window._db, ref = window._ref, update = window._update;
+  const prefix = (document.getElementById('vp-wa-prefix')?.value || '+57').replace(/\D/g,'');
+  const local  = (document.getElementById('vp-wa-numero')?.value || '').replace(/\D/g,'');
+  const waFull = local ? (prefix + local) : '';
+  await update(ref(db, 'vendedores/' + currentUser.id), {
+    whatsapp: waFull,
+    medios_pago: _vpMedios.length ? _vpMedios : null
+  });
+  // Actualizar caché local
+  if (allVendedores[currentUser.id]) {
+    allVendedores[currentUser.id].whatsapp = waFull;
+    allVendedores[currentUser.id].medios_pago = _vpMedios.length ? _vpMedios : null;
+  }
+  toast('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Perfil guardado', 'verde');
+}
+
+window.vpCargarPerfil   = vpCargarPerfil;
+window.vpAgregarMedio   = vpAgregarMedio;
+window.vpEliminarMedio  = vpEliminarMedio;
+window.vpGuardarPerfil  = vpGuardarPerfil;
 
 // ===== MIS VENTAS (vendedor) =====
 function renderMisVentas() {
@@ -5446,7 +5937,7 @@ function abrirCuenta(cuentaKey) {
   const totalEsperado = precioBoleta > 0 ? precioBoleta * numBoletas : 0;
   const saldo = totalEsperado > 0 ? Math.max(0, totalEsperado - totalAbonado) : 0;
 
-  const vendNombre = allVendedores[c.vendedor_id]?.nombre || c.vendedor_id || 'Sin vendedor';
+  const vendNombre = allVendedores[c.vendedor_id]?.nombre || c.vendedor_id || 'La Oficina';
   const _svgCheck  = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
   const _svgClock  = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
   const _svgCircle = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px"><circle cx="12" cy="12" r="10"/></svg>`;
@@ -6131,7 +6622,7 @@ async function generarPDFBoletas(boletas, cuenta, anversoDataURLs) {
   const anv = window._anv || {};
   const nombre    = cuenta.comprador || 'Cliente';
   const telefono  = cuenta.telefono  || '—';
-  const vendedor  = cuenta.vendedor_nombre || '';
+  const vendedor  = cuenta.vendedor_nombre || 'La Oficina';
 
   // Página tamaño carta horizontal: 279.4 × 215.9 mm
   // Cada boleta ocupa media página (anverso arriba, reverso abajo)
@@ -7260,9 +7751,10 @@ function vdRenderPedidosVendedor(vid) {
         ${dirEntrega ? `<div style="font-size:10px;color:#718096">${tipoEntrega}: ${dirEntrega}</div>` : ''}
         ${p.nota ? `<div style="font-size:10px;color:#975a16;background:#fffaf0;border-radius:5px;padding:3px 6px;border:1px solid #feebc8">${p.nota}</div>` : ''}
       </div>
-      ${esPendiente ? `<div style="display:flex;gap:6px;padding:8px 10px">
+      ${esPendiente ? `<div style="display:flex;gap:6px;padding:8px 10px;flex-wrap:wrap">
         <button class="btn-sm btn-azul" onclick="confirmarPedido('${id}')" style="flex:1;padding:7px 4px;font-size:11px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Confirmar</button>
         <button class="btn-sm btn-danger" onclick="cancelarPedido('${id}')" style="flex:1;padding:7px 4px;font-size:11px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#e53e3e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Cancelar</button>
+        <button class="btn-sm" onclick="liberarBoletas('${id}')" style="flex:1;padding:7px 4px;font-size:11px;background:#fff8e1;border:1.5px solid #f59e0b;color:#92400e;border-radius:8px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#92400e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg> Liberar</button>
       </div>` : ''}
     </div>`;
   }
@@ -8066,7 +8558,12 @@ async function guardarConfigTienda() {
     precio: document.getElementById('cfg-tienda-precio').value.trim(),
     fecha: document.getElementById('cfg-tienda-fecha').value.trim(),
     anticipados: anticipadosConFecha.length ? anticipadosConFecha : null,
-    medios_pago: cfgLeerMediosPago()
+    medios_pago: cfgLeerMediosPago(),
+    whatsapp_oficina: (() => {
+      const prefix = (document.getElementById('cfg-tienda-whatsapp-prefix')?.value || '+57').replace(/\D/g,'');
+      const local  = (document.getElementById('cfg-tienda-whatsapp')?.value || '').replace(/\D/g,'');
+      return local ? (prefix + local) : '';
+    })()
   };
   await set(ref(db, 'config/tienda'), config);
   toast('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Configuración de tienda guardada', 'verde');
@@ -8473,9 +8970,10 @@ function renderPedidos(pedidos) {
       </div>
 
       <!-- Acciones -->
-      ${!esConfirmado && !esCancelado ? `<div style="display:flex;gap:8px;padding:10px 14px">
+      ${!esConfirmado && !esCancelado ? `<div style="display:flex;gap:8px;padding:10px 14px;flex-wrap:wrap">
         <button class="btn-sm btn-azul" onclick="confirmarPedido('${id}')" style="flex:1;padding:9px;font-size:13px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Confirmar</button>
         <button class="btn-sm btn-danger" onclick="cancelarPedido('${id}')" style="flex:1;padding:9px;font-size:13px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#e53e3e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Cancelar</button>
+        <button class="btn-sm" onclick="liberarBoletas('${id}')" style="flex:1;padding:9px;font-size:13px;background:#fff8e1;border:1.5px solid #f59e0b;color:#92400e;border-radius:8px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#92400e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg> Liberar</button>
       </div>` : ''}
 
     </div>`;
@@ -8750,6 +9248,48 @@ async function cancelarPedido(id) {
   await remove(ref(db, 'pedidos/' + id));
 }
 
+// ===== LIBERAR BOLETAS SIN ABONO =====
+async function liberarBoletas(id) {
+  const ok = await sjConfirm(
+    'Liberar boletas',
+    'Las boletas de este pedido quedarán disponibles para otro comprador. Solo se puede liberar si no hay abonos registrados.',
+    { icon: '🔓', iconClass: 'warning', okLabel: 'Sí, liberar', okClass: 'danger' }
+  );
+  if (!ok) return;
+
+  const db = window._db, ref = window._ref, get = window._get, remove = window._remove;
+  const snap = await get(ref(db, 'pedidos/' + id));
+  if (!snap.exists()) return;
+  const p = snap.val();
+
+  if (p.estado === 'confirmado') {
+    toast('Este pedido ya fue confirmado — no se puede liberar', 'amarillo'); return;
+  }
+
+  // Verificar que no tenga cuenta_cliente con abonos asociada
+  const cuentasSnap = await get(ref(db, 'cuentas_cliente'));
+  if (cuentasSnap.exists()) {
+    const bkeys = new Set(p.boleta_keys || []);
+    const cuentaConAbono = Object.values(cuentasSnap.val()).find(c => {
+      const tieneEstasBoletas = (c.boleta_keys || []).some(bk => bkeys.has(bk));
+      const tieneAbonos = c.abonos && Object.keys(c.abonos).length > 0;
+      return tieneEstasBoletas && tieneAbonos;
+    });
+    if (cuentaConAbono) {
+      toast('Este pedido tiene abonos registrados — no se puede liberar', 'rojo'); return;
+    }
+  }
+
+  window._pedidosCancelados = window._pedidosCancelados || new Set();
+  window._pedidosCancelados.add(id);
+  if (window._allPedidos) delete window._allPedidos[id];
+  renderMisPedidos();
+  renderPedidos(window._allPedidos || {});
+  toast('🔓 Boletas liberadas — disponibles para otro comprador', 'verde');
+  await remove(ref(db, 'pedidos/' + id));
+}
+window.liberarBoletas = liberarBoletas;
+
 // ===== TIENDA PÚBLICA =====
 let carritoSeleccion = [];
 let tiendaBoletas = {};   // { key: {n1,n2,n3,n4,estadoVenta,...} }
@@ -8807,7 +9347,14 @@ async function abrirTienda(codigoVendedor) {
     if (vendedorFiltro) {
       document.getElementById('tienda-vendedor-badge').style.display = '';
       document.getElementById('tienda-vendedor-nombre').textContent = 'Vendedor: ' + vendedorFiltro.nombre;
-      tiendaVendedorActivo = { id: vendedorIdFiltro, codigo: vendedorFiltro.codigo || '', nombre: vendedorFiltro.nombre || '' };
+      tiendaVendedorActivo = { id: vendedorIdFiltro, codigo: vendedorFiltro.codigo || '', nombre: vendedorFiltro.nombre || '', whatsapp: vendedorFiltro.whatsapp || '' };
+      // Mostrar botón de WhatsApp del vendedor en el badge
+      const waSpan = document.getElementById('tienda-vendedor-wa');
+      if (waSpan && vendedorFiltro.whatsapp) {
+        const waD = vendedorFiltro.whatsapp.replace(/\D/g,'');
+        waSpan.innerHTML = `<a href="https://wa.me/${waD}" target="_blank" style="display:inline-flex;align-items:center;gap:3px;background:#25d366;color:white;font-size:10px;font-weight:800;padding:2px 8px;border-radius:12px;text-decoration:none"><svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WhatsApp</a>`;
+        waSpan.style.display = '';
+      }
     } else {
       tiendaVendedorActivo = { id: '', codigo: '', nombre: '' };
     }
@@ -9236,9 +9783,8 @@ function azarConfirmarShow() {
     setTimeout(() => show.remove(), 300);
   }
   elegidas.forEach(([k]) => {
-    if (!carritoSeleccion.includes(k)) carritoSeleccion.push(k);
+    if (!carritoSeleccion.includes(k)) toggleBoleta(k); // reserva en Firebase incluida
   });
-  actualizarCarritoBar();
   renderTiendaPagina();
   const cant = elegidas.length;
   toast('¡' + cant + ' boleta' + (cant!==1?'s':'') + ' agregada' + (cant!==1?'s':'') + ' al carrito! 🎉', 'verde');
@@ -9325,35 +9871,18 @@ function actualizarCarritoBar() {
       precioEl.textContent = '';
     }
 
-    // Renderizar chips de cada boleta seleccionada
+    // Renderizar chips de cada boleta seleccionada (solo números)
     lista.innerHTML = carritoSeleccion.map(k => {
       const b = tiendaBoletas[k];
       const nums = b ? [b.n1, b.n2, b.n3, b.n4].filter(Boolean) : [k];
       const numsHTML = nums.map(n => `<span class="carrito-chip-num">${n}</span>`).join('');
-      const imgEl = tiendaPlantilla
-        ? `<canvas id="ccv-${k}" width="800" height="347" style="width:100%;height:auto;display:block;border-radius:6px 6px 0 0"></canvas>`
-        : `<div class="carrito-chip-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="2" x2="9" y2="22"/></svg></div>`;
       return `<div class="carrito-chip-wrap">
         <button class="carrito-chip-del" onclick="event.stopPropagation();toggleBoleta('${k}')" title="Quitar">×</button>
         <div class="carrito-chip">
-          ${imgEl}
           <div class="carrito-chip-nums">${numsHTML}</div>
         </div>
       </div>`;
     }).join('');
-    // Dibujar imagen plantilla en los canvas del carrito
-    if (tiendaPlantilla) {
-      requestAnimationFrame(() => {
-        const p = tiendaPlantilla;
-        carritoSeleccion.forEach(k => {
-          const cv = document.getElementById('ccv-' + k);
-          if (!cv) return;
-          cv.width  = p.img.naturalWidth  || p.img.width  || 800;
-          cv.height = p.img.naturalHeight || p.img.height || 347;
-          cv.getContext('2d').drawImage(p.img, 0, 0, cv.width, cv.height);
-        });
-      });
-    }
   } else {
     bar.classList.remove('visible');
     lista.innerHTML = '';
@@ -9428,8 +9957,15 @@ function abrirCheckout() {
       });
     });
   }
-  // Mostrar instrucciones de pago
-  document.getElementById('checkout-metodo-texto').innerHTML = cfgRenderMediosPagoCheckout(tiendaConfig.medios_pago || (tiendaConfig.pago ? [{tipo:'efectivo'}] : [{tipo:'efectivo'}]), tiendaConfig.pago);
+  // Mostrar instrucciones de pago — preferir medios del vendedor activo si existen
+  const vendActivo = tiendaVendedorActivo;
+  let mediosCheckout = tiendaConfig.medios_pago || (tiendaConfig.pago ? [{tipo:'efectivo'}] : [{tipo:'efectivo'}]);
+  let fallbackCheckout = tiendaConfig.pago;
+  if (vendActivo.id && allVendedores[vendActivo.id]?.medios_pago?.length) {
+    mediosCheckout = allVendedores[vendActivo.id].medios_pago;
+    fallbackCheckout = null;
+  }
+  document.getElementById('checkout-metodo-texto').innerHTML = cfgRenderMediosPagoCheckout(mediosCheckout, fallbackCheckout);
   document.getElementById('modal-checkout').classList.add('open');
 }
 
@@ -9462,41 +9998,41 @@ async function enviarPedido() {
 
   const db = window._db, ref = window._ref, push = window._push, set = window._set, get = window._get;
 
-  // Verificar disponibilidad real en Firebase antes de guardar
-  const ventasSnap = await get(ref(db, 'boletas'));
-  const numOcupados = new Set();
-  if (ventasSnap.exists()) {
-    Object.values(ventasSnap.val()).forEach(b => {
-      if (b.estado === 'pagada' || b.estado === 'abonado') {
-        (b.numeros || '').split(',').forEach(n => { const t = n.trim(); if (t) numOcupados.add(t); });
-      }
+  // ── VERIFICAR QUE NINGUNA BOLETA YA ESTÉ EN OTRO PEDIDO ACTIVO ──────────────
+  const pedidosSnap = await get(ref(db, 'pedidos'));
+  const boletasOcupadas = new Set();
+  const hace24h = Date.now() - 24 * 60 * 60 * 1000;
+  if (pedidosSnap.exists()) {
+    Object.values(pedidosSnap.val()).forEach(p => {
+      if (p.estado === 'cancelado') return;
+      if (!p.boleta_keys || !p.boleta_keys.length) return; // pedido sin boletas (corrupto)
+      if (p.estado === 'pendiente' && p.fecha_ts && p.fecha_ts < hace24h) return; // pendiente >24h = basura
+      (p.boleta_keys).forEach(bk => boletasOcupadas.add(bk));
     });
   }
-  const conflictos = carritoSeleccion.filter(k => {
-    const b = tiendaBoletas[k];
-    if (!b) return false;
-    return [b.n1,b.n2,b.n3,b.n4].filter(Boolean).some(n => numOcupados.has(n));
-  });
+  const conflictos = carritoSeleccion.filter(k => boletasOcupadas.has(k));
   if (conflictos.length > 0) {
     conflictos.forEach(k => {
       const b = tiendaBoletas[k];
-      if (b) b.estadoVenta = 'vendida';
+      if (b) b.estadoVenta = 'reservada';
       const tile = document.getElementById('tile-' + k);
-      if (tile) tile.className = 'boleta-tile vendida';
+      if (tile) tile.className = 'boleta-tile reservada';
     });
     carritoSeleccion = carritoSeleccion.filter(k => !conflictos.includes(k));
     actualizarCarritoBar();
-    toast('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#d69e2e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Algunas boletas ya fueron vendidas. Revisa tu selección.', 'rojo');
+    toast('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#d69e2e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Algunas boletas ya fueron tomadas. Revisa tu selección.', 'rojo');
     return;
   }
+  // ── FIN VERIFICACIÓN ─────────────────────────────────────────────────────────
 
-  const nueva = push(ref(db, 'pedidos'));
+  const pedidoId = push(ref(db, 'pedidos')).key;
+
   // Guardar boletas como array de grupos: cada grupo = [n1,n2,n3,n4] de una boleta
   const boletasGrupos = carritoSeleccion.map(k => {
     const b = tiendaBoletas[k];
     return b ? [b.n1,b.n2,b.n3,b.n4].filter(Boolean) : [];
   }).filter(g => g.length > 0);
-  await set(nueva, {
+  await set(ref(db, 'pedidos/' + pedidoId), {
     boletas_grupos: boletasGrupos,
     boleta_keys: carritoSeleccion,
     nombre,
@@ -9514,7 +10050,6 @@ async function enviarPedido() {
     vendedor_codigo: tiendaVendedorActivo.codigo || '',
     vendedor_nombre: tiendaVendedorActivo.nombre || ''
   });
-
   // Mostrar confirmación con números reales de boleta, no keys de Firebase
   const confNums = document.getElementById('confirmado-nums');
   confNums.innerHTML = carritoSeleccion.map(k => {
@@ -9545,6 +10080,34 @@ async function enviarPedido() {
     });
   }
   cerrarModal('modal-checkout');
+  // Mostrar WhatsApp del vendedor activo en el modal de confirmación
+  const confWaEl = document.getElementById('confirmado-vendedor-wa');
+  if (confWaEl) {
+    const vendActivo = tiendaVendedorActivo;
+    const waVend = vendActivo.whatsapp || (allVendedores[vendActivo.id]?.whatsapp) || '';
+    if (waVend) {
+      const waD = waVend.replace(/\D/g,'');
+      confWaEl.innerHTML = `<div style="background:#e8f9eb;border:1.5px solid #c6f6d5;border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:800;color:#276749;margin-bottom:3px">Tu vendedor: ${vendActivo.nombre || 'Vendedor'}</div>
+          <div style="font-size:11px;color:#4a5568">Contáctate para coordinar el pago</div>
+        </div>
+        <a href="https://wa.me/${waD}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;background:#25d366;color:white;font-size:12px;font-weight:800;padding:7px 14px;border-radius:20px;text-decoration:none;font-family:'Nunito',sans-serif;flex-shrink:0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WhatsApp
+        </a>
+      </div>`;
+      confWaEl.style.display = '';
+    } else {
+      confWaEl.style.display = 'none';
+    }
+  }
+  // Guardar datos del pedido para descarga PDF
+  window._ultimoPedidoPDF = {
+    nombre,
+    telefono: tel,
+    boleta_keys: [...carritoSeleccion],
+    boletas: carritoSeleccion.map(k => tiendaBoletas[k]).filter(Boolean)
+  };
   document.getElementById('modal-confirmado').classList.add('open');
   } finally { _guardEnviarPedido = false; }
 }
@@ -9572,9 +10135,13 @@ function limpiarCarrito() {
 }
 
 function limpiarCarritoPostPedido() {
-  // Igual que limpiarCarrito pero NO borra las reservas de Firebase:
-  // el pedido ya fue enviado y las boletas deben seguir bloqueadas para otros
-  // hasta que el vendedor las confirme (en ese momento quedan como vendidas/abonadas).
+  // Liberar reservas de tienda_reservas
+  const db = window._db, ref = window._ref, remove = window._remove;
+  if (db && ref && remove) {
+    carritoSeleccion.forEach(k => {
+      remove(ref(db, 'tienda_reservas/' + k)).catch(() => {});
+    });
+  }
   carritoSeleccion.forEach(n => {
     const tile = document.getElementById('tile-' + n);
     if (tile) tile.className = 'boleta-tile libre';
@@ -9586,6 +10153,295 @@ function limpiarCarritoPostPedido() {
   const btnTrab = document.getElementById('co-btn-trabajo');
   if (btnTrab) btnTrab.style.display = 'none';
   seleccionarEntrega('casa');
+}
+
+async function descargarPDFPedido() {
+  const datos = window._ultimoPedidoPDF;
+  if (!datos || !datos.boletas || !datos.boletas.length) {
+    toast('No hay boletas para descargar', 'rojo'); return;
+  }
+  const btn = document.getElementById('btn-pdf-pedido');
+  if (btn) { btn.disabled = true; btn.innerHTML = '⏳ Generando PDF…'; }
+  try {
+    // Cargar jsPDF dinámicamente
+    if (!window.jspdf) {
+      await new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        s.onload = res; s.onerror = rej;
+        document.head.appendChild(s);
+      });
+    }
+    const { jsPDF } = window.jspdf;
+    const anv = window._anv || {};
+
+    const PW = 215.9, PH = 279.4; // carta vertical (portrait)
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
+
+    const VERDE   = [42, 140, 56];
+    const MAGENTA = [192, 24, 106];
+    const ROJO    = [231, 76, 60];
+    const DARK    = [26, 46, 28];
+    const GRIS    = [244, 248, 244];
+    const BLANCO  = [255, 255, 255];
+
+    for (let idx = 0; idx < datos.boletas.length; idx++) {
+      if (idx > 0) pdf.addPage();
+      const b = datos.boletas[idx];
+      const nums = [b.n1, b.n2, b.n3, b.n4].filter(Boolean);
+
+      // ── Cabecera ──
+      pdf.setFillColor(...VERDE);
+      pdf.rect(0, 0, PW, 18, 'F');
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(...BLANCO);
+      pdf.text('SORTEOS JIMÉNEZ', PW / 2, 11, { align: 'center' });
+      pdf.setFontSize(7);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text('BOLETA DEL PARTICIPANTE', PW / 2, 15.5, { align: 'center' });
+
+      // ── Imagen anverso de la boleta ──
+      let anvDataUrl = null;
+      if (tiendaPlantilla) {
+        const cvOff = document.createElement('canvas');
+        const W = tiendaPlantilla.img.naturalWidth || 800;
+        const H = tiendaPlantilla.img.naturalHeight || 347;
+        cvOff.width = W; cvOff.height = H;
+        cvOff.getContext('2d').drawImage(tiendaPlantilla.img, 0, 0, W, H);
+        anvDataUrl = cvOff.toDataURL('image/jpeg', 0.92);
+      }
+
+      const imgY = 22;
+      const imgW = PW - 16;
+      const imgH = imgW * (347 / 800); // mantiene proporción ~2.3:1
+      if (anvDataUrl) {
+        pdf.addImage(anvDataUrl, 'JPEG', 8, imgY, imgW, imgH, '', 'FAST');
+      } else {
+        pdf.setFillColor(...VERDE);
+        pdf.roundedRect(8, imgY, imgW, imgH, 3, 3, 'F');
+        pdf.setFontSize(12); pdf.setTextColor(...BLANCO);
+        pdf.text('SORTEOS JIMÉNEZ', PW / 2, imgY + imgH / 2, { align: 'center' });
+      }
+
+      // ── Números destacados ──
+      const numsY = imgY + imgH + 6;
+      pdf.setFontSize(7);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(100, 100, 100);
+      pdf.text('TUS NÚMEROS DE BOLETA:', 8, numsY);
+
+      nums.forEach((n, i) => {
+        const nx = 8 + i * 50;
+        pdf.setFillColor(255, 245, 245);
+        pdf.setDrawColor(...ROJO);
+        pdf.setLineWidth(0.5);
+        pdf.roundedRect(nx, numsY + 3, 44, 12, 2, 2, 'FD');
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(...ROJO);
+        pdf.text(String(n).padStart(4, '0'), nx + 22, numsY + 12, { align: 'center' });
+      });
+
+      // ── Datos del cliente ──
+      const clienteY = numsY + 22;
+      pdf.setFillColor(...GRIS);
+      pdf.setDrawColor(180, 220, 182);
+      pdf.setLineWidth(0.4);
+      pdf.roundedRect(8, clienteY, PW - 16, 36, 3, 3, 'FD');
+
+      const lineH = 7.5;
+      pdf.setFontSize(7);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(...DARK);
+      pdf.text('NOMBRE:', 13, clienteY + lineH);
+      pdf.text('TELÉFONO:', 13, clienteY + lineH * 2);
+      pdf.text('VENDEDOR:', 13, clienteY + lineH * 3);
+      pdf.text('FECHA:', 13, clienteY + lineH * 4);
+
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(40, 40, 40);
+      // Truncar textos largos para que no se salgan
+      const maxTextW = PW - 58;
+      const trunc = (txt, maxW) => {
+        if (!txt) return '—';
+        const chars = Math.floor(maxW / 1.8);
+        return txt.length > chars ? txt.slice(0, chars - 1) + '…' : txt;
+      };
+      pdf.text(trunc(datos.nombre, maxTextW), 46, clienteY + lineH);
+      const telFmt = (() => { const t = (datos.telefono || '').replace(/\s+/g, ''); if (!t.startsWith('+')) return t; const digits = t.slice(1); if (digits.length < 10) return t; const prefLen = digits.length > 11 ? digits.length - 10 : 2; return '(+' + digits.slice(0, prefLen) + ') ' + digits.slice(prefLen); })();
+      pdf.text(trunc(telFmt, maxTextW), 46, clienteY + lineH * 2);
+      pdf.text(trunc(tiendaVendedorActivo?.nombre || 'La Oficina', maxTextW), 46, clienteY + lineH * 3);
+      pdf.text(new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }), 46, clienteY + lineH * 4);
+
+      // ── Premios: misma lógica que editorReversoHTML ──
+      const ants = anv.anticipados || (anv.antNombre ? [{ nombre: anv.antNombre, modelo: anv.antModelo, det1: anv.antDet1, det2: anv.antDet2, det3: anv.antDet3 }] : []);
+      const mayNombre = anv.mayNombre || '';
+      const mayModelo = anv.mayModelo || '';
+      const mayDet1   = anv.mayDet1   || '';
+      const mayDet2   = anv.mayDet2   || '';
+      const mayDet3   = anv.mayDet3   || '';
+
+      const premY = clienteY + 42;
+      const premW = PW - 16;
+      const colW = (premW - 8) / 2;
+
+      // ── Helper: word-wrap una cadena al ancho máximo en mm ──
+      function wrapText(txt, maxMM) {
+        const words = txt.split(' ');
+        const lines = [];
+        let cur = '';
+        for (const w of words) {
+          const test = cur ? cur + ' ' + w : w;
+          if (pdf.getTextWidth(test) <= maxMM) { cur = test; }
+          else { if (cur) lines.push(cur); cur = w; }
+        }
+        if (cur) lines.push(cur);
+        return lines;
+      }
+
+      // ── Calcular altura real de cada caja ──
+      const LINE_H = 3.4;  // mm entre líneas de detalle
+      const PAD    = 3;    // padding interior vertical (top + bottom)
+
+      // Caja anticipado: label(4.5) + título(5) + detalles wrapeados
+      pdf.setFontSize(5.5);
+      pdf.setFont('helvetica', 'normal');
+      const antColMaxW = colW - 8;
+      const antLinesList = ants.map(a => {
+        const dets = [a.det1||'', a.det2||'', a.det3||''].filter(Boolean);
+        return dets.flatMap(d => wrapText(d, antColMaxW));
+      });
+      const antLinesTotal = antLinesList.reduce((s, l) => s + l.length, 0);
+      const antBoxH = Math.max(28, PAD + 4.5 + 5.5 + antLinesTotal * LINE_H + PAD);
+
+      // Caja mayor: label(4.5) + título(5) + detalles wrapeados
+      const mayColMaxW = colW - 8;
+      const mayDets = [mayDet1, mayDet2, mayDet3].filter(Boolean);
+      const mayLines = mayDets.flatMap(d => wrapText(d, mayColMaxW));
+      const mayBoxH = Math.max(28, PAD + 4.5 + 5.5 + mayLines.length * LINE_H + PAD);
+
+      const innerBoxH = Math.max(antBoxH, mayBoxH);
+      const boxH = 8 + innerBoxH + 2;
+
+      // Fondo general premios
+      pdf.setFillColor(248, 252, 248);
+      pdf.setDrawColor(160, 200, 164);
+      pdf.setLineWidth(0.4);
+      pdf.roundedRect(8, premY, premW, boxH, 3, 3, 'FD');
+
+      // Título sección
+      pdf.setFontSize(6);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(80, 120, 85);
+      pdf.text('PREMIOS DEL SORTEO', 12, premY + 5.5);
+
+      const py = premY + 8;
+
+      // ── Columna izquierda: anticipados ──
+      ants.forEach((a, ai) => {
+        const aY = py + ai * (innerBoxH / Math.max(ants.length, 1));
+        pdf.setFillColor(255, 255, 255);
+        pdf.setDrawColor(180, 210, 180);
+        pdf.setLineWidth(0.35);
+        pdf.roundedRect(10, py, colW - 2, innerBoxH, 2, 2, 'FD');
+
+        pdf.setFontSize(5.5);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(100, 100, 100);
+        pdf.text('ANTICIPADO:', 12, py + PAD + 1.5);
+
+        pdf.setFontSize(7.5);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(...DARK);
+        const antTitle = [a.nombre, a.modelo].filter(Boolean).join(' ');
+        // word-wrap el título también si es largo
+        const antTitleLines = wrapText(antTitle, antColMaxW);
+        antTitleLines.forEach((tl, ti) => pdf.text(tl, 12, py + PAD + 1.5 + 5 + ti * 4));
+        const afterTitle = py + PAD + 1.5 + 5 + antTitleLines.length * 4;
+
+        pdf.setFontSize(5.5);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(70, 70, 70);
+        let dy = afterTitle;
+        antLinesList[ai].forEach(l => { pdf.text(l, 12, dy); dy += LINE_H; });
+      });
+
+      // ── Columna derecha: premio mayor ──
+      const mayColX = 10 + colW + 2;
+      pdf.setFillColor(255, 255, 255);
+      pdf.setDrawColor(180, 210, 180);
+      pdf.setLineWidth(0.35);
+      pdf.roundedRect(mayColX, py, colW - 2, innerBoxH, 2, 2, 'FD');
+
+      pdf.setFontSize(5.5);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(100, 100, 100);
+      pdf.text('PREMIO MAYOR:', mayColX + 2, py + PAD + 1.5);
+
+      pdf.setFontSize(7.5);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(...DARK);
+      const mayTitle = [mayNombre, mayModelo].filter(Boolean).join(' ');
+      const mayTitleLines = wrapText(mayTitle, mayColMaxW);
+      mayTitleLines.forEach((tl, ti) => pdf.text(tl, mayColX + 2, py + PAD + 1.5 + 5 + ti * 4));
+      const afterMayTitle = py + PAD + 1.5 + 5 + mayTitleLines.length * 4;
+
+      pdf.setFontSize(5.5);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(70, 70, 70);
+      let mayDy = afterMayTitle;
+      mayLines.forEach(l => { pdf.text(l, mayColX + 2, mayDy); mayDy += LINE_H; });
+
+      // ── Aviso: boleta virtual sin valor hasta cancelar ──
+      const avisoY = premY + boxH + 4;
+      const avisoW = premW;
+      const AMARILLO_BG  = [255, 251, 230];
+      const AMARILLO_BRD = [214, 158,  46];
+      const AMARILLO_TXT = [133,  77,  14];
+      pdf.setFillColor(...AMARILLO_BG);
+      pdf.setDrawColor(...AMARILLO_BRD);
+      pdf.setLineWidth(0.5);
+      pdf.roundedRect(8, avisoY, avisoW, 18, 2, 2, 'FD');
+      // Triángulo ⚠ dibujado con primitivas (el char no renderiza en jsPDF)
+      pdf.setFillColor(...AMARILLO_TXT);
+      pdf.triangle(12, avisoY + 13, 15.5, avisoY + 5, 19, avisoY + 13, 'F');
+      pdf.setFillColor(...AMARILLO_BG);
+      pdf.setFontSize(5); pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(...AMARILLO_BG);
+      pdf.text('!', 15.5, avisoY + 12, { align: 'center' });
+      pdf.setTextColor(...AMARILLO_TXT);
+      pdf.setFontSize(6.5); pdf.setFont('helvetica', 'bold');
+      pdf.text('IMPORTANTE:', 22, avisoY + 6.5);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(6);
+      pdf.text('Esta boleta virtual NO tiene valor para cobrar el premio.', 22, avisoY + 11);
+      pdf.text('Solo se entregará la boleta original una vez cancelada en su totalidad.', 22, avisoY + 15.5);
+
+      // ── Pie ──
+      const pieY = PH - 14;
+      pdf.setFillColor(...MAGENTA);
+      pdf.rect(0, pieY, PW, 14, 'F');
+      pdf.setFontSize(7);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(...BLANCO);
+      pdf.text('¡GRACIAS POR TU PARTICIPACIÓN!', PW / 2, pieY + 5.5, { align: 'center' });
+      pdf.setFontSize(6); pdf.setFont('helvetica', 'normal');
+      pdf.text('Guarda este comprobante. El vendedor confirmará tu pago.', PW / 2, pieY + 10, { align: 'center' });
+    }
+
+    const nombreArchivo = `boletas_${(datos.nombre || 'pedido').replace(/\s+/g,'_').toLowerCase()}.pdf`;
+    pdf.save(nombreArchivo);
+    toast('✅ PDF descargado correctamente', 'verde');
+  } catch(e) {
+    toast('Error al generar PDF: ' + e.message, 'rojo');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg> Descargar mis boletas en PDF';
+    }
+  }
 }
 
 function _limpiarReservasPropias() {
@@ -10727,6 +11583,8 @@ window.seleccionarVendedorMsv = seleccionarVendedorMsv;
 window.filtrarMsv = filtrarMsv;
 window.logout = logout;
 window.abrirTab = abrirTab;
+window.toggleNavDrawer = toggleNavDrawer;
+window.cerrarNavDrawer = cerrarNavDrawer;
 window.filtrarBoletas = filtrarBoletas;
 window.filtrarEstado = filtrarEstado;
 window.boletasCambiarPag = boletasCambiarPag;
@@ -11236,7 +12094,97 @@ async function distribuirGuardar() {
   toast('✅ Guardado: ' + guardados.join(' · '), 'verde');
 }
 
+function distribuirBuscarNum(query) {
+  const el = document.getElementById('dist-buscar-resultado');
+  if (!el) return;
+  const q = (query || '').trim();
+  if (!q) { el.style.display = 'none'; el.innerHTML = ''; return; }
+
+  // Buscar en todos los vendedores de allVendedores
+  const resultados = []; // [{nombre, tipo:'vendedor'|'oficina', id}]
+
+  // Construir mapa índice → {n1,n2,n3,n4} desde editorNumerosBD
+  // Cada boleta son 4 números consecutivos: índice de boleta = Math.floor(i/4)
+  const numABoleta = {}; // num → {idx, n1,n2,n3,n4}
+  if (editorNumerosBD.length >= 4) {
+    for (let i = 0; i + 3 < editorNumerosBD.length; i += 4) {
+      const boletaIdx = Math.floor(i / 4);
+      const nums = [editorNumerosBD[i], editorNumerosBD[i+1], editorNumerosBD[i+2], editorNumerosBD[i+3]];
+      nums.forEach(n => { numABoleta[n] = { idx: boletaIdx, nums }; });
+    }
+  }
+
+  // Normalizar query: rellenar con ceros a la izquierda si es numérico
+  const qPad = /^\d+$/.test(q) ? q.padStart(4, '0') : q;
+
+  // Encontrar qué boleta(s) contienen ese número
+  const boletasMatch = new Set();
+  Object.entries(numABoleta).forEach(([n, b]) => {
+    if (n === qPad || n.includes(q)) boletasMatch.add(b.idx);
+  });
+
+  if (!boletasMatch.size) {
+    el.innerHTML = '<div style="font-size:13px;color:#718096;padding:4px 0">No se encontró ninguna boleta con ese número.</div>';
+    el.style.display = 'block';
+    return;
+  }
+
+  // Buscar en cada vendedor qué boleta(s) coinciden
+  let encontrado = false;
+  Object.entries(allVendedores).forEach(([vid, v]) => {
+    const asigSet = new Set((v.boletasAsignadas || []).map(n => Number(n)));
+    const coinciden = [...boletasMatch].filter(idx => asigSet.has(idx));
+    if (coinciden.length) {
+      encontrado = true;
+      coinciden.forEach(idx => {
+        resultados.push({ vendedor: v.nombre || vid, tipo: 'vendedor', idx });
+      });
+    }
+  });
+
+  // Buscar en la oficina: boletas NO asignadas a ningún vendedor
+  const todasAsignadas = new Set();
+  Object.values(allVendedores).forEach(v => {
+    (v.boletasAsignadas || []).forEach(n => todasAsignadas.add(Number(n)));
+  });
+  [...boletasMatch].forEach(idx => {
+    if (!todasAsignadas.has(idx)) {
+      encontrado = true;
+      resultados.push({ vendedor: 'La Oficina', tipo: 'oficina', idx });
+    }
+  });
+
+  if (!resultados.length) {
+    el.innerHTML = '<div style="font-size:13px;color:#718096;padding:4px 0">Número encontrado pero sin asignación registrada.</div>';
+    el.style.display = 'block';
+    return;
+  }
+
+  el.innerHTML = resultados.map(r => {
+    const boleta = numABoleta[qPad] || [...boletasMatch].map(i => {
+      const base = i * 4;
+      return { idx: i, nums: [editorNumerosBD[base], editorNumerosBD[base+1], editorNumerosBD[base+2], editorNumerosBD[base+3]] };
+    }).find(b => b.idx === r.idx);
+    const nums = boleta ? boleta.nums.filter(Boolean) : [];
+    const numsHTML = nums.map(n => `<span style="font-family:'Bebas Neue',cursive;font-size:15px;background:#fff5f5;color:#e74c3c;border:1px solid #fcc;border-radius:5px;padding:2px 7px">${n}</span>`).join(' ');
+    const icono = r.tipo === 'oficina'
+      ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>'
+      : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+    const bg = r.tipo === 'oficina' ? '#e8f9eb' : '#fdf2f8';
+    const borde = r.tipo === 'oficina' ? 'var(--verde)' : 'var(--magenta)';
+    const color = r.tipo === 'oficina' ? 'var(--azul-dark)' : 'var(--magenta)';
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:${bg};border:1.5px solid ${borde};border-radius:10px;margin-bottom:4px">
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:800;color:${color};margin-bottom:3px">${icono} ${r.vendedor}</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap">${numsHTML}</div>
+      </div>
+    </div>`;
+  }).join('');
+  el.style.display = 'block';
+}
+
 window.distribuirInit = distribuirInit;
+window.distribuirBuscarNum = distribuirBuscarNum;
 window.distDdToggle = distDdToggle;
 window.distDdSelect = distDdSelect;
 window.distribuirSeleccionarColumna = distribuirSeleccionarColumna;
@@ -11570,6 +12518,7 @@ window.abrirTienda = abrirTienda;
 window.toggleBoleta = toggleBoleta;
 window.abrirCheckout = abrirCheckout;
 window.enviarPedido = enviarPedido;
+window.descargarPDFPedido = descargarPDFPedido;
 window.limpiarCarrito = limpiarCarrito;
 window.limpiarCarritoPostPedido = limpiarCarritoPostPedido;
 window.volverLogin = volverLogin;
