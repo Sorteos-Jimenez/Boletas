@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Sorteos Jiménez</title>
+  <script>
+    // Técnica estándar para SPA en GitHub Pages.
+    // Cuando alguien accede a /Boletas/juan, GitHub Pages devuelve este 404.html.
+    // Aquí extraemos el segmento del vendedor, lo guardamos en sessionStorage
+    // y redirigimos al index.html que lo leerá y abrirá la tienda correcta.
+    (function() {
+      var path = window.location.pathname; // ej: /Boletas/juan
+      var match = path.match(/\/Boletas\/([^\/\?#]+)/i);
+      if (match && match[1]) {
+        sessionStorage.setItem('ghpages_vendor', decodeURIComponent(match[1]));
+      }
+      // Redirigir al index.html conservando la query string original si existe
+      var qs = window.location.search || '';
+      window.location.replace('/Boletas/' + qs);
+    })();
+  </script>
+</head>
+<body>
+  <p style="font-family:sans-serif;text-align:center;margin-top:60px;color:#718096">
+    Redirigiendo...
+  </p>
+</body>
+</html>
