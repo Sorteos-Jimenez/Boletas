@@ -4548,7 +4548,7 @@ async function doLogin() {
       snap.forEach(v => {
         const d = v.val();
         if ((d.username || d.codigo || '').toLowerCase() === codigo && d.pin === pin) {
-          currentUser = { rol: 'vendedor', id: v.key, nombre: d.nombre, boletasAsignadas: d.boletasAsignadas || [] };
+          currentUser = { rol: 'vendedor', id: v.key, nombre: d.nombre, username: d.username || d.codigo || v.key, boletasAsignadas: d.boletasAsignadas || [] };
           encontrado = true;
         }
       });
@@ -5337,23 +5337,23 @@ async function vpCargarPerfil() {
 
   // Mostrar mi link personal
   const linkEl = document.getElementById('mi-link-url');
-  if (linkEl) linkEl.textContent = TIENDA_URL + '?v=' + currentUser.id;
+  if (linkEl) linkEl.textContent = TIENDA_URL + '?v=' + (currentUser.username || currentUser.id);
   // Renderizar QR del link personal
   const qrCanvas = document.getElementById('mi-link-qr-canvas');
   if (qrCanvas && window.renderQROnCanvas) {
-    renderQROnCanvas(qrCanvas, TIENDA_URL + '?v=' + currentUser.id, { size: 200 });
+    renderQROnCanvas(qrCanvas, TIENDA_URL + '?v=' + (currentUser.username || currentUser.id), { size: 200 });
   }
 }
 
 function miLinkCopiar() {
-  const url = TIENDA_URL + '?v=' + currentUser.id;
+  const url = TIENDA_URL + '?v=' + (currentUser.username || currentUser.id);
   navigator.clipboard.writeText(url).then(() => toast('🔗 Link copiado', 'verde')).catch(() => {
     mostrarModalCopiarLink(url);
   });
 }
 
 async function miLinkCompartir() {
-  const url = TIENDA_URL + '?v=' + currentUser.id;
+  const url = TIENDA_URL + '?v=' + (currentUser.username || currentUser.id);
   const nombre = currentUser.nombre || 'mi tienda';
   if (navigator.share) {
     try { await navigator.share({ title: 'Sorteos — ' + nombre, url }); return; } catch(e) {}
@@ -7757,9 +7757,9 @@ function abrirDetalleVendedor(vid) {
       </div>
       <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
         <canvas id="vd-qr-canvas-${vid}" style="border-radius:10px;max-width:180px;display:block"></canvas>
-        <div style="font-size:11px;color:#718096;font-weight:700;word-break:break-all;text-align:center;background:#f4f8f4;border-radius:8px;padding:8px 10px;width:100%">${TIENDA_URL}?v=${vid}</div>
+        <div style="font-size:11px;color:#718096;font-weight:700;word-break:break-all;text-align:center;background:#f4f8f4;border-radius:8px;padding:8px 10px;width:100%">${TIENDA_URL}?v=${v.username||v.codigo||vid}</div>
         <div style="display:flex;gap:8px;width:100%">
-          <button onclick="navigator.clipboard&&navigator.clipboard.writeText('${TIENDA_URL}?v=${vid}').then(()=>toast('🔗 Link copiado','verde'))" style="flex:1;padding:9px;background:white;color:var(--dark);border:2px solid var(--borde);border-radius:10px;font-size:12px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px">
+          <button onclick="navigator.clipboard&&navigator.clipboard.writeText('${TIENDA_URL}?v=${v.username||v.codigo||vid}').then(()=>toast('🔗 Link copiado','verde'))" style="flex:1;padding:9px;background:white;color:var(--dark);border:2px solid var(--borde);border-radius:10px;font-size:12px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             Copiar link
           </button>
@@ -7782,7 +7782,7 @@ function abrirDetalleVendedor(vid) {
   // Renderizar QR del vendedor
   if (window.renderQROnCanvas) {
     const qc = document.getElementById('vd-qr-canvas-' + vid);
-    if (qc) renderQROnCanvas(qc, TIENDA_URL + '?v=' + vid, { size: 180 });
+    if (qc) renderQROnCanvas(qc, TIENDA_URL + '?v=' + (v.username||v.codigo||vid), { size: 180 });
   }
 }
 
@@ -12614,9 +12614,20 @@ function distribuirBuscarNum(query) {
     // Estado anulada desde allBoletasPlantilla
     const bpKey = nums.length ? Object.keys(allBoletasPlantilla || {}).find(k => String(allBoletasPlantilla[k].n1).padStart(4,'0') === String(nums[0]).padStart(4,'0')) : null;
     const esAnulada = bpKey && allBoletasPlantilla[bpKey]?.anulada === true;
+    // Detectar si tiene un pedido activo (pendiente o confirmado)
+    let estadoPedido = null;
+    if (!esAnulada && bpKey) {
+      const pedidos = Object.values(window._allPedidos || {});
+      const pedidoMatch = pedidos.find(p => Array.isArray(p.boleta_keys) && p.boleta_keys.includes(bpKey) && p.estado !== 'cancelado');
+      if (pedidoMatch) estadoPedido = pedidoMatch.estado; // 'pendiente' | 'confirmado' | etc.
+    }
     const estadoBadge = esAnulada
       ? `<span style="font-size:10px;font-weight:800;color:#c53030;background:#fff5f5;border:1px solid #fed7d7;border-radius:12px;padding:2px 8px;margin-left:6px">🚫 ANULADA</span>`
-      : `<span style="font-size:10px;font-weight:800;color:#276749;background:#e6fffa;border:1px solid #9ae6b4;border-radius:12px;padding:2px 8px;margin-left:6px">✅ DISPONIBLE</span>`;
+      : estadoPedido === 'confirmado'
+        ? `<span style="font-size:10px;font-weight:800;color:#276749;background:#f0fff4;border:1px solid #9ae6b4;border-radius:12px;padding:2px 8px;margin-left:6px">✅ COMPRADA</span>`
+        : estadoPedido
+          ? `<span style="font-size:10px;font-weight:800;color:#c05621;background:#fffaf0;border:1px solid #fbd38d;border-radius:12px;padding:2px 8px;margin-left:6px">⏳ PENDIENTE</span>`
+          : `<span style="font-size:10px;font-weight:800;color:#276749;background:#e6fffa;border:1px solid #9ae6b4;border-radius:12px;padding:2px 8px;margin-left:6px">✅ DISPONIBLE</span>`;
     const btnAccion = bpKey
       ? (esAnulada
           ? `<button onclick="distReactivarBoleta('${bpKey}')" style="display:inline-block;margin-top:6px;padding:5px 12px;background:linear-gradient(135deg,#38a169,#276749);color:white;border:none;border-radius:20px;font-family:'Nunito',sans-serif;font-weight:800;font-size:11px;cursor:pointer">🔓 Quitar anulación</button>`
