@@ -2299,21 +2299,23 @@
     inset: 0;
     background: rgba(10,20,12,0.75);
     z-index: 9990;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
     backdrop-filter: blur(4px);
+    padding: 20px;
   }
   #modal-sel-vendedor.open { display: flex; }
   .msv-sheet {
     background: white;
-    border-radius: 24px 24px 0 0;
+    border-radius: 20px;
     width: 100%;
-    max-width: 480px;
-    max-height: 78vh;
+    max-width: 420px;
+    max-height: 50vh;
     display: flex;
     flex-direction: column;
     animation: slideUp 0.28s cubic-bezier(0.34,1.1,0.64,1);
     overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
   }
   .msv-header {
     padding: 20px 20px 0;
@@ -2833,12 +2835,7 @@
       </div>
       <button class="msv-close" onclick="cerrarModalSelVendedor()">✕</button>
     </div>
-    <div class="msv-search-wrap">
-      <div class="msv-search-rel">
-        <span class="msv-search-icon">🔍</span>
-        <input class="msv-search" id="msv-search-input" type="text" placeholder="Buscar vendedor..." oninput="filtrarMsv(this.value)" autocomplete="off">
-      </div>
-    </div>
+
     <div class="msv-list" id="msv-list">
       <div class="msv-spinner"><div class="spinner"></div><p>Cargando...</p></div>
     </div>
@@ -4476,9 +4473,7 @@ async function cargarVendedoresEnSelect() {
 function abrirModalSelVendedor() {
   const overlay = document.getElementById('modal-sel-vendedor');
   overlay.classList.add('open');
-  document.getElementById('msv-search-input').value = '';
   renderMsvList(_msvLista);
-  setTimeout(() => document.getElementById('msv-search-input').focus(), 200);
 }
 
 function cerrarModalSelVendedor() {
@@ -4519,9 +4514,7 @@ function seleccionarVendedorMsv(key, nombre) {
     `<span class="sel-vendedor-btn-avatar">${ini}</span><span>${nombre}</span>`;
   // Actualizar check visual
   document.querySelectorAll('.msv-item').forEach(el => el.classList.remove('selected'));
-  renderMsvList(document.getElementById('msv-search-input').value.trim()
-    ? _msvLista.filter(v => v.nombre.toLowerCase().includes(document.getElementById('msv-search-input').value.toLowerCase()))
-    : _msvLista);
+  renderMsvList(_msvLista);
   setTimeout(cerrarModalSelVendedor, 220);
 }
 
