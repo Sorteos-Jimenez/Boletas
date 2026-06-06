@@ -3780,6 +3780,34 @@
         </div>
       </div>
 
+      <!-- Mi link de vendedor -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-header">
+          <h3><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Mi link de tienda</h3>
+        </div>
+        <div class="card-body">
+          <p style="font-size:12px;color:#718096;margin-bottom:12px">Comparte este link para que tus clientes vean solo tus boletas disponibles.</p>
+          <div style="display:flex;align-items:center;gap:8px;background:#f4f8f4;border:2px solid var(--borde);border-radius:10px;padding:10px 12px;margin-bottom:12px">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#3ab54a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <span id="mi-link-url" style="font-size:11px;color:#4a5568;font-weight:700;word-break:break-all;flex:1;line-height:1.4"></span>
+          </div>
+          <canvas id="mi-link-qr-canvas" style="display:block;margin:0 auto 12px;border-radius:10px;max-width:200px"></canvas>
+          <div style="display:flex;gap:8px">
+            <button onclick="miLinkCopiar()" style="flex:1;padding:10px;background:white;color:var(--dark);border:2px solid var(--borde);border-radius:10px;font-size:13px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copiar
+            </button>
+            <button onclick="miLinkCompartir()" style="flex:1;padding:10px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;border:none;border-radius:10px;font-size:13px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+              Compartir
+            </button>
+            <button onclick="miLinkDescargarQR()" title="Descargar QR" style="padding:10px 12px;background:white;color:var(--dark);border:2px solid var(--borde);border-radius:10px;font-size:13px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <button onclick="vpGuardarPerfil()" style="width:100%;padding:13px;background:linear-gradient(135deg,#3ab54a,#2a8c38);color:white;border:none;border-radius:12px;font-size:15px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;box-shadow:0 4px 14px rgba(58,181,74,0.35);display:flex;align-items:center;justify-content:center;gap:8px">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         Guardar perfil
@@ -4955,49 +4983,33 @@ function renderBoletas() {
 
   const buscar = document.getElementById('buscar-boleta')?.value.toLowerCase() || '';
 
-  // ── VENDEDOR: lógica original por boletas de plantilla ──
+  // ── VENDEDOR: vista de cuentas_cliente propias (igual que admin pero filtrado) ──
   if (currentUser.rol === 'vendedor') {
-    let lista = Object.entries(allBoletas);
-    const asig = new Set((currentUser.boletasAsignadas || []).map(n => String(n).padStart(4,'0')));
-    if (!asig.size) { lista = []; }
-    else if (Object.keys(allBoletasPlantilla).length) {
-      lista = Object.entries(allBoletasPlantilla)
-        .filter(([, bp]) => asig.has(String(bp.n1).padStart(4,'0')))
-        .sort(([, a], [, b]) => (a.idx || 0) - (b.idx || 0))
-        .map(([k, bp]) => {
-          const venta = Object.values(allBoletas).find(b => {
-            const ns = (b.numeros || '').split(',').map(n => n.trim());
-            return ns.includes(bp.n1);
-          });
-          return [k, {
-            numeros: [bp.n1, bp.n2, bp.n3, bp.n4].filter(Boolean).join(', '),
-            estado: venta ? venta.estado : 'libre',
-            comprador: venta ? venta.comprador : ''
-          }];
-        });
-    } else {
-      const db = window._db, ref = window._ref, get = window._get;
-      if (db) {
-        get(ref(db, 'boletas_plantilla')).then(snap => {
-          if (snap.exists()) {
-            allBoletasPlantilla = snap.val();
-            if (!editorNumerosBD.length) {
-              const nums = [];
-              Object.values(allBoletasPlantilla)
-                .sort((a, b) => (a.idx||0)-(b.idx||0))
-                .forEach(b => { if (b.n1) nums.push(b.n1,b.n2,b.n3,b.n4); });
-              editorNumerosBD = nums;
-            }
-          }
-          renderBoletas();
-        });
-      }
-      lista = [];
+    let lista = Object.entries(allCuentas).filter(([, c]) => c.vendedor_id === currentUser.id);
+
+    // Filtro por estado
+    if (filtroEstado) {
+      const mapEstado = { pagada: 'pagado', abonado: 'abonado', libre: 'pendiente' };
+      const estadoCuenta = mapEstado[filtroEstado] || filtroEstado;
+      lista = lista.filter(([, c]) => c.estado === estadoCuenta);
     }
-    if (filtroEstado) lista = lista.filter(([, b]) => b.estado === filtroEstado);
-    if (buscar) lista = lista.filter(([k, b]) =>
-      (b.numeros || '').includes(buscar) || (b.comprador || '').toLowerCase().includes(buscar) || k.includes(buscar)
-    );
+
+    // Búsqueda
+    if (buscar) {
+      lista = lista.filter(([k, c]) =>
+        (c.comprador || '').toLowerCase().includes(buscar) ||
+        (c.telefono  || '').includes(buscar) ||
+        (c.boleta_keys || []).some(bk => {
+          const b = allBoletas[bk];
+          return b && (b.numeros || '').includes(buscar);
+        }) ||
+        k.includes(buscar)
+      );
+    }
+
+    // Ordenar: más recientes primero
+    lista.sort(([, a], [, b]) => (b.fecha_ts || 0) - (a.fecha_ts || 0));
+
     boletasListaFiltrada = lista;
     boletasPagActual = 1;
     renderBoletasPagina();
@@ -5071,29 +5083,97 @@ function renderBoletasPagina() {
         ${boletasPagActual===totalPags?'disabled':''}>Sig →</button>
     </div>` : '';
 
-  // ── VENDEDOR: flip cards originales ──
+  // ── VENDEDOR: tarjetas de cuenta (misma vista que admin, solo sus cuentas) ──
   if (currentUser.rol === 'vendedor') {
-    const enriched = pagina.map(([k, b]) => {
-      const nums = (b.numeros || '').split(',').map(n => n.trim()).filter(Boolean);
-      const ventaKey = Object.keys(allBoletas).find(bk => {
-        const ns = (allBoletas[bk].numeros || '').split(',').map(n => n.trim());
-        return nums.length && ns.includes(nums[0]);
+    // reutilizar el mismo bloque de renderizado de cuentas del admin
+    const _cuentaCanvasDataV = [];
+    const htmlV = pagina.map(([cuentaKey, c]) => {
+      const boletas = (c.boleta_keys || []).map(bk => allBoletas[bk]).filter(Boolean);
+      const _cSlug = cuentaKey.replace(/[^a-z0-9]/gi,'').slice(-6);
+      let numeros = '';
+      if (boletas.length) {
+        const cards = boletas.map((b, bi) => {
+          const nums = (b.numeros || '').split(',').map(n => n.trim()).filter(Boolean);
+          if (!nums.length) return '';
+          const cvId = `vcnt-${_cSlug}-${bi}`;
+          const n1pad = String(nums[0] || '').padStart(4, '0');
+          const bpEntry = Object.values(allBoletasPlantilla).find(bp =>
+            String(bp.n1).padStart(4,'0') === n1pad
+          );
+          const anversoImg = bpEntry?.anverso_img || null;
+          let imgHTML = '';
+          if (anversoImg) {
+            imgHTML = '<img src="' + anversoImg + '" loading="lazy" style="width:100%;height:auto;display:block;border-radius:8px 8px 0 0">';
+          } else if (tiendaPlantilla) {
+            imgHTML = '<canvas id="' + cvId + '" style="width:100%;height:auto;display:block;border-radius:8px 8px 0 0"></canvas>';
+            _cuentaCanvasDataV.push({ cvId });
+          } else {
+            imgHTML = '<div style="width:100%;height:40px;display:flex;align-items:center;justify-content:center;background:var(--gris);border-radius:8px 8px 0 0"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#a0aec0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="2" x2="9" y2="22"/></svg></div>';
+          }
+          const numsHTML = nums.map(function(n){ return '<span style="font-size:13px;font-weight:800;font-family:\'Bebas Neue\',cursive;letter-spacing:1px;color:var(--rojo);background:#fff5f5;border:1.5px solid #fecaca;border-radius:5px;padding:3px 4px;text-align:center">' + n + '</span>'; }).join('');
+          return '<div style="display:inline-flex;flex-direction:column;background:white;border:2px solid #e8f9eb;border-radius:10px;overflow:hidden;min-width:88px;max-width:130px;flex:1">' +
+            imgHTML +
+            '<div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:5px 6px">' + numsHTML + '</div>' +
+            '</div>';
+        }).join('');
+        numeros = `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px">${cards}</div>`;
+      } else {
+        numeros = `<div style="font-size:11px;color:#a0aec0;margin-bottom:6px">${(c.boleta_keys || []).length} boleta(s)</div>`;
+      }
+      const abonos  = c.abonos ? Object.values(c.abonos) : [];
+      const totalAbonado = abonos.reduce((s, a) => s + (Number(a.monto) || 0), 0);
+      const totalCuenta  = Number(c.total_cuenta) || 0;
+      const precioCfg = (window.tiendaConfig?.precio || '0').toString().replace(/[.,\s]/g,'');
+      const precioBoleta = Number(precioCfg) || 0;
+      const numBoletas = (c.boleta_keys || []).length;
+      const totalEsperado = precioBoleta ? precioBoleta * numBoletas : totalCuenta;
+      const saldo = Math.max(0, totalEsperado - totalAbonado - (c.estado === 'pagado' ? totalEsperado : 0));
+      const estadoColor = c.estado === 'pagado' ? '#276749' : c.estado === 'abonado' ? '#975a16' : '#718096';
+      const estadoBg    = c.estado === 'pagado' ? '#f0fff4' : c.estado === 'abonado' ? '#fffaf0' : '#f7fafc';
+      const estadoLabel = c.estado === 'pagado' ? '✅ Pagado' : c.estado === 'abonado' ? '⏳ Abonado' : '⬜ Pendiente';
+      return `
+      <div style="background:white;border:1.5px solid var(--borde);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:box-shadow .15s"
+           onclick="abrirCuenta('${cuentaKey}')"
+           onmouseenter="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.10)'"
+           onmouseleave="this.style.boxShadow=''">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+              <span style="font-size:15px;font-weight:800;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px">${c.comprador || 'Sin nombre'}</span>
+              <span style="font-size:11px;font-weight:700;color:${estadoColor};background:${estadoBg};border-radius:20px;padding:2px 9px;border:1px solid ${estadoColor}40;white-space:nowrap">${estadoLabel}</span>
+            </div>
+            <div style="font-size:12px;color:#718096;margin-bottom:6px">${c.telefono ? (() => { const _tw = c.telefono; return `<a href="https://wa.me/${_waNum(_tw)}" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:3px;color:#25d366;text-decoration:none;font-weight:700"><svg width="12" height="12" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>${c.telefono}</a> &middot; `; })() : ''}<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:3px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${c.fecha || ''}</div>
+            ${numeros}
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <span style="font-size:11px;font-weight:700;color:#276749;background:#f0fff4;border:1px solid #c6f6d5;border-radius:6px;padding:2px 8px">
+                Abonado: $${totalAbonado.toLocaleString('es-CO')}
+              </span>
+              ${saldo > 0 ? `<span style="font-size:11px;font-weight:700;color:#c53030;background:#fff5f5;border:1px solid #fed7d7;border-radius:6px;padding:2px 8px">Saldo: $${saldo.toLocaleString('es-CO')}</span>` : ''}
+              <span style="font-size:11px;font-weight:600;color:#a0aec0;background:#f7fafc;border:1px solid #e2e8f0;border-radius:6px;padding:2px 8px">${numBoletas} boleta${numBoletas !== 1 ? 's' : ''}</span>
+            </div>
+          </div>
+          <div style="font-size:11px;color:#a0aec0;white-space:nowrap;padding-top:2px">›</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    cont.innerHTML = (pagina.length === 0
+      ? '<div class="empty-state"><span class="icon">🎫</span><p>Aún no tienes clientes registrados</p></div>'
+      : htmlV) + paginador;
+
+    // Dibujar canvas en las minicards
+    if (_cuentaCanvasDataV.length && tiendaPlantilla) {
+      requestAnimationFrame(() => {
+        const tp = tiendaPlantilla;
+        _cuentaCanvasDataV.forEach(({ cvId }) => {
+          const cv = document.getElementById(cvId);
+          if (!cv) return;
+          cv.width  = tp.img.naturalWidth  || tp.img.width  || 800;
+          cv.height = tp.img.naturalHeight || tp.img.height || 347;
+          cv.getContext('2d').drawImage(tp.img, 0, 0, cv.width, cv.height);
+        });
       });
-      const venta = ventaKey ? allBoletas[ventaKey] : null;
-      return [k, {
-        n1: nums[0]||null, n2: nums[1]||null, n3: nums[2]||null, n4: nums[3]||null,
-        estadoVenta: b.estado || 'libre',
-        _boletaKey: ventaKey || '',
-        _comprador: venta ? venta.comprador : '',
-        _telefono:  venta ? venta.telefono  : '',
-        _fecha:     venta ? venta.fecha      : '',
-        _monto:     venta ? venta.monto_pagado : 0,
-        _direccion: venta ? (venta.direccion_casa || venta.dir_casa || venta.direccion || '') : '',
-        _entregada: venta ? (venta.entregada || false) : false,
-        _fechaEntrega: venta ? (venta.fecha_entrega || '') : '',
-      }];
-    });
-    cont.innerHTML = vdRenderBoletasTile(enriched, 'libre') + paginador;
+    }
     return;
   }
 
@@ -5254,6 +5334,42 @@ async function vpCargarPerfil() {
   // Cargar medios de pago — efectivo por defecto si no hay ninguno
   _vpMedios = v.medios_pago ? JSON.parse(JSON.stringify(v.medios_pago)) : [{ tipo: 'efectivo' }];
   vpRenderMedios();
+
+  // Mostrar mi link personal
+  const linkEl = document.getElementById('mi-link-url');
+  if (linkEl) linkEl.textContent = TIENDA_URL + '?v=' + currentUser.id;
+  // Renderizar QR del link personal
+  const qrCanvas = document.getElementById('mi-link-qr-canvas');
+  if (qrCanvas && window.renderQROnCanvas) {
+    renderQROnCanvas(qrCanvas, TIENDA_URL + '?v=' + currentUser.id, { size: 200 });
+  }
+}
+
+function miLinkCopiar() {
+  const url = TIENDA_URL + '?v=' + currentUser.id;
+  navigator.clipboard.writeText(url).then(() => toast('🔗 Link copiado', 'verde')).catch(() => {
+    mostrarModalCopiarLink(url);
+  });
+}
+
+async function miLinkCompartir() {
+  const url = TIENDA_URL + '?v=' + currentUser.id;
+  const nombre = currentUser.nombre || 'mi tienda';
+  if (navigator.share) {
+    try { await navigator.share({ title: 'Sorteos — ' + nombre, url }); return; } catch(e) {}
+  }
+  navigator.clipboard.writeText(url).then(() => toast('🔗 Link copiado', 'verde')).catch(() => {
+    mostrarModalCopiarLink(url);
+  });
+}
+
+function miLinkDescargarQR() {
+  const canvas = document.getElementById('mi-link-qr-canvas');
+  if (!canvas) return;
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = 'qr-' + (currentUser.nombre || currentUser.id).replace(/\s+/g,'-').toLowerCase() + '.png';
+  a.click();
 }
 
 function vpRenderMedios() {
@@ -6139,11 +6255,12 @@ function abrirCuenta(cuentaKey) {
       <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Enviar boletas 📲
     </button>
 
-    <!-- Eliminar -->
+    <!-- Eliminar (solo admin) -->
+    ${currentUser?.rol === 'admin' ? `
     <button onclick="eliminarCuenta('${cuentaKey}')"
       style="width:100%;padding:11px;background:white;color:#e53e3e;border:1.5px solid #fed7d7;border-radius:12px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e53e3e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Eliminar esta cuenta
-    </button>
+    </button>` : ''}
   </div>`;
 
   // Crear modal si no existe
@@ -7630,7 +7747,28 @@ function abrirDetalleVendedor(vid) {
       ${vdRenderPedidosVendedor(vid)}
     </div>
 
-    <div style="margin-top:20px;border-top:2px solid var(--borde);padding-top:14px">
+    <div style="margin-top:16px;border-top:2px solid var(--borde);padding-top:14px">
+      <div style="font-size:11px;font-weight:800;color:#718096;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/></svg>
+        QR del vendedor
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+        <canvas id="vd-qr-canvas-${vid}" style="border-radius:10px;max-width:180px;display:block"></canvas>
+        <div style="font-size:11px;color:#718096;font-weight:700;word-break:break-all;text-align:center;background:#f4f8f4;border-radius:8px;padding:8px 10px;width:100%">${TIENDA_URL}?v=${vid}</div>
+        <div style="display:flex;gap:8px;width:100%">
+          <button onclick="navigator.clipboard&&navigator.clipboard.writeText('${TIENDA_URL}?v=${vid}').then(()=>toast('🔗 Link copiado','verde'))" style="flex:1;padding:9px;background:white;color:var(--dark);border:2px solid var(--borde);border-radius:10px;font-size:12px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copiar link
+          </button>
+          <button onclick="(function(){const c=document.getElementById('vd-qr-canvas-${vid}');if(!c)return;const a=document.createElement('a');a.href=c.toDataURL('image/png');a.download='qr-${(v.nombre||vid).replace(/\s+/g,'-').toLowerCase()}.png';a.click()})()" style="flex:1;padding:9px;background:white;color:var(--dark);border:2px solid var(--borde);border-radius:10px;font-size:12px;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Descargar QR
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:14px;border-top:2px solid var(--borde);padding-top:14px">
       <button onclick="eliminarVendedor('${vid}')" style="width:100%;padding:12px;background:#fff5f5;border:2px solid #fed7d7;border-radius:12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;color:var(--rojo);cursor:pointer;transition:all 0.2s" onmouseenter="this.style.background='#fed7d7'" onmouseleave="this.style.background='#fff5f5'">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg> Eliminar vendedor
       </button>
@@ -7638,6 +7776,11 @@ function abrirDetalleVendedor(vid) {
   `;
 
   document.getElementById('modal-vendedor-detalle').classList.add('open');
+  // Renderizar QR del vendedor
+  if (window.renderQROnCanvas) {
+    const qc = document.getElementById('vd-qr-canvas-' + vid);
+    if (qc) renderQROnCanvas(qc, TIENDA_URL + '?v=' + vid, { size: 180 });
+  }
 }
 
 function vdSwitchTab(tab, vid) {
@@ -9631,11 +9774,15 @@ async function abrirTienda(codigoVendedor) {
   }
 
   // Mapa de visibilidad: { __oficina__: bool, [vendedorId]: bool }
-  // Si no hay config guardada, todo es visible por defecto.
+  // Si no hay config guardada en absoluto, todo es visible por defecto.
+  // Si hay config guardada, lo que no esté explícitamente en true se oculta.
   const visConfig = visSnap.exists() ? (visSnap.val() || {}) : {};
+  const visConfigTieneEntradas = Object.keys(visConfig).length > 0;
   const visiblePara = (vendedorId) => {
     const key = vendedorId ? vendedorId : '__oficina__';
-    return (key in visConfig) ? visConfig[key] : true;
+    if (key in visConfig) return visConfig[key];
+    // Si hay config guardada, lo no listado es oculto por defecto
+    return !visConfigTieneEntradas;
   };
 
   // Set de índices asignados a este vendedor (para filtrar)
@@ -9653,18 +9800,12 @@ async function abrirTienda(codigoVendedor) {
       });
     });
   }
-  // DEBUG — quitar después
-  console.log('[FILTRO] visConfig:', JSON.stringify(visConfig));
-  console.log('[FILTRO] n1ToVendedor muestra:', Object.entries(n1ToVendedor).slice(0,8).map(([k,v])=>k+'→'+v).join(', '));
-  console.log('[FILTRO] esOficinaFiltro:', esOficinaFiltro, '| indicesVendedor:', indicesVendedor ? 'Set('+indicesVendedor.size+')' : 'null');
 
-  let _dbgCount = 0;
   if (plantSnap.exists()) {
     Object.entries(plantSnap.val()).forEach(([k, b]) => {
       const n1 = b.n1 ? String(b.n1).padStart(4, '0') : null;
       // Determinar a qué vendedor pertenece la boleta por su n1
       const vidBoleta = n1 ? (n1ToVendedor[n1] || null) : null;
-      if (_dbgCount < 5) { console.log('[BOLETA]', n1, '→ vidBoleta:', vidBoleta, '| visible:', visiblePara(vidBoleta)); _dbgCount++; }
       // Filtro por oficina: solo boletas NO asignadas a ningún vendedor
       if (esOficinaFiltro && vidBoleta) return;
       // Si hay filtro por vendedor URL, solo incluir boletas de su lista
@@ -11985,6 +12126,10 @@ function _distribuirCargarColumna(lado) {
   Object.entries(allBoletasPlantilla || {}).forEach(([k, b]) => { if (b.n1) n1ToKey[b.n1] = k; });
   // ──────────────────────────────────────────────────────────────────────────
 
+  // Mapa n1 → anulada (boletas_plantilla con anulada:true no aparecen en lista)
+  const n1Anulada = new Set();
+  Object.values(allBoletasPlantilla || {}).forEach(b => { if (b.anulada === true && b.n1) n1Anulada.add(b.n1); });
+
   // Si es La Oficina: boletas sin asignar (excluyendo todos los vendedores EXCEPTO el de la otra columna si lo hay)
   if (id === '__oficina__') {
     const asignadasTotal = new Set();
@@ -11994,9 +12139,6 @@ function _distribuirCargarColumna(lado) {
       }
     });
     const lista = [];
-    // Mapa n1 → anulada (boletas_plantilla con anulada:true no aparecen en lista)
-    const n1Anulada = new Set();
-    Object.values(allBoletasPlantilla || {}).forEach(b => { if (b.anulada === true && b.n1) n1Anulada.add(b.n1); });
     if (editorNumerosBD.length >= 4) {
       for (let i = 0; i + 3 < editorNumerosBD.length; i += 4) {
         const nums = [editorNumerosBD[i], editorNumerosBD[i+1], editorNumerosBD[i+2], editorNumerosBD[i+3]];
@@ -12135,7 +12277,6 @@ function distribuirRenderLista(lado) {
   const cont = document.getElementById(contId);
   if (!cont) return;
   const countEl = document.getElementById(countId);
-  if (countEl) countEl.textContent = lista.length + ' boletas';
 
   // Desconectar observer anterior para esta columna (clave ya normalizada a izq/der)
   if (_distObservers[lado]) { _distObservers[lado].disconnect(); _distObservers[lado] = null; }
@@ -12143,6 +12284,11 @@ function distribuirRenderLista(lado) {
   const filtradas = buscar
     ? lista.filter(b => b.nums.some(n => n.includes(buscar)))
     : lista;
+
+  // Mostrar total o "X / total" cuando hay búsqueda activa
+  if (countEl) countEl.textContent = buscar
+    ? filtradas.length + ' / ' + lista.length + ' boletas'
+    : lista.length + ' boletas';
 
   if (!filtradas.length) {
     cont.innerHTML = `<div style="text-align:center;padding:30px 16px;color:#a0aec0;font-size:12px;font-weight:600">${lista.length ? 'Sin coincidencias' : 'Vac\u00edo'}</div>`;
@@ -13121,6 +13267,70 @@ window.cerrarQRTienda = cerrarQRTienda;
 window.descargarQRTienda = descargarQRTienda;
 window.compartirQRTienda = compartirQRTienda;
 window.copiarLinkQRTienda = copiarLinkQRTienda;
+</script>
+
+<!-- ===== MODAL COPIAR LINK ===== -->
+<div id="modal-copiar-link" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.55);align-items:flex-end;justify-content:center;padding:0" onclick="if(event.target===this)cerrarModalCopiarLink()">
+  <div style="background:white;border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;max-width:480px;box-shadow:0 -8px 40px rgba(0,0,0,0.18)">
+    <div style="width:36px;height:4px;background:#e2e8f0;border-radius:2px;margin:0 auto 20px"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <div style="width:38px;height:38px;background:linear-gradient(135deg,#3ab54a,#2a8c38);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      </div>
+      <div>
+        <div style="font-size:15px;font-weight:800;color:#1a2e1c">Mi link de tienda</div>
+        <div style="font-size:12px;color:#718096">Copia y comparte con tus clientes</div>
+      </div>
+    </div>
+    <div style="background:#f4f8f4;border:2px solid #d4ecd6;border-radius:12px;padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#3ab54a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      <input id="modal-copiar-link-input" type="text" readonly
+        style="flex:1;border:none;background:transparent;font-size:12px;font-weight:700;color:#2d3748;font-family:'Nunito',sans-serif;outline:none;min-width:0"
+        onclick="this.select()">
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="cerrarModalCopiarLink()" style="flex:1;padding:13px;background:#f4f8f4;border:2px solid #d4ecd6;border-radius:12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;color:#4a5568;cursor:pointer">
+        Cerrar
+      </button>
+      <button onclick="copiarDesdeModal()" id="btn-copiar-modal" style="flex:2;padding:13px;background:linear-gradient(135deg,#3ab54a,#2a8c38);color:white;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 4px 14px rgba(58,181,74,0.35);display:flex;align-items:center;justify-content:center;gap:7px">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copiar link
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+function mostrarModalCopiarLink(url) {
+  const modal = document.getElementById('modal-copiar-link');
+  document.getElementById('modal-copiar-link-input').value = url;
+  modal.style.display = 'flex';
+  // Reset botón
+  const btn = document.getElementById('btn-copiar-modal');
+  btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar link';
+  btn.style.background = 'linear-gradient(135deg,#3ab54a,#2a8c38)';
+  setTimeout(() => document.getElementById('modal-copiar-link-input').select(), 100);
+}
+
+function cerrarModalCopiarLink() {
+  document.getElementById('modal-copiar-link').style.display = 'none';
+}
+
+function copiarDesdeModal() {
+  const input = document.getElementById('modal-copiar-link-input');
+  const url = input.value;
+  const btn = document.getElementById('btn-copiar-modal');
+  navigator.clipboard.writeText(url).then(() => {
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ¡Copiado!';
+    btn.style.background = 'linear-gradient(135deg,#48bb78,#276749)';
+    setTimeout(cerrarModalCopiarLink, 1200);
+  }).catch(() => {
+    input.select();
+    document.execCommand('copy');
+    btn.innerHTML = '✓ ¡Copiado!';
+    setTimeout(cerrarModalCopiarLink, 1200);
+  });
+}
 </script>
 </body>
 </html>
