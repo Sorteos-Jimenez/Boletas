@@ -12177,8 +12177,8 @@ async function resetCampanaCompleta() {
     window._allPedidos = {};
     // Limpiar boletasAsignadas en caché local de vendedores
     Object.keys(allVendedores).forEach(vid => { if (allVendedores[vid]) allVendedores[vid].boletasAsignadas = []; });
-    distOficina = [];
-    distVendedor = [];
+    distIzq = [];
+    distDer = [];
     distVendedorId = '';
 
     // Limpiar UI del Editor
@@ -12407,8 +12407,8 @@ window.vdConfirmarAbono = vdConfirmarAbono;
 
 
 // ===== DISTRIBUIR BOLETAS A VENDEDORES =====
-let distOficina = [];
-let distVendedor = [];
+let distIzq = [];
+let distDer = [];
 let distVendedorId = '';
 let _distModificado = false;
 // IDs de los vendedores seleccionados en cada columna; '__oficina__' = La Oficina
@@ -12532,14 +12532,14 @@ function _distribuirCargarColumna(lado) {
 
   if (!id) {
     // Sin selección: vaciar
-    if (lado === 'izq') distOficina = [];
-    else distVendedor = [];
+    if (lado === 'izq') distIzq = [];
+    else distDer = [];
     distribuirRenderLista(lado);
     return;
   }
 
   // Boletas ocupadas por la OTRA columna (para no mostrarlas en ambas)
-  const otraLista = lado === 'izq' ? distVendedor : distOficina;
+  const otraLista = lado === 'izq' ? distDer : distIzq;
   const otrasNums = new Set(otraLista.flatMap(b => b.nums));
 
   // ── Mismo criterio de exclusión que la tienda ──────────────────────────────
@@ -12590,12 +12590,12 @@ function _distribuirCargarColumna(lado) {
         lista.push({ nums, checked: false, id: nums.join('-') });
       }
     }
-    if (lado === 'izq') distOficina = lista;
-    else distVendedor = lista;
+    if (lado === 'izq') distIzq = lista;
+    else distDer = lista;
   } else {
     // Es un vendedor: cargar sus boletas asignadas
     const v = allVendedores[id];
-    if (!v) { if (lado === 'izq') distOficina = []; else distVendedor = []; distribuirRenderLista(lado); return; }
+    if (!v) { if (lado === 'izq') distIzq = []; else distDer = []; distribuirRenderLista(lado); return; }
     const asignadas = v.boletasAsignadas || [];
     const asignadasSet = new Set(asignadas.map(n => String(n).padStart(4,'0')));
     const lista = [];
@@ -12621,8 +12621,8 @@ function _distribuirCargarColumna(lado) {
         lista.push({ nums, checked: false, id: nums.join('-') });
       }
     }
-    if (lado === 'izq') distOficina = lista;
-    else distVendedor = lista;
+    if (lado === 'izq') distIzq = lista;
+    else distDer = lista;
   }
 
   // Actualizar título
@@ -12708,7 +12708,7 @@ function distribuirRenderLista(lado) {
   if (lado === 'oficina') lado = 'izq';
   if (lado === 'vendedor') lado = 'der';
 
-  const lista = lado === 'izq' ? distOficina : distVendedor;
+  const lista = lado === 'izq' ? distIzq : distDer;
   const contId = lado === 'izq' ? 'dist-lista-oficina' : 'dist-lista-vendedor';
   const countId = lado === 'izq' ? 'dist-oficina-count' : 'dist-vendedor-count';
   const buscarId = lado === 'izq' ? 'dist-buscar-oficina' : 'dist-buscar-vendedor';
@@ -12792,7 +12792,7 @@ function distribuirRenderLista(lado) {
 function distribuirCheckToggle(chipId, lado) {
   if (lado === 'oficina') lado = 'izq';
   if (lado === 'vendedor') lado = 'der';
-  const lista = lado === 'izq' ? distOficina : distVendedor;
+  const lista = lado === 'izq' ? distIzq : distDer;
   const boleta = lista.find(b => b.id === chipId);
   if (!boleta) return;
   boleta.checked = !boleta.checked;
@@ -12811,7 +12811,7 @@ function distribuirFiltrar(lado) {
 function distribuirCheck(chipId, lado, checked) {
   if (lado === 'oficina') lado = 'izq';
   if (lado === 'vendedor') lado = 'der';
-  const lista = lado === 'izq' ? distOficina : distVendedor;
+  const lista = lado === 'izq' ? distIzq : distDer;
   const boleta = lista.find(b => b.id === chipId);
   if (boleta) boleta.checked = checked;
   const chip = document.getElementById('dchip-' + chipId);
@@ -12821,7 +12821,7 @@ function distribuirCheck(chipId, lado, checked) {
 function distribuirSeleccionarTodas(lado, checked) {
   if (lado === 'oficina') lado = 'izq';
   if (lado === 'vendedor') lado = 'der';
-  const lista = lado === 'izq' ? distOficina : distVendedor;
+  const lista = lado === 'izq' ? distIzq : distDer;
   lista.forEach(b => b.checked = checked);
   distribuirRenderLista(lado);
 }
@@ -12841,8 +12841,8 @@ function distribuirMoverChip(chipId, origen, destino) {
   if (origen === 'vendedor') origen = 'der';
   if (destino === 'oficina') destino = 'izq';
   if (destino === 'vendedor') destino = 'der';
-  const listaOrigen = origen === 'izq' ? distOficina : distVendedor;
-  const listaDest = destino === 'izq' ? distOficina : distVendedor;
+  const listaOrigen = origen === 'izq' ? distIzq : distDer;
+  const listaDest = destino === 'izq' ? distIzq : distDer;
   const idx = listaOrigen.findIndex(b => b.id === chipId);
   if (idx < 0) return;
   const [boleta] = listaOrigen.splice(idx, 1);
@@ -12855,23 +12855,23 @@ function distribuirMoverChip(chipId, origen, destino) {
 
 function distribuirMover(direccion) {
   if (direccion === 'a-der' || direccion === 'a-vendedor') {
-    const seleccionadas = distOficina.filter(b => b.checked);
+    const seleccionadas = distIzq.filter(b => b.checked);
     if (!seleccionadas.length) { toast('Selecciona al menos una boleta', 'rojo'); return; }
     if (!_distIdDer) { toast('Selecciona un destinatario en la columna derecha', 'rojo'); return; }
     seleccionadas.forEach(b => {
-      const i = distOficina.indexOf(b);
-      if (i >= 0) distOficina.splice(i, 1);
+      const i = distIzq.indexOf(b);
+      if (i >= 0) distIzq.splice(i, 1);
       b.checked = false;
-      distVendedor.push(b);
+      distDer.push(b);
     });
   } else {
-    const seleccionadas = distVendedor.filter(b => b.checked);
+    const seleccionadas = distDer.filter(b => b.checked);
     if (!seleccionadas.length) { toast('Selecciona al menos una boleta', 'rojo'); return; }
     seleccionadas.forEach(b => {
-      const i = distVendedor.indexOf(b);
-      if (i >= 0) distVendedor.splice(i, 1);
+      const i = distDer.indexOf(b);
+      if (i >= 0) distDer.splice(i, 1);
       b.checked = false;
-      distOficina.push(b);
+      distIzq.push(b);
     });
   }
   const cbOf = document.getElementById('dist-sel-all-oficina');
@@ -12892,7 +12892,7 @@ async function distribuirGuardar() {
   if (_distIdIzq && _distIdIzq !== '__oficina__') {
     const v = allVendedores[_distIdIzq];
     if (v) {
-      const nums = distOficina.flatMap(b => b.nums).map(n => Number(n));
+      const nums = distIzq.flatMap(b => b.nums).map(n => Number(n));
       try {
         await update(ref(db, 'vendedores/' + _distIdIzq), { boletasAsignadas: nums });
         guardados.push(v.nombre + ' (' + nums.length + ')');
@@ -12904,7 +12904,7 @@ async function distribuirGuardar() {
   if (_distIdDer && _distIdDer !== '__oficina__') {
     const v = allVendedores[_distIdDer];
     if (v) {
-      const nums = distVendedor.flatMap(b => b.nums).map(n => Number(n));
+      const nums = distDer.flatMap(b => b.nums).map(n => Number(n));
       try {
         await update(ref(db, 'vendedores/' + _distIdDer), { boletasAsignadas: nums });
         guardados.push(v.nombre + ' (' + nums.length + ')');
