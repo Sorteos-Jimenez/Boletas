@@ -12575,7 +12575,7 @@ function _distribuirCargarColumna(lado) {
     const asignadasTotal = new Set();
     Object.entries(allVendedores).forEach(([vid, v]) => {
       if (vid !== otraId) { // no excluir las del vendedor que está en la otra columna
-        (v.boletasAsignadas || []).forEach(n => asignadasTotal.add(n));
+        (v.boletasAsignadas || []).forEach(n => asignadasTotal.add(String(n).padStart(4,'0')));
       }
     });
     const lista = [];
