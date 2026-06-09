@@ -12671,10 +12671,14 @@ async function distribuirGuardar() {
     const v = allVendedores[_distIdIzq];
     if (v) {
       const nums = distOficina.flatMap(b => b.nums).map(n => Number(n));
-      try {
-        await update(ref(db, 'vendedores/' + _distIdIzq), { boletasAsignadas: nums });
-        guardados.push(v.nombre + ' (' + distOficina.length + ')');
-      } catch(err) { errores.push(v.nombre + ': ' + err.message); }
+      if (nums.length === 0) {
+        errores.push(v.nombre + ': no hay boletas para asignar');
+      } else {
+        try {
+          await update(ref(db, 'vendedores/' + _distIdIzq), { boletasAsignadas: nums });
+          guardados.push(v.nombre + ' (' + distOficina.length + ')');
+        } catch(err) { errores.push(v.nombre + ': ' + err.message); }
+      }
     }
   }
 
@@ -12683,17 +12687,21 @@ async function distribuirGuardar() {
     const v = allVendedores[_distIdDer];
     if (v) {
       const nums = distVendedor.flatMap(b => b.nums).map(n => Number(n));
-      try {
-        await update(ref(db, 'vendedores/' + _distIdDer), { boletasAsignadas: nums });
-        guardados.push(v.nombre + ' (' + distVendedor.length + ')');
-      } catch(err) { errores.push(v.nombre + ': ' + err.message); }
+      if (nums.length === 0) {
+        errores.push(v.nombre + ': no hay boletas para asignar');
+      } else {
+        try {
+          await update(ref(db, 'vendedores/' + _distIdDer), { boletasAsignadas: nums });
+          guardados.push(v.nombre + ' (' + distVendedor.length + ')');
+        } catch(err) { errores.push(v.nombre + ': ' + err.message); }
+      }
     }
   }
 
   if (!guardados.length && !errores.length) {
     toast('Selecciona al menos un vendedor para guardar', 'rojo'); return;
   }
-  if (errores.length) { toast('❌ Error: ' + errores.join(', '), 'rojo'); return; }
+  if (errores.length) { toast('❌ ' + errores.join(', '), 'rojo'); return; }
   _distModificado = false;
   toast('✅ Guardado: ' + guardados.join(' · '), 'verde');
 }
