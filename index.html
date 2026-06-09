@@ -5598,13 +5598,17 @@ function renderMisVentas() {
 
   // Usar vdRenderBoletas para mostrar flip cards igual que en admin
   if (Object.keys(allBoletasPlantilla).length) {
-    const abonadasList = vendidas.filter(([, b]) => b.estado === 'abonado');
-    const pagadasList  = vendidas.filter(([, b]) => b.estado === 'pagada');
+    const abonadasList  = vendidas.filter(([, b]) => b.estado === 'abonado');
+    const pagadasList   = vendidas.filter(([, b]) => b.estado === 'pagada');
+    const sinAbonoList  = vendidas.filter(([, b]) => b.estado === 'sin_abono');
     let html = '';
-    if (abonadas) html += `<div style="font-size:11px;font-weight:800;text-transform:uppercase;color:#975a16;letter-spacing:.5px;margin-bottom:8px;padding:0 2px">
+    if (sinAbono) html += `<div style="font-size:11px;font-weight:800;text-transform:uppercase;color:#c53030;letter-spacing:.5px;margin-bottom:8px;padding:0 2px">
+      <svg width="10" height="10" viewBox="0 0 10 10" style="vertical-align:middle;margin-right:4px"><circle cx="5" cy="5" r="5" fill="#ea5455"/></svg>Por cobrar · sin abono (${sinAbono})</div>
+      ${vdRenderBoletas(sinAbonoList, 'sin_abono')}`;
+    if (abonadas) html += `<div style="font-size:11px;font-weight:800;text-transform:uppercase;color:#975a16;letter-spacing:.5px;margin:${sinAbono?'14px':'0'}px 0 8px;padding:0 2px">
       <svg width="10" height="10" viewBox="0 0 10 10" style="vertical-align:middle;margin-right:4px"><circle cx="5" cy="5" r="5" fill="#ff9f43"/></svg>Abonadas (${abonadas})</div>
       ${vdRenderBoletas(abonadasList, 'abonada')}`;
-    if (pagadas) html += `<div style="font-size:11px;font-weight:800;text-transform:uppercase;color:#276749;letter-spacing:.5px;margin:${abonadas?'14px':'0'}px 0 8px;padding:0 2px">
+    if (pagadas) html += `<div style="font-size:11px;font-weight:800;text-transform:uppercase;color:#276749;letter-spacing:.5px;margin:${abonadas||sinAbono?'14px':'0'}px 0 8px;padding:0 2px">
       <svg width="10" height="10" viewBox="0 0 10 10" style="vertical-align:middle;margin-right:4px"><circle cx="5" cy="5" r="5" fill="#3ab54a"/></svg>Pagadas (${pagadas})</div>
       ${vdRenderBoletas(pagadasList, 'vendida')}`;
     cont.innerHTML = html;
@@ -5612,8 +5616,8 @@ function renderMisVentas() {
     // Fallback lista simple si no hay plantilla cargada
     cont.innerHTML = vendidas.map(([k, b]) => {
       const nums = (b.numeros || '').split(',').map(n => n.trim());
-      const estadoColor = b.estado === 'pagada' ? 'var(--verde)' : 'var(--amarillo)';
-      const estadoLabel = b.estado === 'pagada' ? 'Pagada' : 'Abonado';
+      const estadoColor = b.estado === 'pagada' ? 'var(--verde)' : b.estado === 'sin_abono' ? 'var(--rojo)' : 'var(--amarillo)';
+      const estadoLabel = b.estado === 'pagada' ? 'Pagada' : b.estado === 'sin_abono' ? 'Sin cobrar' : 'Abonado';
       return `<div class="boleta-item">
         <div>
           <div class="boleta-numeros">${nums.map(n => `<span class="num-badge">${n}</span>`).join('')}</div>
@@ -5769,6 +5773,7 @@ async function ejecutarConfirmarEntrega() {
 
   // Datos de la cuenta unificada
   const totalPagado = tipoPago === 'completo' ? precioPorBoleta * grupos.length : montoAbono;
+  const estadoCuenta = tipoPago === 'completo' ? 'pagado' : tipoPago === 'abono' ? 'abonado' : 'pendiente';
   const cuentaData = {
     comprador:    p.nombre    || '',
     telefono:     p.telefono  || '',
@@ -5779,7 +5784,7 @@ async function ejecutarConfirmarEntrega() {
     fecha_ts,
     boleta_keys:  boletaKeys,
     total_cuenta: totalPagado,
-    estado:       tipoPago === 'completo' ? 'pagado' : 'abonado',
+    estado:       estadoCuenta,
     metodo_pago:  'tienda',
     observaciones: obsBase,
     pedido_id:    id
@@ -6170,8 +6175,9 @@ function abrirCuenta(cuentaKey) {
   const _svgCheck  = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
   const _svgClock  = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
   const _svgCircle = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px"><circle cx="12" cy="12" r="10"/></svg>`;
-  const estadoLabel = c.estado==='pagado' ? `${_svgCheck} Pagado` : c.estado==='abonado' ? `${_svgClock} Abonado` : `${_svgCircle} Pendiente`;
-  const estadoBadgeBg = c.estado==='pagado' ? 'rgba(198,246,213,0.35)' : c.estado==='abonado' ? 'rgba(253,230,138,0.35)' : 'rgba(255,255,255,0.2)';
+  const _svgAlert = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+  const estadoLabel = c.estado==='pagado' ? `${_svgCheck} Pagado` : c.estado==='abonado' ? `${_svgClock} Abonado` : `${_svgAlert} Sin cobrar`;
+  const estadoBadgeBg = c.estado==='pagado' ? 'rgba(198,246,213,0.35)' : c.estado==='abonado' ? 'rgba(253,230,138,0.35)' : 'rgba(229,62,62,0.35)';
 
   // ── Miniboletas estáticas (sin flip) con imagen + números + estado ──
   const boletasHtml = boletas.length
@@ -9649,11 +9655,19 @@ async function ejecutarConfirmarPedido() {
     ? precioPorBoleta
     : tipoPago === 'abono' ? Math.floor(montoPagado / grupos.length) : 0;
 
+  // Crear cuenta_cliente unificada para este pedido (incluye sin_abono como pendiente)
+  const cuentaRef2 = push(ref(db, 'cuentas_cliente'));
+  const cuentaKey2 = cuentaRef2.key;
+  const boletaKeys2 = [];
+  const batchCpp = {};
+  const obsBase2 = 'Pedido desde tienda online · ' + (p.ciudad || '') + (vendedorCodigoFinal ? ' · Vendedor: ' + vendedorCodigoFinal : '');
+
   for (const grupo of grupos) {
     const numerosStr = grupo.join(', ');
     const nueva = push(ref(db, 'boletas'));
     const nuevaKey = nueva.key;
-    await set(nueva, {
+    boletaKeys2.push(nuevaKey);
+    batchCpp['boletas/' + nuevaKey] = {
       numeros: numerosStr,
       comprador: p.nombre,
       telefono: p.telefono,
@@ -9667,23 +9681,38 @@ async function ejecutarConfirmarPedido() {
       estado: estadoBoleta,
       monto_pagado: montoPorBoleta,
       metodo_pago: 'tienda',
-      observaciones: 'Pedido desde tienda online · ' + (p.ciudad || '') + (vendedorCodigoFinal ? ' · Vendedor: ' + vendedorCodigoFinal : ''),
+      observaciones: obsBase2,
       fecha,
-      fecha_ts
-    });
-    // Si es abono, registrar en subcolección para que aparezca en historial
-    if (tipoPago === 'abono' && montoPorBoleta > 0) {
-      const abonoRef = push(ref(db, 'boletas/' + nuevaKey + '/abonos'));
-      await set(abonoRef, {
-        monto: montoPorBoleta,
-        metodo: 'tienda',
-        fecha,
-        fecha_ts
-      });
-    }
+      fecha_ts,
+      cuenta_id: cuentaKey2
+    };
   }
 
-  await update(ref(db, 'pedidos/' + id), { estado: 'confirmado' });
+  // Registrar abono inicial en historial de cuenta (solo tipo abono)
+  const totalPagadoCpp = tipoPago === 'completo' ? precioPorBoleta * grupos.length : montoPagado;
+  const estadoCuentaCpp = tipoPago === 'completo' ? 'pagado' : tipoPago === 'abono' ? 'abonado' : 'pendiente';
+  const cuentaDataCpp = {
+    comprador:    p.nombre    || '',
+    telefono:     p.telefono  || '',
+    vendedor_id:  vendedorIdFinal,
+    ciudad:       p.ciudad    || '',
+    dir_casa:     p.dir_casa  || '',
+    fecha,
+    fecha_ts,
+    boleta_keys:  boletaKeys2,
+    total_cuenta: totalPagadoCpp,
+    estado:       estadoCuentaCpp,
+    metodo_pago:  'tienda',
+    observaciones: obsBase2,
+    pedido_id:    id
+  };
+  if (tipoPago === 'abono' && montoPagado > 0) {
+    const abonoKey2 = push(ref(db, 'cuentas_cliente/' + cuentaKey2 + '/abonos')).key;
+    cuentaDataCpp.abonos = { [abonoKey2]: { monto: montoPagado, metodo: 'tienda', fecha, fecha_ts } };
+  }
+  batchCpp['cuentas_cliente/' + cuentaKey2] = cuentaDataCpp;
+  batchCpp['pedidos/' + id + '/estado'] = 'confirmado';
+  await update(ref(db), batchCpp);
 
   const tipoPagoLabel = tipoPago === 'completo' ? 'Pago total' : tipoPago === 'abono' ? `Abono $${(montoPagado||0).toLocaleString('es-CO')}` : 'Sin abono';
   toast(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Pedido confirmado — ${grupos.length} boleta(s) · ${tipoPagoLabel}`, 'verde');
