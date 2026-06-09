@@ -2752,9 +2752,9 @@
     /* Distribuir boletas: más columnas */
     .asignacion-grid { grid-template-columns: repeat(3, 1fr); }
 
-    /* Editor boleta: layout horizontal */
-    .editor-boleta-wrap { flex-direction: row; align-items: flex-start; }
-    .editor-canvas-card { flex: 1.2; }
+    /* Editor boleta: siempre en filas */
+    .editor-boleta-wrap { flex-direction: column; }
+    .editor-canvas-card { flex: none; }
 
     /* Boleta física más grande */
     .boleta-fisica-wrap { max-width: 480px; }
