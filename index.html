@@ -2982,6 +2982,31 @@
         </div>
       </div>
 
+      <!-- Stat bloqueadas (se muestra solo si hay > 0) -->
+      <div id="stat-bloqueadas-wrap" style="display:none;margin-bottom:16px">
+        <div style="background:#fff;border:2px solid #fecaca;border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:42px;height:42px;border-radius:12px;background:#fff5f5;border:2px solid #fecaca;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#e53e3e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:800;color:#c53030;text-transform:uppercase;letter-spacing:.5px">Boletas Bloqueadas</div>
+              <div style="font-family:'Bebas Neue',cursive;font-size:32px;line-height:1;color:#e53e3e" id="stat-bloqueadas">0</div>
+              <div style="font-size:11px;color:#a0aec0;margin-top:1px">anuladas / no disponibles en tienda</div>
+            </div>
+          </div>
+          <button onclick="toggleListaBloqueadas()" id="btn-ver-bloqueadas"
+            style="padding:7px 14px;border:2px solid #fecaca;border-radius:10px;background:#fff5f5;color:#c53030;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0">
+            Ver boletas
+          </button>
+        </div>
+        <!-- Lista desplegable de boletas bloqueadas -->
+        <div id="lista-bloqueadas-panel" style="display:none;margin-top:10px;background:white;border:2px solid #fecaca;border-radius:14px;padding:14px 16px">
+          <div style="font-size:12px;font-weight:800;color:#c53030;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">🔒 Boletas bloqueadas en la BD</div>
+          <div id="lista-bloqueadas-grid" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-header">
           <h3><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Recaudo total</h3>
@@ -4145,6 +4170,30 @@
         style="width:100%;padding:12px 14px;border:2px solid var(--borde);border-radius:10px;font-size:15px;font-family:'Nunito',sans-serif;outline:none;transition:border-color 0.2s;"
         onfocus="this.style.borderColor='var(--azul)'" onblur="this.style.borderColor='var(--borde)'"
         oninput="formatearMiles(this)">
+      <!-- Método de pago del abono -->
+      <label style="font-size:12px;font-weight:700;color:#718096;display:block;margin-top:12px;margin-bottom:6px;">MÉTODO DE PAGO</label>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px" id="pago-metodo-grid">
+        <button type="button" onclick="selPagoMetodo('efectivo')" id="pago-m-efectivo"
+          style="padding:8px 4px;border:2px solid var(--borde);border-radius:10px;background:white;cursor:pointer;font-family:'Nunito',sans-serif;text-align:center;transition:all 0.15s">
+          <div style="font-size:18px">💵</div>
+          <div style="font-size:10px;font-weight:700;color:#4a5568;margin-top:2px">Efectivo</div>
+        </button>
+        <button type="button" onclick="selPagoMetodo('transferencia')" id="pago-m-transferencia"
+          style="padding:8px 4px;border:2px solid var(--borde);border-radius:10px;background:white;cursor:pointer;font-family:'Nunito',sans-serif;text-align:center;transition:all 0.15s">
+          <div style="font-size:18px">🏦</div>
+          <div style="font-size:10px;font-weight:700;color:#4a5568;margin-top:2px">Transf.</div>
+        </button>
+        <button type="button" onclick="selPagoMetodo('nequi')" id="pago-m-nequi"
+          style="padding:8px 4px;border:2px solid var(--borde);border-radius:10px;background:white;cursor:pointer;font-family:'Nunito',sans-serif;text-align:center;transition:all 0.15s">
+          <div style="font-size:18px">📱</div>
+          <div style="font-size:10px;font-weight:700;color:#4a5568;margin-top:2px">Nequi</div>
+        </button>
+        <button type="button" onclick="selPagoMetodo('daviplata')" id="pago-m-daviplata"
+          style="padding:8px 4px;border:2px solid var(--borde);border-radius:10px;background:white;cursor:pointer;font-family:'Nunito',sans-serif;text-align:center;transition:all 0.15s">
+          <div style="font-size:18px">💳</div>
+          <div style="font-size:10px;font-weight:700;color:#4a5568;margin-top:2px">Daviplata</div>
+        </button>
+      </div>
     </div>
 
     <button id="pago-confirmar-btn" onclick="ejecutarConfirmarEntrega()" disabled
@@ -4194,6 +4243,30 @@
         onfocus="this.style.borderColor='var(--azul)'" onblur="this.style.borderColor='var(--borde)'"
         oninput="formatearMiles(this);validarMontoCpp()">
       <div id="cpp-monto-hint" style="font-size:11px;color:#a0aec0;margin-top:4px;"></div>
+      <!-- Método de pago del abono -->
+      <label style="font-size:12px;font-weight:700;color:#718096;display:block;margin-top:12px;margin-bottom:6px;">MÉTODO DE PAGO</label>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px" id="cpp-metodo-grid">
+        <button type="button" onclick="selCppMetodo('efectivo')" id="cpp-m-efectivo"
+          style="padding:8px 4px;border:2px solid var(--borde);border-radius:10px;background:white;cursor:pointer;font-family:'Nunito',sans-serif;text-align:center;transition:all 0.15s">
+          <div style="font-size:18px">💵</div>
+          <div style="font-size:10px;font-weight:700;color:#4a5568;margin-top:2px">Efectivo</div>
+        </button>
+        <button type="button" onclick="selCppMetodo('transferencia')" id="cpp-m-transferencia"
+          style="padding:8px 4px;border:2px solid var(--borde);border-radius:10px;background:white;cursor:pointer;font-family:'Nunito',sans-serif;text-align:center;transition:all 0.15s">
+          <div style="font-size:18px">🏦</div>
+          <div style="font-size:10px;font-weight:700;color:#4a5568;margin-top:2px">Transf.</div>
+        </button>
+        <button type="button" onclick="selCppMetodo('nequi')" id="cpp-m-nequi"
+          style="padding:8px 4px;border:2px solid var(--borde);border-radius:10px;background:white;cursor:pointer;font-family:'Nunito',sans-serif;text-align:center;transition:all 0.15s">
+          <div style="font-size:18px">📱</div>
+          <div style="font-size:10px;font-weight:700;color:#4a5568;margin-top:2px">Nequi</div>
+        </button>
+        <button type="button" onclick="selCppMetodo('daviplata')" id="cpp-m-daviplata"
+          style="padding:8px 4px;border:2px solid var(--borde);border-radius:10px;background:white;cursor:pointer;font-family:'Nunito',sans-serif;text-align:center;transition:all 0.15s">
+          <div style="font-size:18px">💳</div>
+          <div style="font-size:10px;font-weight:700;color:#4a5568;margin-top:2px">Daviplata</div>
+        </button>
+      </div>
     </div>
 
     <button id="cpp-confirmar-btn" onclick="ejecutarConfirmarPedido()" disabled
@@ -4957,6 +5030,15 @@ function cargarDatos() {
 }
 
 // ===== DASHBOARD =====
+function toggleListaBloqueadas() {
+  const panel = document.getElementById('lista-bloqueadas-panel');
+  const btn = document.getElementById('btn-ver-bloqueadas');
+  const visible = panel.style.display !== 'none';
+  panel.style.display = visible ? 'none' : 'block';
+  btn.textContent = visible ? 'Ver boletas' : 'Ocultar';
+}
+window.toggleListaBloqueadas = toggleListaBloqueadas;
+
 function renderDashboard() {
   const boletas = Object.values(allBoletas);
   const pagadas = boletas.filter(b => b.estado === 'pagada').length;
@@ -4978,6 +5060,37 @@ function renderDashboard() {
   const pct = total > 0 ? Math.round(((pagadas + abono) / total) * 100) : 0;
   document.getElementById('stat-pct').textContent = pct + '%';
   document.getElementById('progress-fill').style.width = pct + '%';
+
+  // ── BOLETAS BLOQUEADAS (anulada === true en boletas_plantilla) ──
+  const bloqueadas = Object.entries(allBoletasPlantilla).filter(([, b]) => b.anulada === true);
+  const numBloqueadas = bloqueadas.length;
+  const wrapBloq = document.getElementById('stat-bloqueadas-wrap');
+  if (wrapBloq) {
+    if (numBloqueadas > 0) {
+      wrapBloq.style.display = 'block';
+      document.getElementById('stat-bloqueadas').textContent = numBloqueadas;
+      // Renderizar grid de boletas bloqueadas
+      const grid = document.getElementById('lista-bloqueadas-grid');
+      if (grid) {
+        bloqueadas.sort(([,a],[,b]) => (a.idx||0)-(b.idx||0));
+        grid.innerHTML = bloqueadas.map(([k, b]) => {
+          const nums = [b.n1, b.n2, b.n3, b.n4].filter(Boolean);
+          const numsHtml = nums.map(n =>
+            `<span style="font-family:'Bebas Neue',cursive;font-size:14px;color:#c53030;background:#fff5f5;border:1.5px solid #fecaca;border-radius:5px;padding:2px 6px;letter-spacing:1px">${String(n).padStart(4,'0')}</span>`
+          ).join('');
+          return `<div style="background:#fff5f5;border:2px solid #fecaca;border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:5px;min-width:100px">
+            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">${numsHtml}</div>
+            <div style="font-size:10px;font-weight:700;color:#e53e3e;display:flex;align-items:center;gap:3px">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="#e53e3e" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Bloqueada
+            </div>
+          </div>`;
+        }).join('');
+      }
+    } else {
+      wrapBloq.style.display = 'none';
+    }
+  }
 
   // Top vendedores
   const ventas = {};
@@ -5653,6 +5766,8 @@ function vendedorConfirmarEntrega(id) {
   if (montoWrap) montoWrap.style.display = 'none';
   if (montoInput) montoInput.value = '';
   if (confirmarBtn) { confirmarBtn.disabled = true; confirmarBtn.style.background = '#ccc'; confirmarBtn.style.cursor = 'not-allowed'; }
+  _pagoEntregaMetodo = 'efectivo';
+  selPagoMetodo('efectivo');
   document.getElementById('modal-pago-entrega').classList.add('open');
 }
 
@@ -5794,7 +5909,7 @@ async function ejecutarConfirmarEntrega() {
   if (tipoPago === 'abono' && montoAbono > 0) {
     const abonoKey = push(ref(db, 'cuentas_cliente/' + cuentaKey + '/abonos')).key;
     cuentaData.abonos = {
-      [abonoKey]: { monto: montoAbono, metodo: 'tienda', fecha, fecha_ts }
+      [abonoKey]: { monto: montoAbono, metodo: _pagoEntregaMetodo || 'tienda', fecha, fecha_ts }
     };
   }
 
@@ -9489,6 +9604,30 @@ function filtrarPedidosPorVendedor() {
 // Estado temporal para el modal de pago de pedido
 let _cppPedidoId = null;
 let _cppTipoPago = null; // 'completo' | 'abono'
+let _cppMetodoPago = 'efectivo'; // método seleccionado en abono de pedido
+let _pagoEntregaMetodo = 'efectivo'; // método en confirmar entrega vendedor
+
+function selCppMetodo(m) {
+  _cppMetodoPago = m;
+  ['efectivo','transferencia','nequi','daviplata'].forEach(k => {
+    const b = document.getElementById('cpp-m-' + k);
+    if (!b) return;
+    b.style.borderColor = k === m ? 'var(--azul)' : 'var(--borde)';
+    b.style.background  = k === m ? '#ebf8ff'     : 'white';
+  });
+}
+window.selCppMetodo = selCppMetodo;
+
+function selPagoMetodo(m) {
+  _pagoEntregaMetodo = m;
+  ['efectivo','transferencia','nequi','daviplata'].forEach(k => {
+    const b = document.getElementById('pago-m-' + k);
+    if (!b) return;
+    b.style.borderColor = k === m ? 'var(--amarillo)' : 'var(--borde)';
+    b.style.background  = k === m ? '#fffaf0'         : 'white';
+  });
+}
+window.selPagoMetodo = selPagoMetodo;
 
 async function confirmarPedido(id) {
   const db = window._db, ref = window._ref, get = window._get;
@@ -9532,6 +9671,8 @@ async function confirmarPedido(id) {
   document.getElementById('cpp-confirmar-btn').disabled = true;
   document.getElementById('cpp-confirmar-btn').style.background = '#ccc';
   document.getElementById('cpp-confirmar-btn').style.cursor = 'not-allowed';
+  _cppMetodoPago = 'efectivo';
+  selCppMetodo('efectivo');
   ['cpp-btn-completo','cpp-btn-abono','cpp-btn-sin-abono'].forEach(bid => {
     const b = document.getElementById(bid);
     if (b) { b.style.borderColor = 'var(--borde)'; b.style.background = 'white'; }
@@ -9708,7 +9849,7 @@ async function ejecutarConfirmarPedido() {
   };
   if (tipoPago === 'abono' && montoPagado > 0) {
     const abonoKey2 = push(ref(db, 'cuentas_cliente/' + cuentaKey2 + '/abonos')).key;
-    cuentaDataCpp.abonos = { [abonoKey2]: { monto: montoPagado, metodo: 'tienda', fecha, fecha_ts } };
+    cuentaDataCpp.abonos = { [abonoKey2]: { monto: montoPagado, metodo: _cppMetodoPago || 'tienda', fecha, fecha_ts } };
   }
   batchCpp['cuentas_cliente/' + cuentaKey2] = cuentaDataCpp;
   batchCpp['pedidos/' + id + '/estado'] = 'confirmado';
