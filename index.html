@@ -7539,7 +7539,11 @@ async function crearVendedor() {
   }
 
   const nuevaRef = push(ref(db, 'vendedores'));
-  await set(nuevaRef, { nombre, codigo, username: codigo.toLowerCase(), pin, pin_es_defecto: true, comision: Number(comision), telefono, telefono2: telefono2 || null, direccion, direccion2: direccion2 || null, nota: nota || null, boletasAsignadas, activo: true });
+  const nuevoVendedorData = { nombre, codigo, username: codigo.toLowerCase(), pin, pin_es_defecto: true, comision: Number(comision), telefono, telefono2: telefono2 || null, direccion, direccion2: direccion2 || null, nota: nota || null, boletasAsignadas, activo: true };
+  // Optimistic update: mostrar el vendedor inmediatamente sin esperar el onValue
+  allVendedores[nuevaRef.key] = nuevoVendedorData;
+  renderVendedores();
+  await set(nuevaRef, nuevoVendedorData);
 
   document.getElementById('nv-nombre').value = '';
   document.getElementById('nv-codigo').value = '';
@@ -12666,7 +12670,7 @@ async function distribuirGuardar() {
   if (_distIdIzq && _distIdIzq !== '__oficina__') {
     const v = allVendedores[_distIdIzq];
     if (v) {
-      const nums = distOficina.flatMap(b => b.nums);
+      const nums = distOficina.flatMap(b => b.nums).map(n => Number(n));
       try {
         await update(ref(db, 'vendedores/' + _distIdIzq), { boletasAsignadas: nums });
         guardados.push(v.nombre + ' (' + distOficina.length + ')');
@@ -12678,7 +12682,7 @@ async function distribuirGuardar() {
   if (_distIdDer && _distIdDer !== '__oficina__') {
     const v = allVendedores[_distIdDer];
     if (v) {
-      const nums = distVendedor.flatMap(b => b.nums);
+      const nums = distVendedor.flatMap(b => b.nums).map(n => Number(n));
       try {
         await update(ref(db, 'vendedores/' + _distIdDer), { boletasAsignadas: nums });
         guardados.push(v.nombre + ' (' + distVendedor.length + ')');
