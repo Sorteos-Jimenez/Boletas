@@ -3129,20 +3129,6 @@
           </div>
 
           <div class="form-group">
-            <label>Fecha del sorteo</label>
-            <input type="date" id="cfg-tienda-fecha" style="width:100%;padding:12px;border:2px solid var(--borde);border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;outline:none;color:var(--texto)">
-          </div>
-
-          <div class="form-group">
-            <label style="font-weight:800;color:var(--dark);font-size:13px">Fechas de sorteos anticipados</label>
-            <p style="font-size:12px;color:#718096;margin:4px 0 10px">Se generan automáticamente según los premios anticipados definidos en el Editor.</p>
-            <div id="cfg-anticipados-fechas" style="display:flex;flex-direction:column;gap:10px">
-              <p style="font-size:12px;color:#a0aec0;font-style:italic;text-align:center;padding:10px 0">Sin premios anticipados definidos aún.<br>Ve al Editor para agregarlos.</p>
-            </div>
-          </div>
-
-
-          <div class="form-group">
             <label style="font-weight:800;color:var(--dark);font-size:13px">Medios de pago <span style="font-size:11px;font-weight:600;color:#718096">(se muestran en checkout)</span></label>
             <div id="cfg-medios-pago-lista" style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
               <!-- Efectivo (siempre presente, no se puede eliminar) -->
@@ -3346,7 +3332,7 @@
             </div>
             <div style="display:flex;justify-content:space-between">
               <span style="color:#718096;font-weight:700">Sorteo principal</span>
-              <span style="font-weight:800">26 Ago 2026</span>
+              <span style="font-weight:800" id="cfg-sistema-fecha">—</span>
             </div>
             <div style="display:flex;justify-content:space-between">
               <span style="color:#718096;font-weight:700">Versión</span>
@@ -3386,14 +3372,15 @@
         </div>
         <div class="card-body">
           <p style="font-size:13px;color:#718096;margin-bottom:12px">
-            Reinicia boletas, pedidos y configuración del sorteo para empezar una nueva campaña. Se borrará:
+            Reinicia todo para empezar una nueva campaña. Se borrará:
           </p>
           <div style="background:#fff5f5;border:1.5px solid #feb2b2;border-radius:10px;padding:12px;margin-bottom:14px;font-size:12px;color:#742a2a;line-height:1.8">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="2" x2="9" y2="22"/></svg> <b>Boletas</b> — plantilla generada, ventas, números disponibles<br>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> <b>Pedidos</b> — todos los pedidos de la tienda<br>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="2" x2="9" y2="22"/></svg> <b>Boletas asignadas</b> a vendedores — los vendedores y sus PINs se conservan<br>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> <b>Configuración</b> — diseño de boleta, imagen, textos de tienda<br>
-            <span style="display:inline-block;margin-top:6px;font-weight:800;color:#c53030"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#d69e2e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Esta acción NO se puede deshacer. El PIN de admin y los vendedores se conservan.</span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="2" x2="9" y2="22"/></svg> <b>Boletas asignadas</b> a vendedores<br>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> <b>Configuración del sorteo</b> — nombre, premio, fechas, imagen y texto de boleta<br>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> <b style="color:#276749">Se conserva:</b> <span style="color:#276749">vendedores, PINs y comisiones</span><br>
+            <span style="display:inline-block;margin-top:6px;font-weight:800;color:#c53030"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#d69e2e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Esta acción NO se puede deshacer.</span>
           </div>
           <div id="reset-camp-status" style="display:none;font-size:13px;font-weight:700;margin-bottom:10px"></div>
           <div id="reset-camp-progress" style="display:none;margin-bottom:12px">
@@ -3524,6 +3511,10 @@
                 <div class="form-group" style="margin:0">
                   <label style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px">Detalle línea 3</label>
                   <input type="text" id="anv-may-det3" value="EL GANADOR ASUME SOAT / MATRÍCULA E IMPUESTOS DEL VEHÍCULO" oninput="editorActualizarAnversoTexto()" style="width:100%;padding:8px 12px;border:2px solid var(--borde);border-radius:8px;font-size:13px;font-family:'Nunito',sans-serif;outline:none">
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px">📅 Fecha del sorteo</label>
+                  <input type="date" id="cfg-tienda-fecha" style="width:100%;padding:8px 12px;border:2px solid var(--borde);border-radius:8px;font-family:'Nunito',sans-serif;font-size:13px;outline:none;color:var(--texto)">
                 </div>
               </div>
             </div>
@@ -4898,6 +4889,7 @@ function cargarDatos() {
         const precioDigits = precioRaw.replace(/\D/g,'');
         document.getElementById('cfg-tienda-precio').value = precioDigits ? Number(precioDigits).toLocaleString('es-CO') : precioRaw;
         document.getElementById('cfg-tienda-fecha').value = c.fecha || '';
+        actualizarFechaSistema(c.fecha || '');
         const waEl = document.getElementById('cfg-tienda-whatsapp');
         const waPrefEl = document.getElementById('cfg-tienda-whatsapp-prefix');
         if (waEl && c.whatsapp_oficina) {
@@ -8105,12 +8097,38 @@ function vdRenderDisponibles(vid) {
 
   const asignadasSet = new Set(asignadas.map(n => String(n).padStart(4,'0')));
 
-  const boletasCompletas = Object.entries(allBoletasPlantilla)
-    .filter(([, bp]) => {
-      const n1 = String(bp.n1).padStart(4,'0');
-      return asignadasSet.has(n1) && !numConVenta.has(n1) && !numEnPedidoPendiente.has(n1);
-    })
-    .sort(([, a], [, b]) => (a.idx || 0) - (b.idx || 0));
+  const hayPlantilla = Object.keys(allBoletasPlantilla).length > 0;
+  let boletasCompletas;
+
+  if (hayPlantilla) {
+    boletasCompletas = Object.entries(allBoletasPlantilla)
+      .filter(([, bp]) => {
+        const n1 = String(bp.n1).padStart(4,'0');
+        return asignadasSet.has(n1) && !numConVenta.has(n1) && !numEnPedidoPendiente.has(n1);
+      })
+      .sort(([, a], [, b]) => (a.idx || 0) - (b.idx || 0));
+  } else {
+    // Sin plantilla (campaña nueva): mostrar directamente desde asignadasSet
+    let idx = 0;
+    boletasCompletas = [];
+    const sortedNums = [...asignadas]
+      .map(n => String(n).padStart(4,'0'))
+      .filter(n => !numConVenta.has(n) && !numEnPedidoPendiente.has(n))
+      .sort();
+    for (let i = 0; i + 3 < sortedNums.length; i += 4) {
+      const [n1, n2, n3, n4] = sortedNums.slice(i, i + 4);
+      const key = `grp_${i}`;
+      boletasCompletas.push([key, { n1, n2, n3, n4, idx: idx++ }]);
+    }
+    // Grupos incompletos al final
+    const resto = sortedNums.length % 4;
+    if (resto > 0) {
+      const startIdx = sortedNums.length - resto;
+      const nums = sortedNums.slice(startIdx);
+      const bp = { n1: nums[0], n2: nums[1] || null, n3: nums[2] || null, n4: null, idx: idx++ };
+      boletasCompletas.push([`grp_${startIdx}`, bp]);
+    }
+  }
 
   if (!boletasCompletas.length) return '<div class="empty-state" style="padding:24px"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span><p>Todas las boletas asignadas han sido vendidas</p></div>';
 
@@ -8714,6 +8732,10 @@ function crearBloqueAnticipado(idx, datos) {
         <label style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px">Detalle línea 3</label>
         <input type="text" id="anv-ant-det3-${idx}" value="${d.det3||''}" oninput="editorActualizarAnversoTexto()" style="width:100%;padding:8px 12px;border:2px solid var(--borde);border-radius:8px;font-size:13px;font-family:'Nunito',sans-serif;outline:none">
       </div>
+      <div class="form-group" style="margin:0">
+        <label style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px">📅 Fecha del sorteo anticipado</label>
+        <input type="date" id="cfg-ant-fecha-${idx}" value="${d.fecha||''}" style="width:100%;padding:8px 12px;border:2px solid var(--borde);border-radius:8px;font-family:'Nunito',sans-serif;font-size:13px;outline:none;color:var(--texto)">
+      </div>
     </div>`;
   return wrap;
 }
@@ -8744,30 +8766,8 @@ function eliminarAnticipado(idx) {
 }
 
 function sincronizarFechasConfig() {
-  const contenedor = document.getElementById('cfg-anticipados-fechas');
-  if (!contenedor) return;
-  const count = premiosAnticipados.length;
-  if (count === 0) {
-    contenedor.innerHTML = '<p style="font-size:12px;color:#a0aec0;font-style:italic;text-align:center;padding:10px 0">Sin premios anticipados definidos aún.<br>Ve al Editor para agregarlos.</p>';
-    return;
-  }
-  // Guardar fechas existentes antes de re-renderizar
-  const fechasGuardadas = [];
-  for (let i = 0; i < count; i++) {
-    const el = document.getElementById('cfg-ant-fecha-' + i);
-    fechasGuardadas.push(el ? el.value : '');
-  }
-  contenedor.innerHTML = '';
-  for (let i = 0; i < count; i++) {
-    const nombre = document.getElementById('anv-ant-nombre-' + i)?.value || ('Anticipado ' + (i+1));
-    const div = document.createElement('div');
-    div.style.cssText = 'border:1.5px solid var(--borde);border-radius:10px;padding:12px';
-    div.innerHTML = `<label style="font-size:12px;font-weight:800;color:var(--azul);display:block;margin-bottom:6px">
-      Anticipado ${i+1}: ${nombre}
-    </label>
-    <input type="date" id="cfg-ant-fecha-${i}" value="${fechasGuardadas[i]||''}" style="width:100%;padding:10px;border:2px solid var(--borde);border-radius:8px;font-family:'Nunito',sans-serif;font-size:13px;outline:none;color:var(--texto)">`;
-    contenedor.appendChild(div);
-  }
+  // Las fechas ahora se editan directamente en el Editor (dentro de cada bloque de premio).
+  // Esta función se conserva por compatibilidad pero ya no necesita renderizar nada en Config.
 }
 
 
@@ -8902,6 +8902,16 @@ window.cfgToggleMenuMedio = cfgToggleMenuMedio;
 window.cfgAgregarMedio    = cfgAgregarMedio;
 window.cfgEliminarMedio   = cfgEliminarMedio;
 
+function actualizarFechaSistema(fechaISO) {
+  const el = document.getElementById('cfg-sistema-fecha');
+  if (!el) return;
+  if (!fechaISO) { el.textContent = '—'; return; }
+  // fechaISO viene como "YYYY-MM-DD"
+  const [y, m, d] = fechaISO.split('-').map(Number);
+  const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  el.textContent = d + ' ' + (meses[m-1] || '') + ' ' + y;
+}
+
 async function guardarConfigTienda() {
   const db = window._db, ref = window._ref, set = window._set;
   // Recoger fechas de los anticipados desde Config
@@ -8927,6 +8937,7 @@ async function guardarConfigTienda() {
     })()
   };
   await set(ref(db, 'config/tienda'), config);
+  actualizarFechaSistema(config.fecha || '');
   toast('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Configuración de tienda guardada', 'verde');
 }
 
@@ -11915,7 +11926,7 @@ async function borrarBaseDatosBoletas() {
 async function resetCampanaCompleta() {
   const confirmacion = await sjPrompt(
     '🔄 Reset Campaña Completa',
-    'Esto borrará boletas, pedidos y configuración del sorteo.\nLos vendedores y sus PINs se conservan.\nEl PIN de admin se conserva.\n\nEscribe NUEVA CAMPAÑA para confirmar:',
+    'Esto borrará boletas, pedidos, asignaciones Y la configuración del sorteo actual (nombre, fechas, imagen, texto de boleta).\nSe conservan: vendedores, PINs y configuración de comisiones.\n\nEscribe NUEVA CAMPAÑA para confirmar:',
     { icon: '🔄', iconClass: 'danger', okLabel: 'Resetear', placeholder: 'Escribe NUEVA CAMPAÑA' }
   );
   if ((confirmacion || '').trim().toUpperCase() !== 'NUEVA CAMPAÑA') {
@@ -11974,25 +11985,65 @@ async function resetCampanaCompleta() {
       }
     } catch(e) { console.warn('reset skip vendedores:', e.message); }
 
-    // 6. Config tienda y boleta (NO config/admin para conservar PIN)
+    // 6. Borrar configuración del sorteo y diseño de boleta (se ingresarán nuevos para la nueva campaña)
     statusEl.textContent = '⑥ Borrando configuración del sorteo...';
-    bar.style.width = '85%';
+    bar.style.width = '78%';
     await safeRemove('config/tienda');
     await safeRemove('config/boleta_plantilla');
+
+    bar.style.width = '85%';
 
     // Limpiar cachés en memoria
     allBoletas = {};
     tiendaBoletas = {};
-    window.tiendaConfig = {};
     window._anv = null;
     allBoletasPlantilla = {};
     editorNumerosBD = [];
+    premiosAnticipados = [];
+    editorImgSorteo = null;
+    editorTextos = [];
+    window.tiendaConfig = {};
+    window._allPedidos = {};
+    // Limpiar boletasAsignadas en caché local de vendedores
+    Object.keys(allVendedores).forEach(vid => { if (allVendedores[vid]) allVendedores[vid].boletasAsignadas = []; });
     distOficina = [];
     distVendedor = [];
     distVendedorId = '';
 
+    // Limpiar UI del Editor
+    const listaAnticipados = document.getElementById('lista-anticipados');
+    if (listaAnticipados) listaAnticipados.innerHTML = '';
+    const uploadZone = document.getElementById('upload-img-zone');
+    if (uploadZone) { uploadZone.querySelector('p') && (uploadZone.querySelector('p').textContent = 'Toca para subir imagen del anverso (JPG, PNG, WEBP)'); }
+    const imgPreviewWrap = document.getElementById('img-preview-wrap');
+    if (imgPreviewWrap) imgPreviewWrap.style.display = 'none';
+    const imgInfo = document.getElementById('img-info');
+    if (imgInfo) { imgInfo.style.display = 'none'; imgInfo.textContent = ''; }
+    const txtCount = document.getElementById('txt-db-count');
+    if (txtCount) txtCount.textContent = '0 nums';
+    const numsPreview = document.getElementById('nums-db-preview');
+    if (numsPreview) numsPreview.innerHTML = '';
+    // Limpiar campos de texto del Premio Mayor y fechas
+    ['anv-may-nombre','anv-may-modelo','anv-may-det1','anv-may-det2','anv-may-det3'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    const fechaEl = document.getElementById('cfg-tienda-fecha');
+    if (fechaEl) fechaEl.value = '';
+    // Limpiar Config tienda
+    ['cfg-tienda-nombre','cfg-tienda-desc','cfg-tienda-precio'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    actualizarFechaSistema('');
+    // Re-renderizar canvas del editor vacío
+    if (typeof renderEditorCanvas === 'function') renderEditorCanvas();
+
+    // Limpiar UI de pedidos
+    const pedidosLista = document.getElementById('pedidos-lista');
+    if (pedidosLista) pedidosLista.innerHTML = '<div style="text-align:center;color:#a0aec0;padding:40px 20px;font-size:13px">Sin pedidos</div>';
+
     // Re-renderizar secciones afectadas para que queden vacías
     if (typeof renderBoletas === 'function') renderBoletas();
+    if (typeof renderDashboard === 'function') renderDashboard();
     if (typeof distribuirCargarOficina === 'function') distribuirCargarOficina();
     else {
       // Limpiar UI de distribución directamente
@@ -12671,14 +12722,10 @@ async function distribuirGuardar() {
     const v = allVendedores[_distIdIzq];
     if (v) {
       const nums = distOficina.flatMap(b => b.nums).map(n => Number(n));
-      if (nums.length === 0) {
-        errores.push(v.nombre + ': no hay boletas para asignar');
-      } else {
-        try {
-          await update(ref(db, 'vendedores/' + _distIdIzq), { boletasAsignadas: nums });
-          guardados.push(v.nombre + ' (' + distOficina.length + ')');
-        } catch(err) { errores.push(v.nombre + ': ' + err.message); }
-      }
+      try {
+        await update(ref(db, 'vendedores/' + _distIdIzq), { boletasAsignadas: nums });
+        guardados.push(v.nombre + ' (' + nums.length + ')');
+      } catch(err) { errores.push(v.nombre + ': ' + err.message); }
     }
   }
 
@@ -12687,14 +12734,10 @@ async function distribuirGuardar() {
     const v = allVendedores[_distIdDer];
     if (v) {
       const nums = distVendedor.flatMap(b => b.nums).map(n => Number(n));
-      if (nums.length === 0) {
-        errores.push(v.nombre + ': no hay boletas para asignar');
-      } else {
-        try {
-          await update(ref(db, 'vendedores/' + _distIdDer), { boletasAsignadas: nums });
-          guardados.push(v.nombre + ' (' + distVendedor.length + ')');
-        } catch(err) { errores.push(v.nombre + ': ' + err.message); }
-      }
+      try {
+        await update(ref(db, 'vendedores/' + _distIdDer), { boletasAsignadas: nums });
+        guardados.push(v.nombre + ' (' + nums.length + ')');
+      } catch(err) { errores.push(v.nombre + ': ' + err.message); }
     }
   }
 
