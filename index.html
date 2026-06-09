@@ -10007,6 +10007,7 @@ async function abrirTienda(codigoVendedor) {
       // Aplicar filtro de visibilidad (solo cuando NO hay filtro de vendedor por URL)
       if (!esOficinaFiltro && n1Vendedor === null && !visiblePara(vidBoleta)) return;
       // keysPedidas tiene prioridad: si la boleta tiene un pedido activo, marcarla vendida
+      if (b.anulada === true) return; // boletas bloqueadas/anuladas no se muestran en tienda
       let estadoVenta = keysPedidas.has(k) ? 'vendida' : (nums.map(n => numEstado[n]).find(e => e) || 'libre');
       tiendaBoletas[k] = { ...b, estadoVenta };
     });
