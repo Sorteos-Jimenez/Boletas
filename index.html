@@ -11958,19 +11958,21 @@ async function resetCampanaCompleta() {
     // 5. Limpiar boletas asignadas de vendedores (conservar vendedores)
     statusEl.textContent = '⑤ Limpiando boletas asignadas a vendedores...';
     bar.style.width = '70%';
-    const vendsSnap = await get(ref(db, 'vendedores'));
-    if (vendsSnap.exists()) {
-      const update = window._update;
-      await Promise.all(Object.keys(vendsSnap.val()).map(vid =>
-        update(ref(db, 'vendedores/' + vid), { boletasAsignadas: [] })
-      ));
-    }
+    try {
+      const vendsSnap = await get(ref(db, 'vendedores'));
+      if (vendsSnap.exists()) {
+        const update = window._update;
+        await Promise.all(Object.keys(vendsSnap.val()).map(vid =>
+          update(ref(db, 'vendedores/' + vid), { boletasAsignadas: [] }).catch(e => console.warn('reset skip vendedor:', vid, e.message))
+        ));
+      }
+    } catch(e) { console.warn('reset skip vendedores:', e.message); }
 
     // 6. Config tienda y boleta (NO config/admin para conservar PIN)
     statusEl.textContent = '⑥ Borrando configuración del sorteo...';
     bar.style.width = '85%';
-    try { await set(ref(db, 'config/tienda'), {}); } catch(e) { console.warn('reset skip config/tienda:', e.message); }
-    try { await set(ref(db, 'config/boleta_plantilla'), {}); } catch(e) { console.warn('reset skip config/boleta_plantilla:', e.message); }
+    await safeRemove('config/tienda');
+    await safeRemove('config/boleta_plantilla');
 
     // Limpiar cachés en memoria
     allBoletas = {};
