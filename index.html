@@ -599,6 +599,7 @@
     max-width: 500px;
     max-height: 90vh;
     overflow-y: auto;
+    overscroll-behavior: contain;
     animation: slideUp 0.3s ease;
   }
   @keyframes slideUp {
@@ -3086,8 +3087,8 @@
           <input type="hidden" id="nv-desde" value="">
           <input type="hidden" id="nv-hasta" value="">
           <input type="hidden" id="nv-lista" value="">
-          <input type="hidden" id="nv-txt-label" value="">
-          <input type="hidden" id="nv-reasignar-check" value="">
+          <div id="nv-txt-label" style="display:none">Toca para subir .txt con números de boleta</div>
+          <input type="checkbox" id="nv-reasignar-check" style="display:none">
           <div id="nv-txt-resultado" style="display:none"></div>
           <div id="nv-txt-errores" style="display:none"></div>
           <div id="nv-reasignar-panel" style="display:none"><div id="nv-reasignar-detalle"></div></div>
@@ -3997,7 +3998,7 @@
 
 <!-- MODAL DETALLE VENDEDOR -->
 <div class="modal-overlay" id="modal-vendedor-detalle">
-  <div class="modal" style="padding-bottom:32px">
+  <div class="modal" style="padding-bottom:32px" onclick="event.stopPropagation()">
     <div class="modal-header" style="margin-bottom:0">
       <h3 style="font-size:15px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Perfil de vendedor</h3>
       <button class="modal-close" onclick="cerrarModal('modal-vendedor-detalle')">×</button>
@@ -8440,8 +8441,9 @@ async function vdMarcarEntrega(key, marcado) {
 function abrirEditarVendedor(vid) {
   const panel = document.getElementById('vd-edit-panel');
   if (!panel) return;
-  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-  if (panel.style.display === 'block') {
+  const yaAbierto = panel.style.display === 'block';
+  panel.style.display = yaAbierto ? 'none' : 'block';
+  if (!yaAbierto) {
     panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     document.getElementById('ve-nombre')?.focus();
   }
