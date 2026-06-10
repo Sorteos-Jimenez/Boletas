@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sorteos Jiménez — Sistema de Boletas</title>
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit" async defer></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap');
 
@@ -2919,7 +2919,7 @@
       <input type="password" id="input-pin" placeholder="••••••" autocomplete="off">
     </div>
     <div class="recaptcha-wrap">
-      <div class="g-recaptcha" data-sitekey="6LekgxYtAAAAALN2cNOMpMbC1m61TeFCyaX00ht9"></div>
+      <div id="recaptcha-login"></div>
     </div>
     <button class="btn-primary" onclick="doLogin()">Entrar →</button>
     <div class="error-msg" id="login-error">Código o PIN incorrecto</div>
@@ -3988,7 +3988,7 @@
       <div id="checkout-metodo-texto" style="font-size:13px;color:var(--dark)">Nequi / Daviplata / Transferencia<br><b>Número:</b> ---<br>Envía el comprobante por WhatsApp</div>
     </div>
     <div class="recaptcha-wrap" style="margin:12px 0 4px">
-      <div class="g-recaptcha" id="recaptcha-tienda" data-sitekey="6LekgxYtAAAAALN2cNOMpMbC1m61TeFCyaX00ht9"></div>
+      <div id="recaptcha-tienda"></div>
     </div>
     <button class="btn-success" onclick="enviarPedido()" style="margin-top:8px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Confirmar pedido</button>
     <button onclick="cerrarModal('modal-checkout')" style="width:100%;margin-top:8px;padding:10px;background:none;border:2px solid var(--borde);border-radius:10px;font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;cursor:pointer;color:#718096">Seguir eligiendo</button>
@@ -4625,7 +4625,7 @@ async function doLogin() {
   err.style.display = 'none';
 
   // Verificar reCAPTCHA
-  const captchaResp = grecaptcha.getResponse();
+  const captchaResp = grecaptcha.getResponse(_rcWidgetLogin);
   if (!captchaResp) {
     err.style.display = 'block';
     err.textContent = 'Por favor, completa el captcha';
@@ -4648,10 +4648,10 @@ async function doLogin() {
         currentUser = { rol: 'admin', nombre: 'Administrador' };
         iniciarSesion();
       } else {
-        err.style.display = 'block'; err.textContent = 'PIN incorrecto'; grecaptcha.reset();
+        err.style.display = 'block'; err.textContent = 'PIN incorrecto'; grecaptcha.reset(_rcWidgetLogin);
       }
     } else {
-      err.style.display = 'block'; err.textContent = 'PIN incorrecto'; grecaptcha.reset();
+      err.style.display = 'block'; err.textContent = 'PIN incorrecto'; grecaptcha.reset(_rcWidgetLogin);
     }
   } else {
     if (!codigo) { err.style.display = 'block'; err.textContent = 'Selecciona tu nombre de la lista'; return; }
@@ -4679,7 +4679,7 @@ async function doLogin() {
           setTimeout(() => abrirModalCambiarPinObligatorio(), 400);
         }
       }
-      else { err.style.display = 'block'; err.textContent = 'Código o PIN incorrecto'; grecaptcha.reset(); }
+      else { err.style.display = 'block'; err.textContent = 'Código o PIN incorrecto'; grecaptcha.reset(_rcWidgetLogin); }
     } else {
       err.style.display = 'block'; err.textContent = 'No hay vendedores registrados';
     }
@@ -10739,7 +10739,7 @@ async function enviarPedido() {
   const dirCasa = document.getElementById('co-dir-casa').value.trim();
 
   // Verificar reCAPTCHA tienda
-  const captchaTienda = grecaptcha.getResponse(document.querySelector('#recaptcha-tienda iframe') ? undefined : undefined);
+  const captchaTienda = grecaptcha.getResponse(_rcWidgetTienda);
   if (!captchaTienda) {
     toast('Por favor, completa el captcha', 'rojo');
     _guardEnviarPedido = false;
@@ -10867,7 +10867,7 @@ async function enviarPedido() {
     boletas: carritoSeleccion.map(k => tiendaBoletas[k]).filter(Boolean)
   };
   document.getElementById('modal-confirmado').classList.add('open');
-  } finally { _guardEnviarPedido = false; try { grecaptcha.reset(); } catch(e){} }
+  } finally { _guardEnviarPedido = false; try { grecaptcha.reset(_rcWidgetTienda); } catch(e){} }
 }
 
 function limpiarCarrito() {
@@ -13812,6 +13812,21 @@ function copiarDesdeModal() {
     document.execCommand('copy');
     btn.innerHTML = '✓ ¡Copiado!';
     setTimeout(cerrarModalCopiarLink, 1200);
+  });
+}
+</script>
+
+<script>
+// ===== reCAPTCHA: render con widget IDs explícitos =====
+var _rcWidgetLogin = null;
+var _rcWidgetTienda = null;
+
+function onRecaptchaLoad() {
+  _rcWidgetLogin = grecaptcha.render('recaptcha-login', {
+    sitekey: '6LekgxYtAAAAALN2cNOMpMbC1m61TeFCyaX00ht9'
+  });
+  _rcWidgetTienda = grecaptcha.render('recaptcha-tienda', {
+    sitekey: '6LekgxYtAAAAALN2cNOMpMbC1m61TeFCyaX00ht9'
   });
 }
 </script>
