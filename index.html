@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sorteos Jiménez — Sistema de Boletas</title>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap');
 
@@ -169,6 +170,11 @@
     font-size: 13px;
     margin-top: 12px;
     display: none;
+  }
+  .recaptcha-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 12px 0 4px;
   }
 
   /* ===== LAYOUT PRINCIPAL ===== */
@@ -2912,6 +2918,9 @@
       <label>Contraseña / PIN</label>
       <input type="password" id="input-pin" placeholder="••••••" autocomplete="off">
     </div>
+    <div class="recaptcha-wrap">
+      <div class="g-recaptcha" data-sitekey="6LekgxYtAAAAAN2cNOMpMbC1m61TeFCyaX00ht9"></div>
+    </div>
     <button class="btn-primary" onclick="doLogin()">Entrar →</button>
     <div class="error-msg" id="login-error">Código o PIN incorrecto</div>
     <div style="text-align:center;margin-top:16px;padding-top:16px;border-top:1px solid var(--borde)">
@@ -4612,6 +4621,14 @@ async function doLogin() {
   const err = document.getElementById('login-error');
   err.style.display = 'none';
 
+  // Verificar reCAPTCHA
+  const captchaResp = grecaptcha.getResponse();
+  if (!captchaResp) {
+    err.style.display = 'block';
+    err.textContent = 'Por favor, completa el captcha';
+    return;
+  }
+
   if (!pin) { err.style.display = 'block'; err.textContent = 'Ingresa el PIN'; return; }
 
   const db = window._db, ref = window._ref, get = window._get;
@@ -4628,10 +4645,10 @@ async function doLogin() {
         currentUser = { rol: 'admin', nombre: 'Administrador' };
         iniciarSesion();
       } else {
-        err.style.display = 'block'; err.textContent = 'PIN incorrecto';
+        err.style.display = 'block'; err.textContent = 'PIN incorrecto'; grecaptcha.reset();
       }
     } else {
-      err.style.display = 'block'; err.textContent = 'PIN incorrecto';
+      err.style.display = 'block'; err.textContent = 'PIN incorrecto'; grecaptcha.reset();
     }
   } else {
     if (!codigo) { err.style.display = 'block'; err.textContent = 'Selecciona tu nombre de la lista'; return; }
@@ -4659,7 +4676,7 @@ async function doLogin() {
           setTimeout(() => abrirModalCambiarPinObligatorio(), 400);
         }
       }
-      else { err.style.display = 'block'; err.textContent = 'Código o PIN incorrecto'; }
+      else { err.style.display = 'block'; err.textContent = 'Código o PIN incorrecto'; grecaptcha.reset(); }
     } else {
       err.style.display = 'block'; err.textContent = 'No hay vendedores registrados';
     }
