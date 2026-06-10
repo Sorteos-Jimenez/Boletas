@@ -5602,16 +5602,19 @@ function vpRenderMedios() {
   if (empty) empty.style.display = 'none';
   lista.innerHTML = _vpMedios.map((m, i) => {
     let icon = '💵', titulo = 'Efectivo', detalle = 'Pago en mano';
+    let iconHtml = `<span style="font-size:20px">${icon}</span>`;
     if (m.tipo === 'billetera') {
-      icon = '📱'; titulo = m.nombre || 'Billetera digital';
+      titulo = m.nombre || 'Billetera digital';
       detalle = [m.telefono, m.titular].filter(Boolean).join(' · ');
+      iconHtml = `<span style="display:flex;align-items:center">${getBilleteraIcon(m.nombre, 28)}</span>`;
     } else if (m.tipo === 'transferencia') {
       icon = '🏦'; titulo = m.banco || 'Transferencia';
       detalle = [m.numero_cuenta, m.nombre_cuenta].filter(Boolean).join(' · ');
+      iconHtml = `<span style="font-size:20px">${icon}</span>`;
     }
     const habilitado = m.habilitado !== false; // true por defecto
     return `<div style="background:#f8fafc;border:1.5px solid ${habilitado ? 'var(--borde)' : '#e2e8f0'};border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;opacity:${habilitado ? '1' : '0.6'}">
-      <span style="font-size:20px">${icon}</span>
+      ${iconHtml}
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:800;color:var(--dark)">${titulo}</div>
         ${detalle ? `<div style="font-size:11px;color:#718096">${detalle}</div>` : ''}
@@ -9059,6 +9062,32 @@ function cfgCargarMediosPago(medios) {
   cfgRenderListaMedios();
 }
 
+function getBilleteraIcon(nombre, size) {
+  const s = size || 28;
+  const n = (nombre || '').toLowerCase();
+  if (n.includes('nequi')) {
+    return `<svg width="${s}" height="${s}" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+      <rect width="28" height="28" rx="6" fill="#1a0a2e"/>
+      <rect x="4" y="4" width="7" height="7" rx="2" fill="#e8007d"/>
+      <text x="14" y="21" font-family="Arial Black,sans-serif" font-weight="900" font-size="9" fill="#1a0a2e" text-anchor="middle" letter-spacing="-0.5">Nequi</text>
+      <text x="14" y="21" font-family="Arial Black,sans-serif" font-weight="900" font-size="9" fill="white" text-anchor="middle" letter-spacing="-0.5" transform="translate(0,-1)">Nequi</text>
+    </svg>`;
+  }
+  if (n.includes('bre') || n.includes('breb') || n.includes('llave')) {
+    return `<svg width="${s}" height="${s}" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="brebG" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#00b4ff"/>
+          <stop offset="100%" stop-color="#00e676"/>
+        </linearGradient>
+      </defs>
+      <rect width="28" height="28" rx="6" fill="#1a0050"/>
+      <text x="14" y="19" font-family="Arial Black,sans-serif" font-weight="900" font-size="11" fill="url(#brebG)" text-anchor="middle" letter-spacing="-0.5">Bre-B</text>
+    </svg>`;
+  }
+  return `<span style="font-size:${s * 0.7}px">📱</span>`;
+}
+
 function cfgRenderMediosPagoCheckout(medios, fallbackPago) {
   if (!medios || !medios.length) {
     return fallbackPago
@@ -9070,7 +9099,7 @@ function cfgRenderMediosPagoCheckout(medios, fallbackPago) {
       return `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--borde)"><span style="font-size:18px">💵</span><div><div style="font-weight:800;font-size:13px">Efectivo</div><div style="font-size:12px;color:#718096">Pago en mano al vendedor</div></div></div>`;
     }
     if (m.tipo === 'billetera') {
-      return `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--borde)"><span style="font-size:18px">📱</span><div><div style="font-weight:800;font-size:13px">${m.nombre||'Billetera digital'}</div>${m.telefono?`<div style="font-size:12px;color:#718096">📞 ${m.telefono}</div>`:''}${m.titular?`<div style="font-size:12px;color:#718096">👤 ${m.titular}</div>`:''}</div></div>`;
+      return `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--borde)"><span style="display:flex;align-items:center">${getBilleteraIcon(m.nombre, 28)}</span><div><div style="font-weight:800;font-size:13px">${m.nombre||'Billetera digital'}</div>${m.telefono?`<div style="font-size:12px;color:#718096">📞 ${m.telefono}</div>`:''}${m.titular?`<div style="font-size:12px;color:#718096">👤 ${m.titular}</div>`:''}</div></div>`;
     }
     if (m.tipo === 'transferencia') {
       return `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--borde)"><span style="font-size:18px">🏦</span><div><div style="font-weight:800;font-size:13px">${m.banco||'Transferencia bancaria'}</div>${m.numero_cuenta?`<div style="font-size:12px;color:#718096">🔢 ${m.numero_cuenta}</div>`:''}${m.nombre_cuenta?`<div style="font-size:12px;color:#718096">👤 ${m.nombre_cuenta}</div>`:''}</div></div>`;
