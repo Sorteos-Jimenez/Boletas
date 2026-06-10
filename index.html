@@ -3172,7 +3172,11 @@
                   <div style="font-size:13px;font-weight:800;color:var(--dark)">Efectivo</div>
                   <div style="font-size:11px;color:#718096">Pago en mano al vendedor</div>
                 </div>
-                <span style="font-size:11px;font-weight:700;background:#d4ecd6;color:var(--azul-dark);padding:3px 8px;border-radius:20px">Por defecto</span>
+                <label style="display:flex;align-items:center;cursor:pointer;position:relative;width:38px;height:22px;flex-shrink:0" title="Habilitar/deshabilitar efectivo">
+                  <input type="checkbox" id="cfg-efectivo-toggle" checked onchange="_cfgMedios[0].habilitado=this.checked;document.getElementById('cfg-efectivo-track').style.background=this.checked?'var(--verde)':' #cbd5e0';document.getElementById('cfg-efectivo-thumb').style.left=this.checked?'19px':'3px'" style="opacity:0;width:0;height:0;position:absolute">
+                  <span id="cfg-efectivo-track" style="position:absolute;inset:0;border-radius:11px;background:var(--verde);transition:background 0.2s"></span>
+                  <span id="cfg-efectivo-thumb" style="position:absolute;top:3px;left:19px;width:16px;height:16px;border-radius:50%;background:white;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)"></span>
+                </label>
               </div>
               <!-- Métodos adicionales se renderizan aquí -->
             </div>
@@ -8977,14 +8981,30 @@ function cfgRenderListaMedios() {
   while (lista.children.length > 1) lista.removeChild(lista.lastChild);
 
   _cfgMedios.forEach((m, i) => {
-    if (m.tipo === 'efectivo') return; // el primero ya está en el DOM fijo
+    if (m.tipo === 'efectivo') {
+      // Sincronizar toggle del efectivo fijo
+      const tog = document.getElementById('cfg-efectivo-toggle');
+      const track = document.getElementById('cfg-efectivo-track');
+      const thumb = document.getElementById('cfg-efectivo-thumb');
+      const hab = m.habilitado !== false;
+      if (tog) tog.checked = hab;
+      if (track) track.style.background = hab ? 'var(--verde)' : '#cbd5e0';
+      if (thumb) thumb.style.left = hab ? '19px' : '3px';
+      return;
+    }
+    const hab = m.habilitado !== false;
+    const toggleHtml = `<label style="display:flex;align-items:center;cursor:pointer;position:relative;width:38px;height:22px;flex-shrink:0" title="Habilitar/deshabilitar">
+      <input type="checkbox" ${hab?'checked':''} onchange="_cfgMedios[${i}].habilitado=this.checked;this.parentElement.querySelector('.cfg-track').style.background=this.checked?'var(--verde)':'#cbd5e0';this.parentElement.querySelector('.cfg-thumb').style.left=this.checked?'19px':'3px'" style="opacity:0;width:0;height:0;position:absolute">
+      <span class="cfg-track" style="position:absolute;inset:0;border-radius:11px;background:${hab?'var(--verde)':'#cbd5e0'};transition:background 0.2s"></span>
+      <span class="cfg-thumb" style="position:absolute;top:3px;left:${hab?'19px':'3px'};width:16px;height:16px;border-radius:50%;background:white;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)"></span>
+    </label>`;
     const div = document.createElement('div');
-    div.style.cssText = 'border:2px solid var(--borde);border-radius:12px;padding:12px;background:white';
+    div.style.cssText = `border:2px solid var(--borde);border-radius:12px;padding:12px;background:white;opacity:${hab?1:0.6}`;
     if (m.tipo === 'billetera') {
       div.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px">
           <span style="font-size:13px;font-weight:800;color:var(--dark);display:flex;align-items:center;gap:6px">📱 Billetera digital</span>
-          <button type="button" onclick="cfgEliminarMedio(${i})" style="padding:4px 10px;border:1.5px solid #fed7d7;border-radius:8px;background:#fff5f5;color:var(--rojo);font-size:12px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer">✕ Eliminar</button>
+          <div style="display:flex;align-items:center;gap:8px">${toggleHtml}<button type="button" onclick="cfgEliminarMedio(${i})" style="padding:4px 10px;border:1.5px solid #fed7d7;border-radius:8px;background:#fff5f5;color:var(--rojo);font-size:12px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer">✕ Eliminar</button></div>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px">
           <input type="text" placeholder="Nombre de la billetera (Ej: Nequi)" value="${m.nombre||''}" oninput="_cfgMedios[${i}].nombre=this.value" style="width:100%;padding:9px 12px;border:2px solid var(--borde);border-radius:8px;font-family:'Nunito',sans-serif;font-size:13px;outline:none;color:var(--dark)" onfocus="this.style.borderColor='var(--verde)'" onblur="this.style.borderColor='var(--borde)'">
@@ -8993,9 +9013,9 @@ function cfgRenderListaMedios() {
         </div>`;
     } else if (m.tipo === 'transferencia') {
       div.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px">
           <span style="font-size:13px;font-weight:800;color:var(--dark);display:flex;align-items:center;gap:6px">🏦 Transferencia bancaria</span>
-          <button type="button" onclick="cfgEliminarMedio(${i})" style="padding:4px 10px;border:1.5px solid #fed7d7;border-radius:8px;background:#fff5f5;color:var(--rojo);font-size:12px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer">✕ Eliminar</button>
+          <div style="display:flex;align-items:center;gap:8px">${toggleHtml}<button type="button" onclick="cfgEliminarMedio(${i})" style="padding:4px 10px;border:1.5px solid #fed7d7;border-radius:8px;background:#fff5f5;color:var(--rojo);font-size:12px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer">✕ Eliminar</button></div>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px">
           <input type="text" placeholder="Nombre del banco" value="${m.banco||''}" oninput="_cfgMedios[${i}].banco=this.value" style="width:100%;padding:9px 12px;border:2px solid var(--borde);border-radius:8px;font-family:'Nunito',sans-serif;font-size:13px;outline:none;color:var(--dark)" onfocus="this.style.borderColor='var(--verde)'" onblur="this.style.borderColor='var(--borde)'">
@@ -9013,20 +9033,21 @@ function cfgLeerMediosPago() {
   const inputs = lista ? lista.querySelectorAll('input[type="text"]') : [];
   let inputIdx = 0;
   return _cfgMedios.map(m => {
-    if (m.tipo === 'efectivo') return { tipo: 'efectivo' };
+    const hab = m.habilitado !== false;
+    if (m.tipo === 'efectivo') return { tipo: 'efectivo', habilitado: hab };
     if (m.tipo === 'billetera') {
       const nombre   = inputs[inputIdx]?.value.trim() || m.nombre || '';
       const telefono = inputs[inputIdx+1]?.value.trim() || m.telefono || '';
       const titular  = inputs[inputIdx+2]?.value.trim() || m.titular || '';
       inputIdx += 3;
-      return { tipo: 'billetera', nombre, telefono, titular };
+      return { tipo: 'billetera', nombre, telefono, titular, habilitado: hab };
     }
     if (m.tipo === 'transferencia') {
       const banco        = inputs[inputIdx]?.value.trim() || m.banco || '';
       const numero_cuenta= inputs[inputIdx+1]?.value.trim() || m.numero_cuenta || '';
       const nombre_cuenta= inputs[inputIdx+2]?.value.trim() || m.nombre_cuenta || '';
       inputIdx += 3;
-      return { tipo: 'transferencia', banco, numero_cuenta, nombre_cuenta };
+      return { tipo: 'transferencia', banco, numero_cuenta, nombre_cuenta, habilitado: hab };
     }
     return m;
   });
@@ -9783,6 +9804,16 @@ async function confirmarPedido(id) {
         try {
           const vs = await get(ref(db, 'vendedores/' + resolvedVid));
           if (vs.exists()) vendedorMedios = vs.val().medios_pago || null;
+        } catch(e) {}
+      }
+    } else {
+      // Pedido de La Oficina → usar medios de config de tienda
+      if (_cfgMedios && _cfgMedios.length) {
+        vendedorMedios = _cfgMedios;
+      } else {
+        try {
+          const cs = await get(ref(db, 'config/tienda'));
+          if (cs.exists()) vendedorMedios = cs.val().medios_pago || null;
         } catch(e) {}
       }
     }
