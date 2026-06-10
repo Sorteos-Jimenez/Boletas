@@ -3999,6 +3999,44 @@
   </div>
 </div>
 
+<!-- MODAL DETALLE MÉTODO DE PAGO -->
+<div id="modal-detalle-pago" style="display:none;position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,0.6);align-items:flex-end;justify-content:center;padding:0" onclick="if(event.target===this)cerrarDetallePago()">
+  <div style="background:white;border-radius:24px 24px 0 0;padding:28px 22px 36px;width:100%;max-width:480px;box-shadow:0 -8px 40px rgba(0,0,0,0.2);animation:slideUp 0.25s ease">
+    <div style="width:36px;height:4px;background:#e2e8f0;border-radius:2px;margin:0 auto 22px"></div>
+    <!-- Icono + nombre -->
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px">
+      <div id="mdp-icono" style="flex-shrink:0"></div>
+      <div>
+        <div id="mdp-nombre" style="font-size:18px;font-weight:800;color:#1a2e1c"></div>
+        <div id="mdp-subtipo" style="font-size:12px;color:#718096;margin-top:2px"></div>
+      </div>
+    </div>
+    <!-- Número a copiar -->
+    <div id="mdp-numero-wrap" style="margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Número / Cuenta</div>
+      <div style="display:flex;align-items:center;gap:10px;background:#f4f8f4;border:2px solid #d4ecd6;border-radius:12px;padding:12px 14px">
+        <div id="mdp-numero" style="flex:1;font-size:17px;font-weight:800;color:#1a2e1c;letter-spacing:1px"></div>
+        <button onclick="copiarNumeroPago()" id="btn-copiar-num-pago"
+          style="padding:8px 14px;background:linear-gradient(135deg,#3ab54a,#2a8c38);color:white;border:none;border-radius:9px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copiar
+        </button>
+      </div>
+    </div>
+    <!-- Titular -->
+    <div id="mdp-titular-wrap" style="display:none;margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Titular</div>
+      <div id="mdp-titular" style="font-size:15px;font-weight:700;color:#1a2e1c;background:#f4f8f4;border-radius:10px;padding:10px 14px"></div>
+    </div>
+    <button onclick="cerrarDetallePago()" style="width:100%;padding:14px;background:#f4f8f4;border:2px solid #d4ecd6;border-radius:12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;color:#4a5568;cursor:pointer">
+      Cerrar
+    </button>
+  </div>
+</div>
+<style>
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+</style>
+
 <!-- MODAL PEDIDO CONFIRMADO -->
 <div class="modal-overlay" id="modal-confirmado">
   <div class="modal" style="text-align:center">
@@ -9099,10 +9137,24 @@ function cfgRenderMediosPagoCheckout(medios, fallbackPago) {
       return `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--borde)"><span style="font-size:18px">💵</span><div><div style="font-weight:800;font-size:13px">Efectivo</div><div style="font-size:12px;color:#718096">Pago en mano al vendedor</div></div></div>`;
     }
     if (m.tipo === 'billetera') {
-      return `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--borde)"><span style="display:flex;align-items:center">${getBilleteraIcon(m.nombre, 28)}</span><div><div style="font-weight:800;font-size:13px">${m.nombre||'Billetera digital'}</div>${m.telefono?`<div style="font-size:12px;color:#718096">📞 ${m.telefono}</div>`:''}${m.titular?`<div style="font-size:12px;color:#718096">👤 ${m.titular}</div>`:''}</div></div>`;
+      const num = m.telefono || '';
+      const tit = m.titular || '';
+      const nom = m.nombre || 'Billetera digital';
+      return `<div onclick="abrirDetallePago('${nom.replace(/'/g,"\\'")}','${num}','${tit.replace(/'/g,"\\'")}','billetera')" style="display:flex;align-items:center;gap:8px;padding:10px 10px;border-bottom:1px solid var(--borde);border-radius:10px;cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='#f0fff4'" onmouseout="this.style.background='transparent'">
+        <span style="display:flex;align-items:center">${getBilleteraIcon(m.nombre, 28)}</span>
+        <div style="flex:1"><div style="font-weight:800;font-size:13px">${nom}</div>${num?`<div style="font-size:12px;color:#718096">🔑 ${num}</div>`:''}${tit?`<div style="font-size:12px;color:#718096">👤 ${tit}</div>`:''}</div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#3ab54a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>`;
     }
     if (m.tipo === 'transferencia') {
-      return `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--borde)"><span style="font-size:18px">🏦</span><div><div style="font-weight:800;font-size:13px">${m.banco||'Transferencia bancaria'}</div>${m.numero_cuenta?`<div style="font-size:12px;color:#718096">🔢 ${m.numero_cuenta}</div>`:''}${m.nombre_cuenta?`<div style="font-size:12px;color:#718096">👤 ${m.nombre_cuenta}</div>`:''}</div></div>`;
+      const num = m.numero_cuenta || '';
+      const tit = m.nombre_cuenta || '';
+      const nom = m.banco || 'Transferencia bancaria';
+      return `<div onclick="abrirDetallePago('${nom.replace(/'/g,"\\'")}','${num}','${tit.replace(/'/g,"\\'")}','transferencia')" style="display:flex;align-items:center;gap:8px;padding:10px 10px;border-bottom:1px solid var(--borde);border-radius:10px;cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='#f0fff4'" onmouseout="this.style.background='transparent'">
+        <span style="font-size:18px">🏦</span>
+        <div style="flex:1"><div style="font-weight:800;font-size:13px">${nom}</div>${num?`<div style="font-size:12px;color:#718096">🔑 ${num}</div>`:''}${tit?`<div style="font-size:12px;color:#718096">👤 ${tit}</div>`:''}</div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#3ab54a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>`;
     }
     return '';
   }).join('');
@@ -9111,6 +9163,67 @@ function cfgRenderMediosPagoCheckout(medios, fallbackPago) {
 window.cfgToggleMenuMedio = cfgToggleMenuMedio;
 window.cfgAgregarMedio    = cfgAgregarMedio;
 window.cfgEliminarMedio   = cfgEliminarMedio;
+
+function abrirDetallePago(nombre, numero, titular, tipo) {
+  const modal = document.getElementById('modal-detalle-pago');
+  // Ícono
+  const iconoEl = document.getElementById('mdp-icono');
+  if (tipo === 'billetera') {
+    iconoEl.innerHTML = getBilleteraIcon(nombre, 48);
+  } else {
+    iconoEl.innerHTML = `<div style="width:48px;height:48px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px">🏦</div>`;
+  }
+  document.getElementById('mdp-nombre').textContent = nombre || 'Pago digital';
+  document.getElementById('mdp-subtipo').textContent = tipo === 'billetera' ? 'Billetera digital' : 'Transferencia bancaria';
+  // Número
+  const numWrap = document.getElementById('mdp-numero-wrap');
+  const numEl = document.getElementById('mdp-numero');
+  if (numero) {
+    numEl.textContent = numero;
+    numWrap.style.display = 'block';
+  } else {
+    numWrap.style.display = 'none';
+  }
+  // Titular
+  const titWrap = document.getElementById('mdp-titular-wrap');
+  const titEl = document.getElementById('mdp-titular');
+  if (titular) {
+    titEl.textContent = titular;
+    titWrap.style.display = 'block';
+  } else {
+    titWrap.style.display = 'none';
+  }
+  // Reset botón copiar
+  const btn = document.getElementById('btn-copiar-num-pago');
+  btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar';
+  btn.style.background = 'linear-gradient(135deg,#3ab54a,#2a8c38)';
+  modal.style.display = 'flex';
+}
+
+function cerrarDetallePago() {
+  document.getElementById('modal-detalle-pago').style.display = 'none';
+}
+
+async function copiarNumeroPago() {
+  const num = document.getElementById('mdp-numero').textContent;
+  const btn = document.getElementById('btn-copiar-num-pago');
+  try {
+    await navigator.clipboard.writeText(num);
+  } catch(e) {
+    const ta = document.createElement('textarea');
+    ta.value = num; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  }
+  btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ¡Copiado!';
+  btn.style.background = 'linear-gradient(135deg,#48bb78,#276749)';
+  setTimeout(() => {
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar';
+    btn.style.background = 'linear-gradient(135deg,#3ab54a,#2a8c38)';
+  }, 2000);
+}
+
+window.abrirDetallePago = abrirDetallePago;
+window.cerrarDetallePago = cerrarDetallePago;
+window.copiarNumeroPago = copiarNumeroPago;
 
 function actualizarFechaSistema(fechaISO) {
   const el = document.getElementById('cfg-sistema-fecha');
