@@ -5605,15 +5605,31 @@ function vpRenderMedios() {
       icon = '🏦'; titulo = m.banco || 'Transferencia';
       detalle = [m.numero_cuenta, m.nombre_cuenta].filter(Boolean).join(' · ');
     }
-    return `<div style="background:#f8fafc;border:1.5px solid var(--borde);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px">
+    const habilitado = m.habilitado !== false; // true por defecto
+    return `<div style="background:#f8fafc;border:1.5px solid ${habilitado ? 'var(--borde)' : '#e2e8f0'};border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;opacity:${habilitado ? '1' : '0.6'}">
       <span style="font-size:20px">${icon}</span>
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:800;color:var(--dark)">${titulo}</div>
         ${detalle ? `<div style="font-size:11px;color:#718096">${detalle}</div>` : ''}
+        <div style="font-size:10px;color:${habilitado ? 'var(--verde)' : '#a0aec0'};font-weight:700;margin-top:2px">${habilitado ? '✓ Habilitado para abonos' : '✗ Deshabilitado para abonos'}</div>
       </div>
-      <button onclick="vpEliminarMedio(${i})" style="background:none;border:none;padding:4px;cursor:pointer;color:#e53e3e;font-size:18px;line-height:1;flex-shrink:0" title="Eliminar">×</button>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <label style="display:flex;align-items:center;cursor:pointer;position:relative;width:38px;height:22px" title="${habilitado ? 'Deshabilitar' : 'Habilitar'} para abonos">
+          <input type="checkbox" ${habilitado ? 'checked' : ''} onchange="vpToggleHabilitado(${i},this.checked)" style="opacity:0;width:0;height:0;position:absolute">
+          <span style="position:absolute;inset:0;border-radius:11px;background:${habilitado ? 'var(--verde)' : '#cbd5e0'};transition:background 0.2s"></span>
+          <span style="position:absolute;top:3px;left:${habilitado ? '19px' : '3px'};width:16px;height:16px;border-radius:50%;background:white;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)"></span>
+        </label>
+        <button onclick="vpEliminarMedio(${i})" style="background:none;border:none;padding:4px;cursor:pointer;color:#e53e3e;font-size:18px;line-height:1" title="Eliminar">×</button>
+      </div>
     </div>`;
   }).join('');
+}
+
+function vpToggleHabilitado(i, habilitado) {
+  if (_vpMedios[i]) {
+    _vpMedios[i].habilitado = habilitado;
+    vpRenderMedios();
+  }
 }
 
 function vpAgregarMedio() {
@@ -5704,10 +5720,11 @@ async function vpGuardarPerfil() {
   toast('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Perfil guardado', 'verde');
 }
 
-window.vpCargarPerfil   = vpCargarPerfil;
-window.vpAgregarMedio   = vpAgregarMedio;
-window.vpEliminarMedio  = vpEliminarMedio;
-window.vpGuardarPerfil  = vpGuardarPerfil;
+window.vpCargarPerfil      = vpCargarPerfil;
+window.vpAgregarMedio      = vpAgregarMedio;
+window.vpEliminarMedio     = vpEliminarMedio;
+window.vpGuardarPerfil     = vpGuardarPerfil;
+window.vpToggleHabilitado  = vpToggleHabilitado;
 
 // ===== MIS VENTAS (vendedor) =====
 function renderMisVentas() {
@@ -5787,6 +5804,8 @@ function vendedorConfirmarEntrega(id) {
   if (montoInput) montoInput.value = '';
   if (confirmarBtn) { confirmarBtn.disabled = true; confirmarBtn.style.background = '#ccc'; confirmarBtn.style.cursor = 'not-allowed'; }
   _pagoEntregaMetodo = 'efectivo';
+  // Filtrar métodos de pago habilitados por el vendedor
+  filtrarMetodosAbono('pago-metodo-grid', 'selPagoMetodo');
   selPagoMetodo('efectivo');
   document.getElementById('modal-pago-entrega').classList.add('open');
 }
@@ -9627,6 +9646,51 @@ let _cppTipoPago = null; // 'completo' | 'abono'
 let _cppMetodoPago = 'efectivo'; // método seleccionado en abono de pedido
 let _pagoEntregaMetodo = 'efectivo'; // método en confirmar entrega vendedor
 
+// ===== FILTRO MÉTODOS DE PAGO HABILITADOS =====
+// Muestra solo los métodos de pago habilitados en el perfil del vendedor activo.
+// gridId: id del div contenedor (pago-metodo-grid o cpp-metodo-grid)
+// fnSel: nombre de la función de selección ('selPagoMetodo' o 'selCppMetodo')
+function filtrarMetodosAbono(gridId, fnSel) {
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
+
+  // Obtener medios habilitados del vendedor actual (usa _vpMedios si es vendedor, o todos)
+  let mediosHabilitados = null;
+  if (currentUser?.rol === 'vendedor' && _vpMedios && _vpMedios.length) {
+    mediosHabilitados = _vpMedios.filter(m => m.habilitado !== false).map(m => {
+      // Mapear tipo → clave del botón
+      if (m.tipo === 'efectivo') return 'efectivo';
+      if (m.tipo === 'transferencia') return 'transferencia';
+      if (m.tipo === 'billetera') {
+        const n = (m.nombre || '').toLowerCase();
+        if (n.includes('nequi')) return 'nequi';
+        if (n.includes('daviplata')) return 'daviplata';
+        return 'nequi'; // fallback billetera → nequi
+      }
+      return null;
+    }).filter(Boolean);
+  }
+
+  const todos = ['efectivo', 'transferencia', 'nequi', 'daviplata'];
+  const pfx = gridId === 'pago-metodo-grid' ? 'pago-m-' : 'cpp-m-';
+
+  todos.forEach(k => {
+    const btn = document.getElementById(pfx + k);
+    if (!btn) return;
+    if (!mediosHabilitados || mediosHabilitados.includes(k)) {
+      btn.style.display = '';
+    } else {
+      btn.style.display = 'none';
+    }
+  });
+
+  // Si el único visible es uno, actualizar las columnas del grid
+  const visibles = mediosHabilitados ? mediosHabilitados.filter(k => todos.includes(k)) : todos;
+  grid.style.gridTemplateColumns = `repeat(${Math.min(visibles.length, 4)}, 1fr)`;
+}
+
+window.filtrarMetodosAbono = filtrarMetodosAbono;
+
 function selCppMetodo(m) {
   _cppMetodoPago = m;
   ['efectivo','transferencia','nequi','daviplata'].forEach(k => {
@@ -9699,6 +9763,8 @@ async function confirmarPedido(id) {
   });
 
   document.getElementById('modal-confirmar-pago-pedido').classList.add('open');
+  // Filtrar métodos de pago habilitados para este pedido
+  filtrarMetodosAbono('cpp-metodo-grid', 'selCppMetodo');
 }
 
 function seleccionarTipoPagoPedido(tipo) {
