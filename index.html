@@ -9764,9 +9764,31 @@ async function confirmarPedido(id) {
 
   document.getElementById('modal-confirmar-pago-pedido').classList.add('open');
   // Filtrar métodos de pago habilitados del vendedor dueño del pedido
-  const vendedorPedido = p.vendedor_id ? allVendedores[p.vendedor_id] : null;
-  filtrarMetodosAbono('cpp-metodo-grid', vendedorPedido?.medios_pago || null);
-  if (!vendedorPedido?.medios_pago || vendedorPedido.medios_pago.length > 1) selCppMetodo('efectivo');
+  {
+    const db = window._db, ref = window._ref, get = window._get;
+    // Resolver qué vendedor aplica: primero por vendedor_id del pedido, luego por boleta
+    let resolvedVid = (p.vendedor_id && p.vendedor_id !== '__oficina__') ? p.vendedor_id : null;
+    if (!resolvedVid) {
+      const primerKey = p.boleta_keys && p.boleta_keys[0];
+      const primeraBoleta = primerKey ? allBoletas[primerKey] : null;
+      const vb = primeraBoleta?.vendedor_id;
+      if (vb && vb !== '__oficina__') resolvedVid = vb;
+    }
+    let vendedorMedios = null;
+    if (resolvedVid) {
+      // Intentar cache primero, si no, ir a Firebase
+      if (allVendedores[resolvedVid]?.medios_pago) {
+        vendedorMedios = allVendedores[resolvedVid].medios_pago;
+      } else {
+        try {
+          const vs = await get(ref(db, 'vendedores/' + resolvedVid));
+          if (vs.exists()) vendedorMedios = vs.val().medios_pago || null;
+        } catch(e) {}
+      }
+    }
+    filtrarMetodosAbono('cpp-metodo-grid', vendedorMedios);
+    if (!vendedorMedios || vendedorMedios.filter(m => m.habilitado !== false).length > 1) selCppMetodo('efectivo');
+  }
 }
 
 function seleccionarTipoPagoPedido(tipo) {
