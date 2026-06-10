@@ -3016,9 +3016,28 @@
         </div>
       </div>
 
+      <!-- Notificación pedidos pendientes (solo admin, se muestra si hay > 0) -->
+      <div id="stat-pedidos-wrap" style="display:none;margin-bottom:16px">
+        <div onclick="document.getElementById('tab-btn-pedidos')?.click()" style="background:#fff;border:2px solid #bee3f8;border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:box-shadow 0.2s" onmouseover="this.style.boxShadow='0 4px 16px rgba(49,130,206,0.15)'" onmouseout="this.style.boxShadow='none'">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:42px;height:42px;border-radius:12px;background:#ebf8ff;border:2px solid #bee3f8;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#2b6cb0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              <span id="stat-pedidos-dot" style="position:absolute;top:-4px;right:-4px;width:10px;height:10px;border-radius:50%;background:#e53e3e;border:2px solid white"></span>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:800;color:#2b6cb0;text-transform:uppercase;letter-spacing:.5px">Pedidos pendientes</div>
+              <div style="font-family:'Bebas Neue',cursive;font-size:32px;line-height:1;color:#3182ce" id="stat-pedidos-count">0</div>
+              <div style="font-size:11px;color:#a0aec0;margin-top:1px">de la tienda · requieren atención</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;padding:7px 14px;border:2px solid #bee3f8;border-radius:10px;background:#ebf8ff;color:#2b6cb0;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;white-space:nowrap;flex-shrink:0">
+            Ver pedidos
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#2b6cb0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+      </div>
+
       <div class="card">
-        <div class="card-header">
-          <h3><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Recaudo total</h3>
         </div>
         <div class="card-body">
           <div style="font-family:'Bebas Neue',cursive;font-size:42px;color:var(--verde)" id="stat-recaudo">$0</div>
@@ -9394,6 +9413,14 @@ function renderPedidos(pedidos) {
 
   const listaPendientes  = lista.filter(([, p]) => p.estado !== 'confirmado' && p.estado !== 'cancelado');
   const listaConfirmados = lista.filter(([, p]) => p.estado === 'confirmado' || p.estado === 'cancelado');
+
+  // Actualizar notificación de pedidos pendientes en el dashboard
+  const statPedidosWrap = document.getElementById('stat-pedidos-wrap');
+  const statPedidosCount = document.getElementById('stat-pedidos-count');
+  // Contar pendientes globales (sin filtro de vendedor) para el dashboard
+  const totalPendientesGlobal = Object.values(window._allPedidos || {}).filter(p => p.estado !== 'confirmado' && p.estado !== 'cancelado').length;
+  if (statPedidosWrap) statPedidosWrap.style.display = totalPendientesGlobal > 0 ? '' : 'none';
+  if (statPedidosCount) statPedidosCount.textContent = totalPendientesGlobal;
 
   // Actualizar badges de pestañas
   const badgePend = document.getElementById('ptab-badge-pend');
