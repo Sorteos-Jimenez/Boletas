@@ -5805,8 +5805,8 @@ function vendedorConfirmarEntrega(id) {
   if (confirmarBtn) { confirmarBtn.disabled = true; confirmarBtn.style.background = '#ccc'; confirmarBtn.style.cursor = 'not-allowed'; }
   _pagoEntregaMetodo = 'efectivo';
   // Filtrar métodos de pago habilitados por el vendedor
-  filtrarMetodosAbono('pago-metodo-grid', 'selPagoMetodo');
-  selPagoMetodo('efectivo');
+  filtrarMetodosAbono('pago-metodo-grid', _vpMedios);
+  if (_vpMedios.length > 1) selPagoMetodo('efectivo');
   document.getElementById('modal-pago-entrega').classList.add('open');
 }
 
@@ -9647,46 +9647,46 @@ let _cppMetodoPago = 'efectivo'; // método seleccionado en abono de pedido
 let _pagoEntregaMetodo = 'efectivo'; // método en confirmar entrega vendedor
 
 // ===== FILTRO MÉTODOS DE PAGO HABILITADOS =====
-// Muestra solo los métodos de pago habilitados en el perfil del vendedor activo.
+// Muestra solo los métodos de pago habilitados según los medios_pago del vendedor.
 // gridId: id del div contenedor (pago-metodo-grid o cpp-metodo-grid)
-// fnSel: nombre de la función de selección ('selPagoMetodo' o 'selCppMetodo')
-function filtrarMetodosAbono(gridId, fnSel) {
+// mediosPago: array de medios del vendedor (de Firebase), o null para mostrar todos
+function filtrarMetodosAbono(gridId, mediosPago) {
   const grid = document.getElementById(gridId);
   if (!grid) return;
-
-  // Obtener medios habilitados del vendedor actual (usa _vpMedios si es vendedor, o todos)
-  let mediosHabilitados = null;
-  if (currentUser?.rol === 'vendedor' && _vpMedios && _vpMedios.length) {
-    mediosHabilitados = _vpMedios.filter(m => m.habilitado !== false).map(m => {
-      // Mapear tipo → clave del botón
-      if (m.tipo === 'efectivo') return 'efectivo';
-      if (m.tipo === 'transferencia') return 'transferencia';
-      if (m.tipo === 'billetera') {
-        const n = (m.nombre || '').toLowerCase();
-        if (n.includes('nequi')) return 'nequi';
-        if (n.includes('daviplata')) return 'daviplata';
-        return 'nequi'; // fallback billetera → nequi
-      }
-      return null;
-    }).filter(Boolean);
-  }
 
   const todos = ['efectivo', 'transferencia', 'nequi', 'daviplata'];
   const pfx = gridId === 'pago-metodo-grid' ? 'pago-m-' : 'cpp-m-';
 
+  // Si no hay medios configurados, mostrar todos
+  let visibles = todos;
+  if (mediosPago && mediosPago.length) {
+    const habilitados = mediosPago.filter(m => m.habilitado !== false).map(m => {
+      if (m.tipo === 'efectivo') return 'efectivo';
+      if (m.tipo === 'transferencia') return 'transferencia';
+      if (m.tipo === 'billetera') {
+        const n = (m.nombre || '').toLowerCase();
+        if (n.includes('daviplata')) return 'daviplata';
+        return 'nequi';
+      }
+      return null;
+    }).filter(Boolean);
+    if (habilitados.length) visibles = habilitados;
+  }
+
   todos.forEach(k => {
     const btn = document.getElementById(pfx + k);
     if (!btn) return;
-    if (!mediosHabilitados || mediosHabilitados.includes(k)) {
-      btn.style.display = '';
-    } else {
-      btn.style.display = 'none';
-    }
+    btn.style.display = visibles.includes(k) ? '' : 'none';
   });
 
-  // Si el único visible es uno, actualizar las columnas del grid
-  const visibles = mediosHabilitados ? mediosHabilitados.filter(k => todos.includes(k)) : todos;
+  // Ajustar columnas según visibles
   grid.style.gridTemplateColumns = `repeat(${Math.min(visibles.length, 4)}, 1fr)`;
+
+  // Auto-seleccionar el primero si solo hay uno
+  if (visibles.length === 1) {
+    if (gridId === 'pago-metodo-grid') selPagoMetodo(visibles[0]);
+    else selCppMetodo(visibles[0]);
+  }
 }
 
 window.filtrarMetodosAbono = filtrarMetodosAbono;
@@ -9763,8 +9763,10 @@ async function confirmarPedido(id) {
   });
 
   document.getElementById('modal-confirmar-pago-pedido').classList.add('open');
-  // Filtrar métodos de pago habilitados para este pedido
-  filtrarMetodosAbono('cpp-metodo-grid', 'selCppMetodo');
+  // Filtrar métodos de pago habilitados del vendedor dueño del pedido
+  const vendedorPedido = p.vendedor_id ? allVendedores[p.vendedor_id] : null;
+  filtrarMetodosAbono('cpp-metodo-grid', vendedorPedido?.medios_pago || null);
+  if (!vendedorPedido?.medios_pago || vendedorPedido.medios_pago.length > 1) selCppMetodo('efectivo');
 }
 
 function seleccionarTipoPagoPedido(tipo) {
