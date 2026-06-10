@@ -3987,6 +3987,9 @@
       <div style="font-size:12px;font-weight:800;color:var(--azul-dark);margin-bottom:6px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> ¿Cómo pagar?</div>
       <div id="checkout-metodo-texto" style="font-size:13px;color:var(--dark)">Nequi / Daviplata / Transferencia<br><b>Número:</b> ---<br>Envía el comprobante por WhatsApp</div>
     </div>
+    <div class="recaptcha-wrap" style="margin:12px 0 4px">
+      <div class="g-recaptcha" id="recaptcha-tienda" data-sitekey="6LekgxYtAAAAALN2cNOMpMbC1m61TeFCyaX00ht9"></div>
+    </div>
     <button class="btn-success" onclick="enviarPedido()" style="margin-top:8px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Confirmar pedido</button>
     <button onclick="cerrarModal('modal-checkout')" style="width:100%;margin-top:8px;padding:10px;background:none;border:2px solid var(--borde);border-radius:10px;font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;cursor:pointer;color:#718096">Seguir eligiendo</button>
   </div>
@@ -10734,9 +10737,18 @@ async function enviarPedido() {
   const telPrefix = document.getElementById('co-tel-prefix')?.value || '+57';
   const tel = telRaw ? (telPrefix + telRaw) : '';
   const dirCasa = document.getElementById('co-dir-casa').value.trim();
-  if (!nombre) { toast('Ingresa tu nombre', 'rojo'); return; }
-  if (!tel) { toast('Ingresa tu teléfono', 'rojo'); return; }
-  if (!dirCasa) { toast('Ingresa tu dirección de casa', 'rojo'); return; }
+
+  // Verificar reCAPTCHA tienda
+  const captchaTienda = grecaptcha.getResponse(document.querySelector('#recaptcha-tienda iframe') ? undefined : undefined);
+  if (!captchaTienda) {
+    toast('Por favor, completa el captcha', 'rojo');
+    _guardEnviarPedido = false;
+    return;
+  }
+
+  if (!nombre) { toast('Ingresa tu nombre', 'rojo'); _guardEnviarPedido = false; return; }
+  if (!tel) { toast('Ingresa tu teléfono', 'rojo'); _guardEnviarPedido = false; return; }
+  if (!dirCasa) { toast('Ingresa tu dirección de casa', 'rojo'); _guardEnviarPedido = false; return; }
   const dirTrabajo = document.getElementById('co-dir-trabajo').value.trim();
   const dirEntrega = _entregaSeleccionada === 'trabajo' && dirTrabajo ? dirTrabajo : dirCasa;
   const tipoEntrega = _entregaSeleccionada === 'trabajo' && dirTrabajo ? 'trabajo' : 'casa';
@@ -10855,7 +10867,7 @@ async function enviarPedido() {
     boletas: carritoSeleccion.map(k => tiendaBoletas[k]).filter(Boolean)
   };
   document.getElementById('modal-confirmado').classList.add('open');
-  } finally { _guardEnviarPedido = false; }
+  } finally { _guardEnviarPedido = false; try { grecaptcha.reset(); } catch(e){} }
 }
 
 function limpiarCarrito() {
