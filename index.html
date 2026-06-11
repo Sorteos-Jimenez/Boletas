@@ -7469,7 +7469,8 @@ async function eliminarAbono(key, abonoKey) {
   const snap = await get(ref(db, 'boletas/' + key + '/abonos'));
   const abonos = snap.exists() ? Object.values(snap.val()) : [];
   const total = abonos.reduce((s, a) => s + (Number(a.monto)||0), 0);
-  await update(ref(db, 'boletas/' + key), { monto_pagado: total });
+  const nuevoEstado = total > 0 ? 'abonado' : 'sin_abono';
+  await update(ref(db, 'boletas/' + key), { monto_pagado: total, estado: nuevoEstado });
 
   toast('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg> Abono eliminado', 'rojo');
   setTimeout(() => abrirEditar(key), 400);
@@ -13297,15 +13298,23 @@ function distribuirBuscarNum(query) {
     if (!esAnulada && bpKey) {
       const pedidos = Object.values(window._allPedidos || {});
       const pedidoMatch = pedidos.find(p => Array.isArray(p.boleta_keys) && p.boleta_keys.includes(bpKey) && p.estado !== 'cancelado');
-      if (pedidoMatch) estadoPedido = pedidoMatch.estado; // 'pendiente' | 'confirmado' | etc.
+      if (pedidoMatch) estadoPedido = pedidoMatch.estado;
     }
+    // Leer estado real de la boleta desde allBoletas
+    const boletaReal = bpKey ? Object.values(allBoletas || {}).find(b => {
+      const bNums = (b.numeros || '').split(',').map(n => n.trim());
+      return nums.length && bNums.includes(String(nums[0]));
+    }) : null;
+    const estadoReal = boletaReal?.estado || null;
     const estadoBadge = esAnulada
-      ? `<span style="font-size:10px;font-weight:800;color:#c53030;background:#fff5f5;border:1px solid #fed7d7;border-radius:12px;padding:2px 8px;margin-left:6px">🚫 ANULADA</span>`
-      : estadoPedido === 'confirmado'
-        ? `<span style="font-size:10px;font-weight:800;color:#276749;background:#f0fff4;border:1px solid #9ae6b4;border-radius:12px;padding:2px 8px;margin-left:6px">✅ COMPRADA</span>`
-        : estadoPedido
-          ? `<span style="font-size:10px;font-weight:800;color:#c05621;background:#fffaf0;border:1px solid #fbd38d;border-radius:12px;padding:2px 8px;margin-left:6px">⏳ PENDIENTE</span>`
-          : `<span style="font-size:10px;font-weight:800;color:#276749;background:#e6fffa;border:1px solid #9ae6b4;border-radius:12px;padding:2px 8px;margin-left:6px">✅ DISPONIBLE</span>`;
+      ? `<span style="font-size:10px;font-weight:800;color:#c53030;background:#fff5f5;border:1px solid #fed7d7;border-radius:12px;padding:2px 8px;margin-left:6px">🚫 Estado: ANULADA</span>`
+      : estadoPedido === 'confirmado' || estadoReal === 'pagada'
+        ? `<span style="font-size:10px;font-weight:800;color:#276749;background:#f0fff4;border:1px solid #9ae6b4;border-radius:12px;padding:2px 8px;margin-left:6px">✅ Estado: COMPRADA</span>`
+        : estadoReal === 'abonado'
+          ? `<span style="font-size:10px;font-weight:800;color:#975a16;background:#fffaf0;border:1px solid #fbd38d;border-radius:12px;padding:2px 8px;margin-left:6px">⏳ Estado: ABONADA</span>`
+          : estadoReal === 'sin_abono' || estadoPedido
+            ? `<span style="font-size:10px;font-weight:800;color:#c05621;background:#fff5f0;border:1px solid #fbd38d;border-radius:12px;padding:2px 8px;margin-left:6px">🟡 Estado: PENDIENTE</span>`
+            : `<span style="font-size:10px;font-weight:800;color:#276749;background:#e6fffa;border:1px solid #9ae6b4;border-radius:12px;padding:2px 8px;margin-left:6px">✅ Estado: DISPONIBLE</span>`;
     const btnAccion = bpKey
       ? (esAnulada
           ? `<button onclick="distReactivarBoleta('${bpKey}')" style="display:inline-block;margin-top:6px;padding:5px 12px;background:linear-gradient(135deg,#38a169,#276749);color:white;border:none;border-radius:20px;font-family:'Nunito',sans-serif;font-weight:800;font-size:11px;cursor:pointer">🔓 Quitar anulación</button>`
