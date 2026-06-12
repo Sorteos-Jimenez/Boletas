@@ -10502,7 +10502,7 @@ async function abrirTienda(codigoVendedor) {
         const enCarrito = carritoSeleccion.includes(k);
         if (enCarrito) return;
         const enPedido = pedidosActivos.has(k);
-        if (enPedido && (b.estadoVenta === 'libre' || b.estadoVenta === 'abonado')) {
+        if (enPedido && (b.estadoVenta === 'libre' || b.estadoVenta === 'abonado' || b.estadoVenta === 'reservada')) {
           b._estadoPrevio = b.estadoVenta;
           b.estadoVenta = 'vendida'; cambio = true;
         } else if (!enPedido && b.estadoVenta === 'vendida') {
