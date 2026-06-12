@@ -9523,7 +9523,7 @@ function renderPedidos(pedidos) {
   let lista = Object.entries(pedidos).sort((a,b) => (b[1].fecha_ts||0)-(a[1].fecha_ts||0));
 
   if (filtroVendedor === '__sin__') {
-    lista = lista.filter(([, p]) => !p.vendedor_id);
+    lista = lista.filter(([, p]) => !p.vendedor_id || p.vendedor_id === '__oficina__');
   } else if (filtroVendedor) {
     lista = lista.filter(([, p]) => p.vendedor_id === filtroVendedor);
   }
@@ -13188,7 +13188,7 @@ async function distribuirGuardar() {
       const nums = distIzq.flatMap(b => b.nums).map(n => Number(n));
       try {
         await update(ref(db, 'vendedores/' + _distIdIzq), { boletasAsignadas: nums });
-        guardados.push(v.nombre + ' (' + nums.length + ')');
+        guardados.push(v.nombre + ' (' + distIzq.length + ' boleta' + (distIzq.length !== 1 ? 's' : '') + ')');
       } catch(err) { errores.push(v.nombre + ': ' + err.message); }
     }
   }
@@ -13200,7 +13200,7 @@ async function distribuirGuardar() {
       const nums = distDer.flatMap(b => b.nums).map(n => Number(n));
       try {
         await update(ref(db, 'vendedores/' + _distIdDer), { boletasAsignadas: nums });
-        guardados.push(v.nombre + ' (' + nums.length + ')');
+        guardados.push(v.nombre + ' (' + distDer.length + ' boleta' + (distDer.length !== 1 ? 's' : '') + ')');
       } catch(err) { errores.push(v.nombre + ': ' + err.message); }
     }
   }
