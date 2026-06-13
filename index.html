@@ -5241,7 +5241,7 @@ function renderBoletas() {
 
   // Filtro por estado
   if (filtroEstado) {
-    const mapEstado = { pagada: 'pagado', abonado: 'abonado', libre: 'pendiente' };
+    const mapEstado = { pagada: 'pagado', abonado: 'abonado', libre: 'separada' };
     const estadoCuenta = mapEstado[filtroEstado] || filtroEstado;
     cuentasList = cuentasList.filter(([, c]) => c.estado === estadoCuenta);
   }
@@ -5345,7 +5345,7 @@ function renderBoletasPagina() {
 
     const estadoColor = c.estado === 'pagado' ? '#276749' : c.estado === 'abonado' ? '#975a16' : '#718096';
     const estadoBg    = c.estado === 'pagado' ? '#f0fff4' : c.estado === 'abonado' ? '#fffaf0' : '#f7fafc';
-    const estadoLabel = c.estado === 'pagado' ? '✅ Pagado' : c.estado === 'abonado' ? '⏳ Abonado' : '⬜ Pendiente';
+    const estadoLabel = c.estado === 'pagado' ? '✅ Pagado' : c.estado === 'abonado' ? '⏳ Abonado' : '⬜ Separada';
     const vendNombre  = allVendedores[c.vendedor_id]?.nombre || c.vendedor_id || 'La Oficina';
 
     return `
@@ -5989,7 +5989,7 @@ async function ejecutarConfirmarEntrega() {
 
   // Datos de la cuenta unificada
   const totalPagado = tipoPago === 'completo' ? precioPorBoleta * grupos.length : montoAbono;
-  const estadoCuenta = tipoPago === 'completo' ? 'pagado' : tipoPago === 'abono' ? 'abonado' : 'pendiente';
+  const estadoCuenta = tipoPago === 'completo' ? 'pagado' : tipoPago === 'abono' ? 'abonado' : 'separada';
   const cuentaData = {
     comprador:    p.nombre    || '',
     telefono:     p.telefono  || '',
@@ -6196,7 +6196,7 @@ function renderMisPedidos() {
       <!-- Cabecera: estado + fecha -->
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fffdf0;border-bottom:1.5px solid #fef3c7">
         <span style="font-size:11px;color:#a0aec0;font-weight:600">${fecha}</span>
-        <span style="background:#fef3c7;border:1.5px solid #fcd34d;color:#d97706;border-radius:12px;font-size:11px;font-weight:800;padding:3px 10px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M5 22h14M5 2h14M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22M7 2v4.172a2 2 0 0 1 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg> Pendiente</span>
+        <span style="background:#fef3c7;border:1.5px solid #fcd34d;color:#d97706;border-radius:12px;font-size:11px;font-weight:800;padding:3px 10px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M5 22h14M5 2h14M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22M7 2v4.172a2 2 0 0 1 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg> Separada</span>
       </div>
 
       <!-- Minicards de boletas -->
@@ -6330,7 +6330,7 @@ async function registrarVenta() {
   };
 
   // Estado de cuenta según estado de boleta
-  const estadoCuenta = estado === 'pagada' ? 'pagado' : (montoNum > 0 ? 'abonado' : 'pendiente');
+  const estadoCuenta = estado === 'pagada' ? 'pagado' : (montoNum > 0 ? 'abonado' : 'separada');
 
   const cuentaData = {
     comprador:    nombre,
@@ -6736,7 +6736,7 @@ async function eliminarAbonoCuenta(cuentaKey, abonoKey) {
   const precioBoleta = Number(precioCfg) || 0;
   const numBoletas   = (c.boleta_keys || []).length;
   const totalEsperado = precioBoleta ? precioBoleta * numBoletas : (Number(c.total_cuenta)||0);
-  const nuevoEstado   = totalAbonado >= totalEsperado && totalEsperado > 0 ? 'pagado' : totalAbonado > 0 ? 'abonado' : 'pendiente';
+  const nuevoEstado   = totalAbonado >= totalEsperado && totalEsperado > 0 ? 'pagado' : totalAbonado > 0 ? 'abonado' : 'separada';
 
   const updates = {};
   updates['cuentas_cliente/' + cuentaKey + '/abonos/' + abonoKey] = null;
@@ -7232,7 +7232,7 @@ async function generarPDFBoletas(boletas, cuenta, anversoDataURLs) {
         const total = abonosArr.reduce((s,a) => s + (Number(a.monto)||0), 0);
         return total > 0 ? '$' + total.toLocaleString('es-CO') : '—';
       })() },
-      { label: 'ESTADO', valor: (cuenta.estado === 'pagado' ? '✓ PAGADO' : cuenta.estado === 'abonado' ? '⬤ ABONADO' : 'PENDIENTE') },
+      { label: 'ESTADO', valor: (cuenta.estado === 'pagado' ? '✓ PAGADO' : cuenta.estado === 'abonado' ? '⬤ ABONADO' : 'SEPARADA') },
     ];
     if (vendedor) filas.push({ label: 'VENDEDOR', valor: vendedor });
 
@@ -8179,7 +8179,7 @@ function vdRenderPedidosVendedor(vid) {
       ? `<span style="background:#c6f6d5;border:1.5px solid #9ae6b4;color:#276749;border-radius:12px;font-size:10px;font-weight:800;padding:3px 8px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Confirmado</span>`
       : esCancelado
         ? `<span style="background:#fed7d7;border:1.5px solid #fca5a5;color:#c53030;border-radius:12px;font-size:10px;font-weight:800;padding:3px 8px">Cancelado</span>`
-        : `<span style="background:#fef3c7;border:1.5px solid #fcd34d;color:#d97706;border-radius:12px;font-size:10px;font-weight:800;padding:3px 8px">Pendiente</span>`;
+        : `<span style="background:#fef3c7;border:1.5px solid #fcd34d;color:#d97706;border-radius:12px;font-size:10px;font-weight:800;padding:3px 8px">Separada</span>`;
 
     // Minicards boletas
     const grupos = p.boletas_grupos || [];
@@ -9628,7 +9628,7 @@ function renderPedidos(pedidos) {
       ? '<span class="estado-badge estado-pagada"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Confirmado</span>'
       : esCancelado
         ? '<span class="estado-badge estado-libre" style="background:#fed7d7;color:var(--rojo)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#e53e3e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Cancelado</span>'
-        : '<span class="estado-badge" style="background:#fef3c7;color:#d97706;border:1px solid #fcd34d;font-weight:800">PENDIENTE</span>';
+        : '<span class="estado-badge" style="background:#fef3c7;color:#d97706;border:1px solid #fcd34d;font-weight:800">SEPARADA</span>';
 
     // ── Vendedor: 3 niveles de fallback ──
     let vId     = p.vendedor_id     || '';
@@ -10132,7 +10132,7 @@ async function ejecutarConfirmarPedido() {
 
   // Registrar abono inicial en historial de cuenta (solo tipo abono)
   const totalPagadoCpp = tipoPago === 'completo' ? precioPorBoleta * grupos.length : montoPagado;
-  const estadoCuentaCpp = tipoPago === 'completo' ? 'pagado' : tipoPago === 'abono' ? 'abonado' : 'pendiente';
+  const estadoCuentaCpp = tipoPago === 'completo' ? 'pagado' : tipoPago === 'abono' ? 'abonado' : 'separada';
   const cuentaDataCpp = {
     comprador:    p.nombre    || '',
     telefono:     p.telefono  || '',
