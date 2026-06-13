@@ -2990,9 +2990,9 @@
           <div class="stat-sub">disponibles</div>
         </div>
         <div class="stat-card" style="border-left:4px solid #805ad5">
-          <div class="stat-label" style="color:#805ad5">Pendientes</div>
+          <div class="stat-label" style="color:#805ad5">Separadas</div>
           <div class="stat-value" id="stat-pendientes" style="color:#805ad5">0</div>
-          <div class="stat-sub">boletas en pedidos</div>
+          <div class="stat-sub">apartadas sin pago</div>
         </div>
         <div class="stat-card" style="border-left:4px solid #3182ce">
           <div class="stat-label" style="color:#3182ce">Pedidos</div>
@@ -5123,16 +5123,16 @@ function renderDashboard() {
   // Libres = total publicadas − (pagadas + abono)
   const libres = Math.max(0, total - pagadas - abono); // abono ya es abonado count
 
-  // Pedidos pendientes y boletas en esos pedidos
+  // Boletas separadas y pedidos sin confirmar
+  const separadas = boletas.filter(b => b.estado === 'separada').length;
   const pedidosActivos = Object.values(window._allPedidos || {}).filter(p => p.estado === 'pendiente');
   const numPedidos = pedidosActivos.length;
-  const numPendientes = pedidosActivos.reduce((s, p) => s + (p.boleta_keys ? p.boleta_keys.length : 0), 0);
 
   document.getElementById('stat-total').textContent = total;
   document.getElementById('stat-pagadas').textContent = pagadas;
   document.getElementById('stat-abono').textContent = abono;
   document.getElementById('stat-libres').textContent = libres;
-  document.getElementById('stat-pendientes').textContent = numPendientes;
+  document.getElementById('stat-pendientes').textContent = separadas;
   document.getElementById('stat-pedidos').textContent = numPedidos;
   document.getElementById('stat-recaudo').textContent = '$' + recaudo.toLocaleString('es-CO');
 
