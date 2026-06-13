@@ -10567,7 +10567,7 @@ function renderTiendaGrid(boletas) {
     .filter(([k, b]) => {
       const estado = b.estadoVenta || 'libre';
       if (estado === 'libre') return true;
-      if (estado === 'reservada') return true; // reservada por otro cliente: visible pero bloqueada
+      if (estado === 'reservada') return false; // reservada por otro cliente: ocultar completamente
       if (carritoSeleccion.includes(k)) return true; // propia seleccionada
       return false;
     })
