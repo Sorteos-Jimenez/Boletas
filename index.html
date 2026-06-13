@@ -5124,7 +5124,7 @@ function renderDashboard() {
   const libres = Math.max(0, total - pagadas - abono); // abono ya es abonado count
 
   // Boletas separadas y pedidos sin confirmar
-  const separadas = boletas.filter(b => b.estado === 'separada').length;
+  const separadas = Object.values(allCuentas).filter(c => c.estado === 'separada').length;
   const pedidosActivos = Object.values(window._allPedidos || {}).filter(p => p.estado === 'pendiente');
   const numPedidos = pedidosActivos.length;
 
