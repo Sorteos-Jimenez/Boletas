@@ -3056,6 +3056,13 @@
 
     <!-- ======== TAB: BOLETAS ======== -->
     <div class="tab-panel" id="tab-boletas">
+      <!-- Buscador por nombre de cliente -->
+      <div style="position:relative;margin-bottom:10px">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#a0aec0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="buscar-boleta" placeholder="Buscar cliente por nombre o teléfono..." oninput="renderBoletas()"
+          style="width:100%;padding:9px 12px 9px 34px;border:2px solid var(--borde);border-radius:10px;font-size:13px;font-family:'Nunito',sans-serif;font-weight:600;color:var(--dark);outline:none;background:white;box-sizing:border-box">
+      </div>
+
       <!-- Filtro por vendedor (solo admin) -->
       <div id="filtro-boletas-vendedor-wrap" style="display:none;margin-bottom:12px">
         <select id="filtro-boletas-vendedor" onchange="renderBoletas()" style="width:100%;padding:9px 12px;border:2px solid var(--borde);border-radius:10px;font-size:13px;font-family:'Nunito',sans-serif;font-weight:700;color:var(--dark);outline:none;background:white;cursor:pointer">
