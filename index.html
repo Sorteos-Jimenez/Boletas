@@ -5236,7 +5236,7 @@ function renderBoletas() {
   // Filtro por vendedor
   const fvId = document.getElementById('filtro-boletas-vendedor')?.value || '';
   if (fvId === '__oficina__') {
-    cuentasList = cuentasList.filter(([, c]) => !c.vendedor_id || c.vendedor_id === '');
+    cuentasList = cuentasList.filter(([, c]) => !c.vendedor_id || c.vendedor_id === '' || c.vendedor_id === '__oficina__');
   } else if (fvId) {
     cuentasList = cuentasList.filter(([, c]) => c.vendedor_id === fvId);
   }
