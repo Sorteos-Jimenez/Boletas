@@ -5175,7 +5175,8 @@ function renderDashboard() {
   // Top vendedores
   const ventas = {};
   boletas.filter(b => b.estado !== 'libre').forEach(b => {
-    if (b.vendedor_id) ventas[b.vendedor_id] = (ventas[b.vendedor_id] || 0) + 1;
+    const vid = (b.vendedor_id && b.vendedor_id !== '__oficina__') ? b.vendedor_id : '__oficina__';
+    ventas[vid] = (ventas[vid] || 0) + 1;
   });
   const top = Object.entries(ventas).sort((a, b) => b[1] - a[1]).slice(0, 5);
   const cont = document.getElementById('top-vendedores');
@@ -5185,7 +5186,7 @@ function renderDashboard() {
   }
   cont.innerHTML = top.map(([vid, cnt]) => {
     const v = allVendedores[vid];
-    const nombre = v ? v.nombre : vid;
+    const nombre = v ? v.nombre : (vid === '__oficina__' ? 'La Oficina' : vid);
     return `<div class="vendedor-card">
       <div class="vendedor-avatar">${nombre.charAt(0)}</div>
       <div class="vendedor-data">
