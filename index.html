@@ -10393,15 +10393,57 @@ async function abrirTienda(codigoVendedor) {
       if (!fechasDiv) return;
       let html = '';
 
+      // Función para parsear fecha YYYY-MM-DD o DD/MM/YYYY a objeto Date (medianoche local)
+      function parseFechaTarget(str) {
+        if (!str) return null;
+        if (/^\d{4}-\d{2}-\d{2}$/.test(str.trim())) {
+          const [y, m, d] = str.trim().split('-').map(Number);
+          return new Date(y, m - 1, d);
+        } else if (/^\d{2}\/\d{2}\/\d{4}$/.test(str.trim())) {
+          const [d, m, y] = str.trim().split('/').map(Number);
+          return new Date(y, m - 1, d);
+        }
+        return null;
+      }
+
+      // Genera el HTML de los bloques D H M S de un contador
+      function countdownBlocksHTML(id) {
+        return `<div id="${id}" style="display:flex;gap:5px;justify-content:center;margin-top:6px">
+          <div style="background:rgba(0,0,0,0.25);border-radius:7px;padding:4px 7px;min-width:40px;text-align:center">
+            <div style="font-size:16px;font-weight:900;line-height:1" class="cnt-d">--</div>
+            <div style="font-size:9px;font-weight:700;opacity:0.75;margin-top:1px">DÍAS</div>
+          </div>
+          <div style="background:rgba(0,0,0,0.25);border-radius:7px;padding:4px 7px;min-width:36px;text-align:center">
+            <div style="font-size:16px;font-weight:900;line-height:1" class="cnt-h">--</div>
+            <div style="font-size:9px;font-weight:700;opacity:0.75;margin-top:1px">HRS</div>
+          </div>
+          <div style="background:rgba(0,0,0,0.25);border-radius:7px;padding:4px 7px;min-width:36px;text-align:center">
+            <div style="font-size:16px;font-weight:900;line-height:1" class="cnt-m">--</div>
+            <div style="font-size:9px;font-weight:700;opacity:0.75;margin-top:1px">MIN</div>
+          </div>
+          <div style="background:rgba(0,0,0,0.25);border-radius:7px;padding:4px 7px;min-width:36px;text-align:center">
+            <div style="font-size:16px;font-weight:900;line-height:1" class="cnt-s">--</div>
+            <div style="font-size:9px;font-weight:700;opacity:0.75;margin-top:1px">SEG</div>
+          </div>
+        </div>`;
+      }
+
+      const _cntTargets = []; // { id, target }
+      let _cntIdx = 0;
+
       const ants = tiendaConfig.anticipados || [];
       ants.forEach(a => {
         if (!a.fecha) return;
         const f = fechaLarga(a.fecha);
         if (!f) return;
-        html += `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.12);border-radius:10px;padding:8px 12px;text-align:center">
+        const cid = 'cnt-ant-' + (_cntIdx++);
+        const target = parseFechaTarget(a.fecha);
+        if (target) _cntTargets.push({ id: cid, target });
+        html += `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;text-align:center">
           <span style="display:flex;align-items:center"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6h-3l-2 5H5.5M9 6l3 5"/><path d="M15 6l1 3h4"/></svg></span>
-          <div style="font-size:10px;font-weight:700;opacity:0.75;text-transform:uppercase;letter-spacing:.5px">Anticipado · ${a.nombre || ''} ${a.modelo || ''}</div>
-          <div style="font-size:14px;font-weight:800">${f}</div>
+          <div style="font-size:10px;font-weight:700;opacity:0.75;text-transform:uppercase;letter-spacing:.5px;margin-top:2px">Anticipado · ${a.nombre || ''} ${a.modelo || ''}</div>
+          <div style="font-size:13px;font-weight:800">${f}</div>
+          ${target ? countdownBlocksHTML(cid) : ''}
         </div>`;
       });
 
@@ -10411,10 +10453,14 @@ async function abrirTienda(codigoVendedor) {
           const anv = window._anv || {};
           const mayNombre = anv.mayNombre || '';
           const mayModelo = anv.mayModelo || '';
-          html += `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.12);border-radius:10px;padding:8px 12px;text-align:center">
+          const cid = 'cnt-may-' + (_cntIdx++);
+          const target = parseFechaTarget(tiendaConfig.fecha);
+          if (target) _cntTargets.push({ id: cid, target });
+          html += `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;text-align:center">
             <span style="display:flex;align-items:center"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg></span>
-            <div style="font-size:10px;font-weight:700;opacity:0.75;text-transform:uppercase;letter-spacing:.5px">Premio Mayor · ${mayNombre} ${mayModelo}</div>
-            <div style="font-size:14px;font-weight:800">${f}</div>
+            <div style="font-size:10px;font-weight:700;opacity:0.75;text-transform:uppercase;letter-spacing:.5px;margin-top:2px">Premio Mayor · ${mayNombre} ${mayModelo}</div>
+            <div style="font-size:13px;font-weight:800">${f}</div>
+            ${target ? countdownBlocksHTML(cid) : ''}
           </div>`;
         }
       }
@@ -10422,6 +10468,35 @@ async function abrirTienda(codigoVendedor) {
       if (html) {
         fechasDiv.innerHTML = html;
         fechasDiv.style.display = 'flex';
+
+        // Iniciar contadores regresivos
+        function tickCountdowns() {
+          const now = new Date();
+          _cntTargets.forEach(({ id, target }) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const diff = target - now;
+            if (diff <= 0) {
+              el.querySelector('.cnt-d').textContent = '00';
+              el.querySelector('.cnt-h').textContent = '00';
+              el.querySelector('.cnt-m').textContent = '00';
+              el.querySelector('.cnt-s').textContent = '00';
+              return;
+            }
+            const days = Math.floor(diff / 86400000);
+            const hrs  = Math.floor((diff % 86400000) / 3600000);
+            const mins = Math.floor((diff % 3600000)  / 60000);
+            const secs = Math.floor((diff % 60000)    / 1000);
+            const pad = n => String(n).padStart(2, '0');
+            el.querySelector('.cnt-d').textContent = pad(days);
+            el.querySelector('.cnt-h').textContent = pad(hrs);
+            el.querySelector('.cnt-m').textContent = pad(mins);
+            el.querySelector('.cnt-s').textContent = pad(secs);
+          });
+        }
+        tickCountdowns();
+        if (window._cntInterval) clearInterval(window._cntInterval);
+        window._cntInterval = setInterval(tickCountdowns, 1000);
       }
     })();
 
