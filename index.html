@@ -10504,28 +10504,90 @@ async function abrirTienda(codigoVendedor) {
         fechasDiv.style.display = 'flex';
 
         // Iniciar contadores regresivos
+        // Agrega CSS de animación de pulso si no existe
+        if (!document.getElementById('cnt-keyframes')) {
+          const s = document.createElement('style');
+          s.id = 'cnt-keyframes';
+          s.textContent = `
+            @keyframes cntPulse {
+              0%,100% { transform: scale(1); opacity: 1; }
+              50%      { transform: scale(1.08); opacity: .85; }
+            }
+            @keyframes cntShake {
+              0%,100% { transform: translateX(0); }
+              20%     { transform: translateX(-4px); }
+              40%     { transform: translateX(4px); }
+              60%     { transform: translateX(-3px); }
+              80%     { transform: translateX(3px); }
+            }
+            .cnt-hoy-badge {
+              display: inline-block;
+              background: linear-gradient(135deg,#f6c90e,#ff6b35);
+              color: #1a1a2e;
+              font-family: 'Nunito', sans-serif;
+              font-size: 13px;
+              font-weight: 900;
+              border-radius: 20px;
+              padding: 5px 14px;
+              letter-spacing: .5px;
+              animation: cntPulse 1.1s ease-in-out infinite, cntShake 2.5s ease-in-out infinite;
+              box-shadow: 0 2px 10px rgba(246,201,14,.5);
+              margin-top: 6px;
+              text-transform: uppercase;
+            }
+            .cnt-realizado-badge {
+              display: inline-block;
+              background: rgba(255,255,255,0.18);
+              color: white;
+              font-family: 'Nunito', sans-serif;
+              font-size: 12px;
+              font-weight: 800;
+              border-radius: 20px;
+              padding: 4px 12px;
+              margin-top: 6px;
+              letter-spacing: .3px;
+              opacity: .85;
+            }
+          `;
+          document.head.appendChild(s);
+        }
+
         function tickCountdowns() {
           const now = new Date();
+          const todayStr = now.toDateString();
           _cntTargets.forEach(({ id, target }) => {
             const el = document.getElementById(id);
             if (!el) return;
-            const diff = target - now;
-            if (diff <= 0) {
-              el.querySelector('.cnt-d').textContent = '00';
-              el.querySelector('.cnt-h').textContent = '00';
-              el.querySelector('.cnt-m').textContent = '00';
-              el.querySelector('.cnt-s').textContent = '00';
+
+            const isToday = target.toDateString() === todayStr;
+            const isPast  = !isToday && target < now;
+
+            if (isToday) {
+              // Ya está en hoy — mostrar badge animado si no está ya
+              if (!el.querySelector('.cnt-hoy-badge')) {
+                el.innerHTML = '<div class="cnt-hoy-badge">🎉 ¡HOY ES EL SORTEO!</div>';
+              }
               return;
             }
+            if (isPast) {
+              if (!el.querySelector('.cnt-realizado-badge')) {
+                el.innerHTML = '<div class="cnt-realizado-badge">✅ ¡Sorteo realizado!</div>';
+              }
+              return;
+            }
+            // Countdown normal
+            const diff = target - now;
             const days = Math.floor(diff / 86400000);
             const hrs  = Math.floor((diff % 86400000) / 3600000);
             const mins = Math.floor((diff % 3600000)  / 60000);
             const secs = Math.floor((diff % 60000)    / 1000);
             const pad = n => String(n).padStart(2, '0');
-            el.querySelector('.cnt-d').textContent = pad(days);
-            el.querySelector('.cnt-h').textContent = pad(hrs);
-            el.querySelector('.cnt-m').textContent = pad(mins);
-            el.querySelector('.cnt-s').textContent = pad(secs);
+            if (el.querySelector('.cnt-d')) {
+              el.querySelector('.cnt-d').textContent = pad(days);
+              el.querySelector('.cnt-h').textContent = pad(hrs);
+              el.querySelector('.cnt-m').textContent = pad(mins);
+              el.querySelector('.cnt-s').textContent = pad(secs);
+            }
           });
         }
         tickCountdowns();
