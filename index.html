@@ -3064,10 +3064,30 @@
       </div>
 
       <!-- Filtro por vendedor (solo admin) -->
-      <div id="filtro-boletas-vendedor-wrap" style="display:none;margin-bottom:12px">
+      <div id="filtro-boletas-vendedor-wrap" style="display:none;margin-bottom:10px">
         <select id="filtro-boletas-vendedor" onchange="renderBoletas()" style="width:100%;padding:9px 12px;border:2px solid var(--borde);border-radius:10px;font-size:13px;font-family:'Nunito',sans-serif;font-weight:700;color:var(--dark);outline:none;background:white;cursor:pointer">
           <option value=""><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Todos los vendedores</option>
         </select>
+      </div>
+
+      <!-- Filtro por estado de pago -->
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+        <button id="f-todos" onclick="filtrarEstado('')"
+          style="flex:1;min-width:0;padding:7px 6px;border:2px solid var(--borde);border-radius:10px;background:var(--azul);color:white;border-color:var(--azul);font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s">
+          Todos
+        </button>
+        <button id="f-libre" onclick="filtrarEstado('libre')"
+          style="flex:1;min-width:0;padding:7px 6px;border:2px solid var(--borde);border-radius:10px;background:white;color:var(--dark);font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s">
+          🟡 Separadas
+        </button>
+        <button id="f-abonado" onclick="filtrarEstado('abonado')"
+          style="flex:1;min-width:0;padding:7px 6px;border:2px solid var(--borde);border-radius:10px;background:white;color:var(--dark);font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s">
+          🟠 Abonadas
+        </button>
+        <button id="f-pagada" onclick="filtrarEstado('pagada')"
+          style="flex:1;min-width:0;padding:7px 6px;border:2px solid var(--borde);border-radius:10px;background:white;color:var(--dark);font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s">
+          🟢 Pagadas
+        </button>
       </div>
 
       <div class="card">
@@ -5252,9 +5272,15 @@ function renderBoletas() {
 
   // Filtro por estado
   if (filtroEstado) {
-    const mapEstado = { pagada: 'pagado', abonado: 'abonado', libre: 'separada' };
-    const estadoCuenta = mapEstado[filtroEstado] || filtroEstado;
-    cuentasList = cuentasList.filter(([, c]) => c.estado === estadoCuenta);
+    if (filtroEstado === 'pagada') {
+      cuentasList = cuentasList.filter(([, c]) => c.estado === 'pagado' || c.estado === 'pagada');
+    } else if (filtroEstado === 'abonado') {
+      cuentasList = cuentasList.filter(([, c]) => c.estado === 'abonado');
+    } else if (filtroEstado === 'libre') {
+      cuentasList = cuentasList.filter(([, c]) => c.estado === 'separada' || c.estado === 'libre' || c.estado === 'pendiente' || !c.estado);
+    } else {
+      cuentasList = cuentasList.filter(([, c]) => c.estado === filtroEstado);
+    }
   }
 
   // Búsqueda
@@ -5579,11 +5605,19 @@ function filtrarEstado(estado) {
   filtroEstado = estado;
   ['todos','libre','abonado','pagada'].forEach(f => {
     const el = document.getElementById('f-' + f);
-    if (el) { el.style.background = ''; el.style.color = ''; el.style.borderColor = ''; }
+    if (el) {
+      el.style.background = 'white';
+      el.style.color = 'var(--dark)';
+      el.style.borderColor = 'var(--borde)';
+    }
   });
   const id = estado || 'todos';
   const el = document.getElementById('f-' + id);
-  if (el) { el.style.background = 'var(--azul)'; el.style.color = 'white'; el.style.borderColor = 'var(--azul)'; }
+  if (el) {
+    el.style.background = 'var(--azul)';
+    el.style.color = 'white';
+    el.style.borderColor = 'var(--azul)';
+  }
   renderBoletas();
 }
 
