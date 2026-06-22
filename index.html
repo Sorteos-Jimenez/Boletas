@@ -5131,10 +5131,12 @@ function renderDashboard() {
   // Libres = total publicadas − (pagadas + abono)
   const libres = Math.max(0, total - pagadas - abono); // abono ya es abonado count
 
-  // Boletas separadas y pedidos sin confirmar
-  const separadas = Object.values(allCuentas).filter(c => c.estado === 'separada' || c.estado === 'pendiente').length;
+  // Boletas separadas y pedidos sin confirmar (contar boletas, no pedidos)
+  const separadas = Object.values(allCuentas)
+    .filter(c => c.estado === 'separada' || c.estado === 'pendiente')
+    .reduce((sum, c) => sum + (c.boleta_keys ? c.boleta_keys.length : 1), 0);
   const pedidosActivos = Object.values(window._allPedidos || {}).filter(p => p.estado === 'pendiente');
-  const numPedidos = pedidosActivos.length;
+  const numPedidos = pedidosActivos.reduce((sum, p) => sum + (p.boleta_keys ? p.boleta_keys.length : 1), 0);
 
   document.getElementById('stat-total').textContent = total;
   document.getElementById('stat-pagadas').textContent = pagadas;
@@ -6503,7 +6505,28 @@ function abrirCuenta(cuentaKey) {
       </div>
     </div>
 
-    <!-- Resumen financiero -->
+    <!-- Boletas (miniboletas flip) -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:11px;font-weight:800;color:#a0aec0;letter-spacing:.8px;margin-bottom:10px">BOLETAS</div>
+      ${boletasHtml}
+    </div>
+
+    ${c.estado === 'pagado' ? `
+    <!-- ✅ ESTADO PAGADO: banner de confirmación -->
+    <div style="background:linear-gradient(135deg,#f0fff4,#c6f6d5);border:2.5px solid #68d391;border-radius:16px;padding:20px 16px;margin-bottom:14px;text-align:center">
+      <div style="font-size:32px;margin-bottom:8px">✅</div>
+      <div style="font-size:16px;font-weight:800;color:#276749;margin-bottom:4px">PAGO COMPLETO</div>
+      ${totalEsperado > 0 ? `<div style="font-size:22px;font-weight:800;color:#276749;margin-bottom:6px">$${totalEsperado.toLocaleString('es-CO')}</div>` : ''}
+      <div style="font-size:12px;color:#38a169;font-weight:600">${c.fecha ? `Pagado el ${c.fecha}` : 'Boleta pagada en su totalidad'}</div>
+    </div>
+    ${abonos.length > 0 ? `
+    <!-- Historial abonos (solo si existen) -->
+    <div style="background:#fafafa;border:1.5px solid #e2e8f0;border-radius:14px;padding:14px;margin-bottom:14px">
+      <div style="font-size:11px;font-weight:800;color:#a0aec0;letter-spacing:.8px;margin-bottom:4px">HISTORIAL DE ABONOS</div>
+      ${abonosHtml}
+    </div>` : ''}
+    ` : `
+    <!-- Resumen financiero (solo cuando NO está pagado) -->
     <div style="margin-bottom:18px">
       ${totalEsperado > 0 ? `
       <div style="background:#f8faff;border:1.5px solid #e2e8f0;border-radius:14px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
@@ -6522,19 +6545,13 @@ function abrirCuenta(cuentaKey) {
       </div>
     </div>
 
-    <!-- Boletas (miniboletas flip) -->
-    <div style="margin-bottom:18px">
-      <div style="font-size:11px;font-weight:800;color:#a0aec0;letter-spacing:.8px;margin-bottom:10px">BOLETAS</div>
-      ${boletasHtml}
-    </div>
-
     <!-- Historial abonos -->
     <div style="background:#fafafa;border:1.5px solid #e2e8f0;border-radius:14px;padding:14px;margin-bottom:14px">
       <div style="font-size:11px;font-weight:800;color:#a0aec0;letter-spacing:.8px;margin-bottom:4px">HISTORIAL DE ABONOS</div>
       ${abonosHtml}
     </div>
 
-    <!-- Registrar abono — layout vertical para no desbordar -->
+    <!-- Registrar abono -->
     <div style="background:#f0f7ff;border:2px solid #bee3f8;border-radius:14px;padding:14px;margin-bottom:10px">
       <div style="font-size:12px;font-weight:800;color:#2b6cb0;margin-bottom:10px;display:flex;align-items:center;gap:6px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2b6cb0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> REGISTRAR ABONO</div>
       <input id="cuenta-abono-monto" type="number" placeholder="Monto $" min="0"
@@ -6553,14 +6570,11 @@ function abrirCuenta(cuentaKey) {
     </div>
 
     <!-- Marcar pagada -->
-    ${c.estado !== 'pagado' ? `
     <button onclick="marcarCuentaPagada('${cuentaKey}')"
       style="width:100%;padding:13px;background:linear-gradient(135deg,#276749,#1a5c2a);color:white;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Marcar cuenta como PAGADA completa
-    </button>` : `
-    <div style="width:100%;padding:13px;background:#f0fff4;border:2px solid #c6f6d5;border-radius:12px;text-align:center;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;color:#276749;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#276749" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Cuenta pagada completa
-    </div>`}
+    </button>
+    `}
 
     <!-- Enviar boleta JPG -->
     <button onclick="enviarBoletaJPG('${cuentaKey}')"
