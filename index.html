@@ -3968,7 +3968,7 @@
     <div class="form-group" style="margin:10px 0 0">
       <label style="font-size:12px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Teléfono *</label>
       <div style="display:flex;gap:0;border:2px solid var(--borde);border-radius:10px;overflow:hidden;background:white;width:100%">
-        <select id="co-tel-prefix" style="padding:12px 8px 12px 10px;border:none;border-right:2px solid var(--borde);background:#f8fafc;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:var(--dark);outline:none;cursor:pointer;width:90px;flex-shrink:0">
+        <select id="co-tel-prefix" onchange="coTelPrefixChange()" style="padding:12px 8px 12px 10px;border:none;border-right:2px solid var(--borde);background:#f8fafc;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:var(--dark);outline:none;cursor:pointer;width:90px;flex-shrink:0">
           <option value="+57">🇨🇴 +57</option>
           <option value="+1">🇺🇸 +1</option>
           <option value="+52">🇲🇽 +52</option>
@@ -3978,7 +3978,9 @@
           <option value="+58">🇻🇪 +58</option>
           <option value="+56">🇨🇱 +56</option>
           <option value="+54">🇦🇷 +54</option>
+          <option value="otro">✏️ Otro</option>
         </select>
+        <input type="text" id="co-tel-prefix-custom" placeholder="+XX" maxlength="6" style="display:none;padding:12px 6px;border:none;border-right:2px solid var(--borde);background:#f8fafc;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:var(--dark);outline:none;width:64px;flex-shrink:0">
         <input type="tel" id="co-tel" placeholder="3XX XXX XXXX" style="flex:1;padding:12px 14px;border:none;font-size:15px;font-family:'Nunito',sans-serif;outline:none;min-width:0">
       </div>
     </div>
@@ -11115,6 +11117,18 @@ function actualizarCarritoBar() {
   }
 }
 
+function coTelPrefixChange() {
+  const sel = document.getElementById('co-tel-prefix');
+  const custom = document.getElementById('co-tel-prefix-custom');
+  if (!sel || !custom) return;
+  if (sel.value === 'otro') {
+    custom.style.display = 'block';
+    custom.focus();
+  } else {
+    custom.style.display = 'none';
+  }
+}
+
 let _entregaSeleccionada = 'casa';
 
 function seleccionarEntrega(tipo) {
@@ -11209,7 +11223,8 @@ async function enviarPedido() {
   try {
   const nombre = document.getElementById('co-nombre').value.trim();
   const telRaw = document.getElementById('co-tel').value.trim();
-  const telPrefix = document.getElementById('co-tel-prefix')?.value || '+57';
+  const telPrefixSel = document.getElementById('co-tel-prefix')?.value || '+57';
+  const telPrefix = telPrefixSel === 'otro' ? (document.getElementById('co-tel-prefix-custom')?.value.trim() || '') : telPrefixSel;
   const tel = telRaw ? (telPrefix + telRaw) : '';
   const dirCasa = document.getElementById('co-dir-casa').value.trim();
 
