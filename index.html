@@ -13865,6 +13865,7 @@ function distribuirBuscarNum(query) {
       return nums.length && bNums.includes(String(nums[0]));
     }) : null;
     const estadoReal = boletaReal?.estado || null;
+    const esComprada = !esAnulada && (estadoPedido === 'confirmado' || estadoReal === 'pagada');
     const estadoBadge = esAnulada
       ? `<span style="font-size:10px;font-weight:800;color:#c53030;background:#fff5f5;border:1px solid #fed7d7;border-radius:12px;padding:2px 8px;margin-left:6px">🚫 Estado: ANULADA</span>`
       : estadoPedido === 'confirmado' || estadoReal === 'pagada'
@@ -13877,7 +13878,7 @@ function distribuirBuscarNum(query) {
     const btnAccion = bpKey
       ? (esAnulada
           ? `<button onclick="distReactivarBoleta('${bpKey}')" style="display:inline-block;margin-top:6px;padding:5px 12px;background:linear-gradient(135deg,#38a169,#276749);color:white;border:none;border-radius:20px;font-family:'Nunito',sans-serif;font-weight:800;font-size:11px;cursor:pointer">🔓 Quitar anulación</button>`
-          : `<button onclick="distAnularBoleta('${bpKey}')" style="display:inline-block;margin-top:6px;padding:5px 12px;background:linear-gradient(135deg,#e53e3e,#9b2c2c);color:white;border:none;border-radius:20px;font-family:'Nunito',sans-serif;font-weight:800;font-size:11px;cursor:pointer">🚫 Anular boleta</button>`)
+          : `<button onclick="distAnularBoleta('${bpKey}')" style="display:inline-block;margin-top:6px;padding:5px 12px;background:linear-gradient(135deg,#e53e3e,#9b2c2c);color:white;border:none;border-radius:20px;font-family:'Nunito',sans-serif;font-weight:800;font-size:11px;cursor:pointer">🚫 Anular boleta</button>` + (esComprada ? `<button onclick="distLiberarBoletaComprada('${bpKey}')" style="display:inline-block;margin-top:6px;margin-left:6px;padding:5px 12px;background:linear-gradient(135deg,#3182ce,#2c5282);color:white;border:none;border-radius:20px;font-family:'Nunito',sans-serif;font-weight:800;font-size:11px;cursor:pointer">🔓 Liberar boleta</button>` : ''))
       : '';
     return `<div style="padding:10px 12px;background:${bg};border:1.5px solid ${borde};border-radius:10px;margin-bottom:6px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
@@ -13916,7 +13917,7 @@ async function distReactivarBoleta(bpKey) {
   const pinIngresado = await sjPrompt('PIN de administrador', 'Ingresa el PIN de administrador para quitar la anulación de la boleta <b>' + nums + '</b>.');
   if (pinIngresado === null) return;
   // Verificar PIN contra config/admin (hash SHA-256)
-  const db = window._db, ref = window._ref, get = window._get, update = window._update, remove = window._remove;
+  const db = window._db, ref = window._ref, get = window._get, update = window._update;
   let pinOk = false;
   try {
     const adminSnap = await get(ref(db, 'config/admin'));
@@ -13930,33 +13931,66 @@ async function distReactivarBoleta(bpKey) {
   try {
     await update(ref(db, 'boletas_plantilla/' + bpKey), { anulada: false });
     if (allBoletasPlantilla[bpKey]) allBoletasPlantilla[bpKey].anulada = false;
-    // Al quitar la anulación, la boleta real (colección 'boletas') queda libre y disponible en la tienda,
-    // sin importar el estado que tenía antes de anularse (pagada, abonada, etc.)
-    const primerNum = String(b.n1 || '').trim();
-    const boletaKey = primerNum ? Object.keys(allBoletas || {}).find(k => {
-      const bNums = (allBoletas[k].numeros || '').split(',').map(n => n.trim());
-      return bNums.includes(primerNum);
-    }) : null;
-    if (boletaKey) {
-      await remove(ref(db, 'boletas/' + boletaKey + '/abonos'));
-      await update(ref(db, 'boletas/' + boletaKey), {
-        estado: 'libre',
-        comprador: '',
-        telefono: '',
-        monto_pagado: 0
-      });
-      if (allBoletas[boletaKey]) {
-        allBoletas[boletaKey].estado = 'libre';
-        allBoletas[boletaKey].comprador = '';
-        allBoletas[boletaKey].telefono = '';
-        allBoletas[boletaKey].monto_pagado = 0;
-        delete allBoletas[boletaKey].abonos;
-      }
-    }
-    toast('✅ Boleta reactivada y disponible en la tienda (' + nums + ')', 'verde');
+    toast('✅ Boleta reactivada (' + nums + ')', 'verde');
     distribuirBuscarNum(document.getElementById('dist-buscar-num').value);
     _distribuirCargarColumna('izq');
     if (_distIdDer) _distribuirCargarColumna('der');
+  } catch(e) { toast('❌ Error: ' + e.message, 'rojo'); }
+}
+
+async function distLiberarBoletaComprada(bpKey) {
+  const bp = allBoletasPlantilla[bpKey];
+  if (!bp) return;
+  const nums = [bp.n1,bp.n2,bp.n3,bp.n4].filter(Boolean).join(', ');
+  // Pedir PIN del administrador
+  const pinIngresado = await sjPrompt('PIN de administrador', 'Ingresa el PIN de administrador para liberar la boleta comprada <b>' + nums + '</b>.');
+  if (pinIngresado === null) return;
+  const db = window._db, ref = window._ref, get = window._get, update = window._update, remove = window._remove;
+  let pinOk = false;
+  try {
+    const adminSnap = await get(ref(db, 'config/admin'));
+    if (adminSnap.exists()) {
+      const pinHash = adminSnap.val().pin || '';
+      const hash = await sha256(pinIngresado);
+      pinOk = hash === pinHash || pinIngresado === pinHash;
+    }
+  } catch(e) {}
+  if (!pinOk) { toast('❌ PIN incorrecto', 'rojo'); return; }
+
+  const ok = await sjConfirm('Liberar boleta comprada', 'Esta boleta ya fue comprada. ¿Deseas liberarla y dejarla disponible de nuevo? Se perderán los datos de la venta (comprador y pagos registrados).', { icon: '🔓', iconClass: 'danger', okLabel: 'Sí, liberar', okClass: 'danger' });
+  if (!ok) return;
+
+  try {
+    const primerNum = String(bp.n1 || '').trim();
+
+    // Caso 1: boleta vendida directamente por un vendedor (registro en /boletas)
+    const boletaEntry = Object.entries(allBoletas || {}).find(([, b]) => {
+      const bNums = (b.numeros || '').split(',').map(n => n.trim());
+      return primerNum && bNums.includes(primerNum);
+    });
+    if (boletaEntry) {
+      const [bKey] = boletaEntry;
+      await remove(ref(db, 'boletas/' + bKey + '/abonos'));
+      await update(ref(db, 'boletas/' + bKey), { estado: 'libre', comprador: '', telefono: '', monto_pagado: 0 });
+      if (allBoletas[bKey]) Object.assign(allBoletas[bKey], { estado: 'libre', comprador: '', telefono: '', monto_pagado: 0 });
+    }
+
+    // Caso 2: boleta comprada mediante un pedido confirmado en la tienda pública
+    const pedidoEntry = Object.entries(window._allPedidos || {}).find(([, p]) => Array.isArray(p.boleta_keys) && p.boleta_keys.includes(bpKey) && p.estado !== 'cancelado');
+    if (pedidoEntry) {
+      const [pId] = pedidoEntry;
+      window._pedidosCancelados = window._pedidosCancelados || new Set();
+      window._pedidosCancelados.add(pId);
+      if (window._allPedidos) delete window._allPedidos[pId];
+      await remove(ref(db, 'pedidos/' + pId));
+    }
+
+    toast('🔓 Boleta liberada — disponible de nuevo (' + nums + ')', 'verde');
+    distribuirBuscarNum(document.getElementById('dist-buscar-num').value);
+    _distribuirCargarColumna('izq');
+    if (_distIdDer) _distribuirCargarColumna('der');
+    if (typeof renderPedidos === 'function') renderPedidos(window._allPedidos || {});
+    if (typeof renderMisPedidos === 'function') renderMisPedidos();
   } catch(e) { toast('❌ Error: ' + e.message, 'rojo'); }
 }
 
