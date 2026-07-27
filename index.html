@@ -6620,9 +6620,16 @@ function abrirCuenta(cuentaKey) {
             ? `<canvas id="${cvId}" width="800" height="347" style="width:100%;height:auto;display:block;border-radius:10px 10px 0 0"></canvas>`
             : `<div style="width:100%;height:70px;background:var(--gris,#f4f8f4);border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:center;font-size:28px">🎫</div>`;
         const numsHtml = nums.map(n => `<span class="vd-flip-num">${n}</span>`).join('');
+        const checkboxLiberar = c.estado !== 'pagado'
+          ? `<label style="position:absolute;top:6px;left:6px;z-index:2;display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.92);border:1.5px solid #f6c453;border-radius:8px;padding:3px 7px;cursor:pointer">
+               <input type="checkbox" class="libsel-check" data-cuenta="${cuentaKey}" data-boleta="${b.key}" checked style="width:15px;height:15px;cursor:pointer;accent-color:#f6c453">
+               <span style="font-size:9px;font-weight:800;color:#b7791f">Liberar</span>
+             </label>`
+          : '';
         return `
           <div class="vd-flip-wrap">
             <div style="border-radius:12px;overflow:hidden;border:2px solid ${esPagada?'#c6f6d5':esAbonado?'#fbd38d':'#e2e8f0'};position:relative">
+              ${checkboxLiberar}
               ${imgEl}
               <span class="vd-flip-badge" style="background:${badgeColor};color:white">${badgeLabel}</span>
               <div class="vd-flip-nums">${numsHtml}</div>
@@ -6767,6 +6774,12 @@ function abrirCuenta(cuentaKey) {
     <button onclick="marcarCuentaPagada('${cuentaKey}')"
       style="width:100%;padding:13px;background:linear-gradient(135deg,#276749,#1a5c2a);color:white;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Marcar cuenta como PAGADA completa
+    </button>
+
+    <!-- Liberar boletas (cliente se arrepintió, con o sin abonos) -->
+    <button onclick="liberarCuenta('${cuentaKey}')"
+      style="width:100%;padding:13px;background:#fff8e6;border:1.5px solid #f6c453;color:#b7791f;border-radius:12px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b7791f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg> Liberar boletas
     </button>
     `}
 
@@ -7004,6 +7017,56 @@ async function eliminarCuenta(cuentaKey) {
   cerrarModal('modal-cuenta-cliente');
   toast('Cuenta eliminada', 'rojo');
 }
+
+async function liberarCuenta(cuentaKey) {
+  const c = allCuentas[cuentaKey];
+  if (!c) return;
+  if (c.estado === 'pagado') {
+    toast('Esta cuenta ya está pagada en su totalidad, no se puede liberar', 'rojo');
+    return;
+  }
+  const abonos = c.abonos ? Object.values(c.abonos) : [];
+  const totalAbonado = abonos.reduce((s, a) => s + (Number(a.monto) || 0), 0);
+
+  // Solo liberar las boletas cuyo checkbox está marcado (puede haber más de una boleta en la cuenta)
+  const allBoletaKeys = c.boleta_keys || [];
+  const checkboxesMarcados = document.querySelectorAll(`.libsel-check[data-cuenta="${cuentaKey}"]:checked`);
+  const selectedKeys = Array.from(checkboxesMarcados).map(chk => chk.dataset.boleta);
+  if (selectedKeys.length === 0) {
+    toast('Selecciona al menos una boleta para liberar', 'rojo');
+    return;
+  }
+  const esLiberacionParcial = selectedKeys.length < allBoletaKeys.length;
+  const etiquetaBoletas = esLiberacionParcial ? `${selectedKeys.length} boleta${selectedKeys.length > 1 ? 's' : ''} seleccionada${selectedKeys.length > 1 ? 's' : ''}` : 'Las boletas de esta cuenta';
+
+  const msg = totalAbonado > 0
+    ? `¿El cliente se arrepintió? ${etiquetaBoletas} quedarán libres y disponibles de nuevo, sin datos del comprador. El abono de $${totalAbonado.toLocaleString('es-CO')} ya registrado se pierde (el dinero no se devuelve).`
+    : `¿El cliente se arrepintió? ${etiquetaBoletas} quedarán libres y disponibles de nuevo, sin datos del comprador.`;
+  const ok = await sjConfirm('Liberar boletas', msg, { icon: '↩️', iconClass: 'danger', okLabel: 'Liberar' });
+  if (!ok) return;
+
+  const db = window._db, ref = window._ref, update = window._update;
+  const updates = {};
+  if (esLiberacionParcial) {
+    // Liberación parcial: solo se libera lo seleccionado, la cuenta sigue existiendo con el resto
+    const boletasRestantes = allBoletaKeys.filter(bk => !selectedKeys.includes(bk));
+    updates['cuentas_cliente/' + cuentaKey + '/boleta_keys'] = boletasRestantes;
+  } else {
+    updates['cuentas_cliente/' + cuentaKey] = null;
+  }
+  selectedKeys.forEach(bk => {
+    updates['boletas/' + bk + '/estado'] = 'libre';
+    updates['boletas/' + bk + '/comprador'] = '';
+    updates['boletas/' + bk + '/telefono'] = '';
+    updates['boletas/' + bk + '/monto_pagado'] = 0;
+    updates['boletas/' + bk + '/abonos'] = null;
+  });
+
+  await update(ref(db), updates);
+  cerrarModal('modal-cuenta-cliente');
+  toast(esLiberacionParcial ? '🔓 Boleta(s) seleccionada(s) liberada(s)' : '🔓 Boletas liberadas', 'verde');
+}
+window.liberarCuenta = liberarCuenta;
 
 // ===== ENVIAR BOLETAS JPG AL CLIENTE =====
 async function enviarBoletaJPG(cuentaKey) {
