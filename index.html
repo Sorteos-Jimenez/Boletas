@@ -10921,6 +10921,7 @@ async function abrirTienda(codigoVendedor) {
       (b.numeros||'').split(',').forEach(n => {
         const num = n.trim();
         if (!num) return;
+        if (b.estado === 'libre') return; // libre: no ocupa el número, queda disponible en la tienda
         const nuevoEstado = b.estado === 'pagada' ? 'vendida' : b.estado === 'sin_abono' ? 'vendida' : 'abonado';
         // Solo sobreescribir si el nuevo estado es más restrictivo
         if (nuevoEstado === 'vendida' || !numEstado[num]) {
