@@ -7109,11 +7109,7 @@ async function ejecutarLiberarCuenta() {
     updates['cuentas_cliente/' + cuentaKey] = null;
   }
   selectedKeys.forEach(bk => {
-    updates['boletas/' + bk + '/estado'] = 'libre';
-    updates['boletas/' + bk + '/comprador'] = '';
-    updates['boletas/' + bk + '/telefono'] = '';
-    updates['boletas/' + bk + '/monto_pagado'] = 0;
-    updates['boletas/' + bk + '/abonos'] = null;
+    updates['boletas/' + bk] = null;
   });
 
   await update(ref(db), updates);
