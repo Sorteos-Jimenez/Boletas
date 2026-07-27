@@ -13916,7 +13916,7 @@ async function distReactivarBoleta(bpKey) {
   const pinIngresado = await sjPrompt('PIN de administrador', 'Ingresa el PIN de administrador para quitar la anulación de la boleta <b>' + nums + '</b>.');
   if (pinIngresado === null) return;
   // Verificar PIN contra config/admin (hash SHA-256)
-  const db = window._db, ref = window._ref, get = window._get, update = window._update;
+  const db = window._db, ref = window._ref, get = window._get, update = window._update, remove = window._remove;
   let pinOk = false;
   try {
     const adminSnap = await get(ref(db, 'config/admin'));
@@ -13930,7 +13930,30 @@ async function distReactivarBoleta(bpKey) {
   try {
     await update(ref(db, 'boletas_plantilla/' + bpKey), { anulada: false });
     if (allBoletasPlantilla[bpKey]) allBoletasPlantilla[bpKey].anulada = false;
-    toast('✅ Boleta reactivada (' + nums + ')', 'verde');
+    // Al quitar la anulación, la boleta real (colección 'boletas') queda libre y disponible en la tienda,
+    // sin importar el estado que tenía antes de anularse (pagada, abonada, etc.)
+    const primerNum = String(b.n1 || '').trim();
+    const boletaKey = primerNum ? Object.keys(allBoletas || {}).find(k => {
+      const bNums = (allBoletas[k].numeros || '').split(',').map(n => n.trim());
+      return bNums.includes(primerNum);
+    }) : null;
+    if (boletaKey) {
+      await remove(ref(db, 'boletas/' + boletaKey + '/abonos'));
+      await update(ref(db, 'boletas/' + boletaKey), {
+        estado: 'libre',
+        comprador: '',
+        telefono: '',
+        monto_pagado: 0
+      });
+      if (allBoletas[boletaKey]) {
+        allBoletas[boletaKey].estado = 'libre';
+        allBoletas[boletaKey].comprador = '';
+        allBoletas[boletaKey].telefono = '';
+        allBoletas[boletaKey].monto_pagado = 0;
+        delete allBoletas[boletaKey].abonos;
+      }
+    }
+    toast('✅ Boleta reactivada y disponible en la tienda (' + nums + ')', 'verde');
     distribuirBuscarNum(document.getElementById('dist-buscar-num').value);
     _distribuirCargarColumna('izq');
     if (_distIdDer) _distribuirCargarColumna('der');
