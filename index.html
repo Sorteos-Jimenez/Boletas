@@ -7107,6 +7107,15 @@ async function ejecutarLiberarCuenta() {
     updates['cuentas_cliente/' + cuentaKey + '/boleta_keys'] = boletasRestantes;
   } else {
     updates['cuentas_cliente/' + cuentaKey] = null;
+    // Liberación total: también cancelar el pedido original de la tienda (si existe),
+    // si no, el pedido queda 'confirmado' y la boleta sigue viéndose como vendida/comprada
+    // en la tienda y en el buscador, aunque la cuenta y la boleta ya se hayan borrado.
+    if (c.pedido_id) {
+      window._pedidosCancelados = window._pedidosCancelados || new Set();
+      window._pedidosCancelados.add(c.pedido_id);
+      if (window._allPedidos) delete window._allPedidos[c.pedido_id];
+      updates['pedidos/' + c.pedido_id] = null;
+    }
   }
   selectedKeys.forEach(bk => {
     updates['boletas/' + bk] = null;
