@@ -7854,6 +7854,16 @@ async function guardarEdicion(key) {
     observaciones: document.getElementById('e-obs').value,
   };
 
+  // Si queda pagada, asegurar que el monto cubra el precio de la boleta
+  // (evita boletas marcadas "vendida" sin abono/monto registrado que descuadran el recaudo total)
+  if (estado === 'pagada') {
+    const montoActual = Number(allBoletas[key]?.monto_pagado) || 0;
+    const precioBoleta = Number((window.tiendaConfig?.precio || '0').toString().replace(/[.,\s]/g, '')) || 0;
+    if (precioBoleta > 0 && montoActual < precioBoleta) {
+      datos.monto_pagado = precioBoleta;
+    }
+  }
+
   // Si se regresa a libre, limpiar monto y eliminar historial de abonos
   if (estado === 'libre') {
     datos.monto_pagado = 0;
