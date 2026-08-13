@@ -3356,6 +3356,27 @@
               <input type="tel" id="cfg-tienda-whatsapp" placeholder="3XX XXX XXXX" style="flex:1;padding:12px 14px;border:none;font-size:15px;font-family:'Nunito',sans-serif;outline:none;min-width:0">
             </div>
           </div>
+          <div class="form-group">
+            <label style="font-weight:800;color:var(--dark);font-size:13px">Redes sociales <span style="font-size:11px;font-weight:600;color:#718096">(opcional, se muestran como iconos en la tienda)</span></label>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:18px;width:22px;text-align:center">📘</span>
+                <input type="url" id="cfg-tienda-red-facebook" placeholder="https://facebook.com/tu-pagina" style="flex:1;padding:10px 12px;border:2px solid var(--borde);border-radius:10px;font-size:13px;font-family:'Nunito',sans-serif;outline:none">
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:18px;width:22px;text-align:center">📷</span>
+                <input type="url" id="cfg-tienda-red-instagram" placeholder="https://instagram.com/tu-usuario" style="flex:1;padding:10px 12px;border:2px solid var(--borde);border-radius:10px;font-size:13px;font-family:'Nunito',sans-serif;outline:none">
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:18px;width:22px;text-align:center">🎵</span>
+                <input type="url" id="cfg-tienda-red-tiktok" placeholder="https://tiktok.com/@tu-usuario" style="flex:1;padding:10px 12px;border:2px solid var(--borde);border-radius:10px;font-size:13px;font-family:'Nunito',sans-serif;outline:none">
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:18px;width:22px;text-align:center">▶️</span>
+                <input type="url" id="cfg-tienda-red-youtube" placeholder="https://youtube.com/@tu-canal" style="flex:1;padding:10px 12px;border:2px solid var(--borde);border-radius:10px;font-size:13px;font-family:'Nunito',sans-serif;outline:none">
+              </div>
+            </div>
+          </div>
           <button class="btn-primary" onclick="guardarConfigTienda()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Guardar configuración tienda</button>
         </div>
       </div>
@@ -4044,6 +4065,7 @@
       <span style="background:rgba(255,255,255,0.15);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700">4 números por boleta · $<span id="tienda-precio">80.000</span></span>
       <span id="tienda-vendedor-badge" style="display:none;background:rgba(255,255,255,0.25);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> <span id="tienda-vendedor-nombre"></span><span id="tienda-vendedor-wa" style="display:none;margin-left:6px"></span></span>
     </div>
+    <div id="tienda-redes-sociales" style="display:none;margin-top:10px;gap:10px;align-items:center"></div>
       <div class="tienda-banner-carrusel" id="tienda-banner-carrusel"></div>
       <div class="tienda-banner-dots" id="tienda-banner-dots"></div>
       <div id="tienda-zoom-overlay" onclick="tiendaCerrarZoomBanner()" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.92);align-items:center;justify-content:center;padding:20px;cursor:zoom-out">
@@ -5323,6 +5345,15 @@ function cargarDatos() {
           }
           waEl.value = stored.slice(matchedPrefix.length);
         }
+        const redesCfg = c.redes || {};
+        const rFb = document.getElementById('cfg-tienda-red-facebook');
+        const rIg = document.getElementById('cfg-tienda-red-instagram');
+        const rTt = document.getElementById('cfg-tienda-red-tiktok');
+        const rYt = document.getElementById('cfg-tienda-red-youtube');
+        if (rFb) rFb.value = redesCfg.facebook || '';
+        if (rIg) rIg.value = redesCfg.instagram || '';
+        if (rTt) rTt.value = redesCfg.tiktok || '';
+        if (rYt) rYt.value = redesCfg.youtube || '';
         cfgCargarMediosPago(c.medios_pago || (c.pago ? [{tipo:'efectivo'}] : [{tipo:'efectivo'}]));
         _cfgBanners = Array.isArray(c.banners) ? c.banners.slice() : [];
         cfgRenderBanners();
@@ -9767,7 +9798,13 @@ async function guardarConfigTienda() {
       const prefix = (document.getElementById('cfg-tienda-whatsapp-prefix')?.value || '+57').replace(/\D/g,'');
       const local  = (document.getElementById('cfg-tienda-whatsapp')?.value || '').replace(/\D/g,'');
       return local ? (prefix + local) : '';
-    })()
+    })(),
+    redes: {
+      facebook:  document.getElementById('cfg-tienda-red-facebook')?.value.trim()  || '',
+      instagram: document.getElementById('cfg-tienda-red-instagram')?.value.trim() || '',
+      tiktok:    document.getElementById('cfg-tienda-red-tiktok')?.value.trim()    || '',
+      youtube:   document.getElementById('cfg-tienda-red-youtube')?.value.trim()   || ''
+    }
   };
   await set(ref(db, 'config/tienda'), config);
   actualizarFechaSistema(config.fecha || '');
@@ -10719,6 +10756,30 @@ async function liberarBoletas(id) {
 }
 window.liberarBoletas = liberarBoletas;
 
+// ===== REDES SOCIALES (iconos clicables en la tienda pública) =====
+function renderRedesSociales(cfg) {
+  const cont = document.getElementById('tienda-redes-sociales');
+  if (!cont) return;
+  const redes = (cfg && cfg.redes) || {};
+  const items = [
+    { key: 'facebook',  url: redes.facebook,  label: 'Facebook',
+      svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z"/></svg>' },
+    { key: 'instagram', url: redes.instagram, label: 'Instagram',
+      svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>' },
+    { key: 'tiktok',    url: redes.tiktok,    label: 'TikTok',
+      svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M16.6 5.82s.51.5 0 0A4.278 4.278 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.02 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48z"/></svg>' },
+    { key: 'youtube',   url: redes.youtube,   label: 'YouTube',
+      svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.56A3.02 3.02 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3.02 3.02 0 0 0 2.12 2.14c1.88.56 9.38.56 9.38.56s7.5 0 9.38-.56a3.02 3.02 0 0 0 2.12-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.8zM9.6 15.6V8.4L15.8 12z"/></svg>' }
+  ];
+  const activos = items.filter(it => it.url);
+  if (!activos.length) { cont.style.display = 'none'; cont.innerHTML = ''; return; }
+  cont.style.display = 'flex';
+  cont.innerHTML = activos.map(it => `
+    <a href="${it.url}" target="_blank" rel="noopener noreferrer" title="${it.label}" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.18);text-decoration:none">${it.svg}</a>
+  `).join('');
+}
+window.renderRedesSociales = renderRedesSociales;
+
 // ===== TIENDA PÚBLICA =====
 let carritoSeleccion = [];
 let tiendaBoletas = {};   // { key: {n1,n2,n3,n4,estadoVenta,...} }
@@ -10758,6 +10819,7 @@ async function abrirTienda(codigoVendedor) {
     document.getElementById('tienda-nombre-texto').textContent = (tiendaConfig.nombre||'Sorteos Jiménez');
     document.getElementById('tienda-desc').textContent = tiendaConfig.descripcion||'Escoge tus boletas y participa';
     document.getElementById('tienda-precio').textContent = tiendaConfig.precio||'80.000';
+    renderRedesSociales(tiendaConfig);
 
   }
   if (typeof renderTiendaBannerCarrusel === 'function') {
