@@ -3745,6 +3745,14 @@
                   <label style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px">📅 Fecha del sorteo</label>
                   <input type="date" id="cfg-tienda-fecha" style="width:100%;padding:8px 12px;border:2px solid var(--borde);border-radius:8px;font-family:'Nunito',sans-serif;font-size:13px;outline:none;color:var(--texto)">
                 </div>
+                <div class="form-group" style="margin:0">
+                  <label style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px">🏅 Nombre del ganador</label>
+                  <input type="text" id="cfg-tienda-ganador-nombre" style="width:100%;padding:8px 12px;border:2px solid var(--borde);border-radius:8px;font-size:13px;font-family:'Nunito',sans-serif;outline:none">
+                </div>
+                <div class="form-group" style="margin:0">
+                  <label style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px">🎟️ Número ganador</label>
+                  <input type="text" id="cfg-tienda-ganador-numero" style="width:100%;padding:8px 12px;border:2px solid var(--borde);border-radius:8px;font-size:13px;font-family:'Nunito',sans-serif;outline:none">
+                </div>
               </div>
             </div>
 
@@ -5328,6 +5336,10 @@ function cargarDatos() {
         document.getElementById('cfg-tienda-precio').value = precioDigits ? Number(precioDigits).toLocaleString('es-CO') : precioRaw;
         document.getElementById('cfg-tienda-fecha').value = c.fecha || '';
         actualizarFechaSistema(c.fecha || '');
+        const cfgGanadorMayNombreEl = document.getElementById('cfg-tienda-ganador-nombre');
+        const cfgGanadorMayNumeroEl = document.getElementById('cfg-tienda-ganador-numero');
+        if (cfgGanadorMayNombreEl) cfgGanadorMayNombreEl.value = c.ganador_mayor_nombre || '';
+        if (cfgGanadorMayNumeroEl) cfgGanadorMayNumeroEl.value = c.ganador_mayor_numero || '';
         const waEl = document.getElementById('cfg-tienda-whatsapp');
         const waPrefEl = document.getElementById('cfg-tienda-whatsapp-prefix');
         if (waEl && c.whatsapp_oficina) {
@@ -5374,6 +5386,12 @@ function cargarDatos() {
             fechasConfig.forEach((f, i) => {
               const el = document.getElementById('cfg-ant-fecha-' + i);
               if (el) el.value = f;
+            });
+            c.anticipados.forEach((a, i) => {
+              const elN = document.getElementById('cfg-ant-ganador-nombre-' + i);
+              const elNum = document.getElementById('cfg-ant-ganador-numero-' + i);
+              if (elN) elN.value = a.ganadorNombre || '';
+              if (elNum) elNum.value = a.ganadorNumero || '';
             });
           }, 200);
         }
@@ -9440,6 +9458,14 @@ function crearBloqueAnticipado(idx, datos) {
         <label style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px">📅 Fecha del sorteo anticipado</label>
         <input type="date" id="cfg-ant-fecha-${idx}" value="${d.fecha||''}" style="width:100%;padding:8px 12px;border:2px solid var(--borde);border-radius:8px;font-family:'Nunito',sans-serif;font-size:13px;outline:none;color:var(--texto)">
       </div>
+      <div class="form-group" style="margin:0">
+        <label style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px">🏅 Nombre del ganador</label>
+        <input type="text" id="cfg-ant-ganador-nombre-${idx}" value="${d.ganadorNombre||''}" style="width:100%;padding:8px 12px;border:2px solid var(--borde);border-radius:8px;font-size:13px;font-family:'Nunito',sans-serif;outline:none">
+      </div>
+      <div class="form-group" style="margin:0">
+        <label style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px">🎟️ Número ganador</label>
+        <input type="text" id="cfg-ant-ganador-numero-${idx}" value="${d.ganadorNumero||''}" style="width:100%;padding:8px 12px;border:2px solid var(--borde);border-radius:8px;font-size:13px;font-family:'Nunito',sans-serif;outline:none">
+      </div>
     </div>`;
   return wrap;
 }
@@ -9780,13 +9806,17 @@ async function guardarConfigTienda() {
     det1: document.getElementById('anv-ant-det1-' + i)?.value.trim() || '',
     det2: document.getElementById('anv-ant-det2-' + i)?.value.trim() || '',
     det3: document.getElementById('anv-ant-det3-' + i)?.value.trim() || '',
-    fecha: document.getElementById('cfg-ant-fecha-' + i)?.value.trim() || ''
+    fecha: document.getElementById('cfg-ant-fecha-' + i)?.value.trim() || '',
+    ganadorNombre: document.getElementById('cfg-ant-ganador-nombre-' + i)?.value.trim() || '',
+    ganadorNumero: document.getElementById('cfg-ant-ganador-numero-' + i)?.value.trim() || ''
   }));
   const config = {
     nombre: document.getElementById('cfg-tienda-nombre').value.trim(),
     descripcion: document.getElementById('cfg-tienda-desc').value.trim(),
     precio: document.getElementById('cfg-tienda-precio').value.trim(),
     fecha: document.getElementById('cfg-tienda-fecha').value.trim(),
+    ganador_mayor_nombre: document.getElementById('cfg-tienda-ganador-nombre')?.value.trim() || '',
+    ganador_mayor_numero: document.getElementById('cfg-tienda-ganador-numero')?.value.trim() || '',
     anticipados: anticipadosConFecha.length ? anticipadosConFecha : null,
     medios_pago: cfgLeerMediosPago(),
     banners: _cfgBanners.length ? _cfgBanners : null,
@@ -10966,7 +10996,7 @@ async function abrirTienda(codigoVendedor) {
         if (!f) return;
         const cid = 'cnt-ant-' + (_cntIdx++);
         const target = parseFechaTarget(a.fecha);
-        if (target) _cntTargets.push({ id: cid, target });
+        if (target) _cntTargets.push({ id: cid, target, ganadorNombre: a.ganadorNombre || '', ganadorNumero: a.ganadorNumero || '' });
         html += `<div style="position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:3px;background:#ffffff;border:2px dashed var(--dark);border-radius:22px;padding:14px 16px;text-align:center">
           <div style="width:40px;height:40px;border-radius:50%;background:var(--dark);display:flex;align-items:center;justify-content:center;margin-bottom:2px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--amarillo)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6h-3l-2 5H5.5M9 6l3 5"/><path d="M15 6l1 3h4"/></svg></div>
           <div style="font-size:10px;font-weight:800;color:var(--dark);opacity:0.85;text-transform:uppercase;letter-spacing:.6px">⚡ Anticipado</div>
@@ -10984,7 +11014,7 @@ async function abrirTienda(codigoVendedor) {
           const mayModelo = anv.mayModelo || '';
           const cid = 'cnt-may-' + (_cntIdx++);
           const target = parseFechaTarget(tiendaConfig.fecha);
-          if (target) _cntTargets.push({ id: cid, target });
+          if (target) _cntTargets.push({ id: cid, target, ganadorNombre: tiendaConfig.ganador_mayor_nombre || '', ganadorNumero: tiendaConfig.ganador_mayor_numero || '' });
           html += `<div style="position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:3px;background:#ffffff;border:2px dashed var(--dark);border-radius:22px;padding:16px;text-align:center">
             <div style="position:absolute;top:8px;right:10px;background:var(--rojo);color:#fff;font-size:8.5px;font-weight:900;letter-spacing:.4px;padding:3px 8px;border-radius:20px;text-transform:uppercase">¡El grande! 🔥</div>
             <div style="width:44px;height:44px;border-radius:50%;background:var(--dark);display:flex;align-items:center;justify-content:center;margin-bottom:2px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--amarillo)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg></div>
@@ -11050,6 +11080,17 @@ async function abrirTienda(codigoVendedor) {
               letter-spacing: .3px;
               opacity: .85;
             }
+            .cnt-ganador-linea {
+              display: block;
+              margin-top: 6px;
+              font-size: 12px;
+              font-weight: 800;
+              color: white;
+              background: rgba(0,0,0,0.15);
+              border-radius: 12px;
+              padding: 5px 12px;
+              letter-spacing: .2px;
+            }
           `;
           document.head.appendChild(s);
         }
@@ -11057,7 +11098,7 @@ async function abrirTienda(codigoVendedor) {
         function tickCountdowns() {
           const now = new Date();
           const todayStr = now.toDateString();
-          _cntTargets.forEach(({ id, target }) => {
+          _cntTargets.forEach(({ id, target, ganadorNombre, ganadorNumero }) => {
             const el = document.getElementById(id);
             if (!el) return;
 
@@ -11072,8 +11113,12 @@ async function abrirTienda(codigoVendedor) {
               return;
             }
             if (isPast) {
-              if (!el.querySelector('.cnt-realizado-badge')) {
-                el.innerHTML = '<div class="cnt-realizado-badge">✅ ¡Sorteo realizado!</div>';
+              if (!el.querySelector('.cnt-realizado-badge') && !el.querySelector('.cnt-ganador-linea')) {
+                const tieneGanador = (ganadorNombre || ganadorNumero);
+                const ganadorHTML = tieneGanador
+                  ? `<div class="cnt-ganador-linea">🏅 ${ganadorNombre || 'Ganador'}${ganadorNumero ? ' · N° ' + ganadorNumero : ''}</div>`
+                  : '';
+                el.innerHTML = '<div class="cnt-realizado-badge">✅ ¡Sorteo realizado!</div>' + ganadorHTML;
               }
               return;
             }
