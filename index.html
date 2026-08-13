@@ -3747,11 +3747,11 @@
                 </div>
                 <div class="form-group" style="margin:0">
                   <label style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px">🏅 Nombre del ganador</label>
-                  <input type="text" id="cfg-tienda-ganador-nombre" style="width:100%;padding:8px 12px;border:2px solid var(--borde);border-radius:8px;font-size:13px;font-family:'Nunito',sans-serif;outline:none">
+                  <input type="text" id="cfg-tienda-ganador-nombre" oninput="autoGuardarGanador()" style="width:100%;padding:8px 12px;border:2px solid var(--borde);border-radius:8px;font-size:13px;font-family:'Nunito',sans-serif;outline:none">
                 </div>
                 <div class="form-group" style="margin:0">
                   <label style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px">🎟️ Número ganador</label>
-                  <input type="text" id="cfg-tienda-ganador-numero" style="width:100%;padding:8px 12px;border:2px solid var(--borde);border-radius:8px;font-size:13px;font-family:'Nunito',sans-serif;outline:none">
+                  <input type="text" id="cfg-tienda-ganador-numero" oninput="autoGuardarGanador()" style="width:100%;padding:8px 12px;border:2px solid var(--borde);border-radius:8px;font-size:13px;font-family:'Nunito',sans-serif;outline:none">
                 </div>
               </div>
             </div>
@@ -9460,11 +9460,11 @@ function crearBloqueAnticipado(idx, datos) {
       </div>
       <div class="form-group" style="margin:0">
         <label style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px">🏅 Nombre del ganador</label>
-        <input type="text" id="cfg-ant-ganador-nombre-${idx}" value="${d.ganadorNombre||''}" style="width:100%;padding:8px 12px;border:2px solid var(--borde);border-radius:8px;font-size:13px;font-family:'Nunito',sans-serif;outline:none">
+        <input type="text" id="cfg-ant-ganador-nombre-${idx}" value="${d.ganadorNombre||''}" oninput="autoGuardarGanador()" style="width:100%;padding:8px 12px;border:2px solid var(--borde);border-radius:8px;font-size:13px;font-family:'Nunito',sans-serif;outline:none">
       </div>
       <div class="form-group" style="margin:0">
         <label style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px">🎟️ Número ganador</label>
-        <input type="text" id="cfg-ant-ganador-numero-${idx}" value="${d.ganadorNumero||''}" style="width:100%;padding:8px 12px;border:2px solid var(--borde);border-radius:8px;font-size:13px;font-family:'Nunito',sans-serif;outline:none">
+        <input type="text" id="cfg-ant-ganador-numero-${idx}" value="${d.ganadorNumero||''}" oninput="autoGuardarGanador()" style="width:100%;padding:8px 12px;border:2px solid var(--borde);border-radius:8px;font-size:13px;font-family:'Nunito',sans-serif;outline:none">
       </div>
     </div>`;
   return wrap;
@@ -9797,7 +9797,17 @@ function actualizarFechaSistema(fechaISO) {
   el.textContent = d + ' ' + (meses[m-1] || '') + ' ' + y;
 }
 
-async function guardarConfigTienda() {
+// Autoguardado (con debounce) para los campos de nombre/número ganador.
+// Evita disparar un guardado por cada tecla: espera a que el usuario pare de escribir.
+let _autoGuardarGanadorTimer = null;
+function autoGuardarGanador() {
+  if (_autoGuardarGanadorTimer) clearTimeout(_autoGuardarGanadorTimer);
+  _autoGuardarGanadorTimer = setTimeout(() => {
+    guardarConfigTienda(true);
+  }, 900);
+}
+
+async function guardarConfigTienda(silencioso) {
   const db = window._db, ref = window._ref, set = window._set;
   // Recoger fechas de los anticipados desde Config
   const anticipadosConFecha = premiosAnticipados.map((_, i) => ({
@@ -9838,7 +9848,9 @@ async function guardarConfigTienda() {
   };
   await set(ref(db, 'config/tienda'), config);
   actualizarFechaSistema(config.fecha || '');
-  toast('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Configuración de tienda guardada', 'verde');
+  if (!silencioso) {
+    toast('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Configuración de tienda guardada', 'verde');
+  }
 }
 
 // ===== FILTRO VISIBILIDAD VENDEDORES EN TIENDA =====
