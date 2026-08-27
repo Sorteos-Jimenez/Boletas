@@ -13048,7 +13048,7 @@ async function editorGenerarTodasBoletas() {
     const idxBoleta = Math.floor(i / NPB) + 1;
     const key = 'b' + String(idxBoleta).padStart(5,'0');
     todasLasBoletas[key] = {
-      n1: nums[0], n2: nums[1], n3: nums[2], n4: nums[3],
+      n1: nums[0] ?? null, n2: nums[1] ?? null, n3: nums[2] ?? null, n4: nums[3] ?? null,
       idx: idxBoleta,
       estado: 'libre'
     };
