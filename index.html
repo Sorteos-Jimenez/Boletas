@@ -3307,6 +3307,26 @@
           </div>
 
           <div class="form-group">
+            <label style="font-weight:800;color:var(--dark);font-size:13px">Formato de números <span style="font-size:11px;font-weight:600;color:#718096">(define este sorteo)</span></label>
+            <div style="display:flex;gap:10px;margin-top:6px">
+              <div style="flex:1">
+                <label style="font-size:11px;color:#718096">Cifras por número</label>
+                <select id="cfg-tienda-cifras" style="width:100%;padding:12px 14px;border:2px solid var(--borde);border-radius:10px;font-size:15px;font-family:'Nunito',sans-serif;color:var(--dark);outline:none;background:white;cursor:pointer">
+                  <option value="3">3 cifras (ej: 007)</option>
+                  <option value="4" selected>4 cifras (ej: 0007)</option>
+                </select>
+              </div>
+              <div style="flex:1">
+                <label style="font-size:11px;color:#718096">Números por boleta</label>
+                <select id="cfg-tienda-numeros-boleta" style="width:100%;padding:12px 14px;border:2px solid var(--borde);border-radius:10px;font-size:15px;font-family:'Nunito',sans-serif;color:var(--dark);outline:none;background:white;cursor:pointer">
+                  <option value="1">1 número</option>
+                  <option value="4" selected>4 números</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
             <label style="font-weight:800;color:var(--dark);font-size:13px">Medios de pago <span style="font-size:11px;font-weight:600;color:#718096">(se muestran en checkout)</span></label>
             <div id="cfg-medios-pago-lista" style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
               <!-- Efectivo (siempre presente, no se puede eliminar) -->
@@ -5334,6 +5354,10 @@ function cargarDatos() {
         const precioRaw = c.precio || '';
         const precioDigits = precioRaw.replace(/\D/g,'');
         document.getElementById('cfg-tienda-precio').value = precioDigits ? Number(precioDigits).toLocaleString('es-CO') : precioRaw;
+        const cfgCifrasEl = document.getElementById('cfg-tienda-cifras');
+        const cfgNumBoletaEl = document.getElementById('cfg-tienda-numeros-boleta');
+        if (cfgCifrasEl) cfgCifrasEl.value = String(c.cifras || 4);
+        if (cfgNumBoletaEl) cfgNumBoletaEl.value = String(c.numerosPorBoleta || 4);
         document.getElementById('cfg-tienda-fecha').value = c.fecha || '';
         actualizarFechaSistema(c.fecha || '');
         const cfgGanadorMayNombreEl = document.getElementById('cfg-tienda-ganador-nombre');
@@ -5483,7 +5507,7 @@ function renderDashboard() {
         grid.innerHTML = bloqueadas.map(([k, b]) => {
           const nums = [b.n1, b.n2, b.n3, b.n4].filter(Boolean);
           const numsHtml = nums.map(n =>
-            `<span style="font-family:'Bebas Neue',cursive;font-size:14px;color:#c53030;background:#fff5f5;border:1.5px solid #fecaca;border-radius:5px;padding:2px 6px;letter-spacing:1px">${String(n).padStart(4,'0')}</span>`
+            `<span style="font-family:'Bebas Neue',cursive;font-size:14px;color:#c53030;background:#fff5f5;border:1.5px solid #fecaca;border-radius:5px;padding:2px 6px;letter-spacing:1px">${String(n).padStart(nvCifras(),'0')}</span>`
           ).join('');
           return `<div style="background:#fff5f5;border:2px solid #fecaca;border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:5px;min-width:100px">
             <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">${numsHtml}</div>
@@ -5537,7 +5561,7 @@ let boletasListaFiltrada = [];
 // Formato número con punto en posición del millar: 1234 → 1.234
 function formatNumBoleta(n) {
   if (!n) return '';
-  const s = String(n).padStart(4, '0');
+  const s = String(n).padStart(nvCifras(),'0');
   // Insertar punto entre posición 1 y 2 (millar): 1234 → 1.234
   return s.length === 4 ? s[0] + '.' + s.slice(1) : s;
 }
@@ -5643,9 +5667,9 @@ function renderBoletasPagina() {
         if (!nums.length) return '';
         const cvId = `cnt-${_cSlug}-${bi}`;
         // Buscar imagen individual en allBoletasPlantilla por n1
-        const n1pad = String(nums[0] || '').padStart(4, '0');
+        const n1pad = String(nums[0] || '').padStart(nvCifras(),'0');
         const bpEntry = Object.values(allBoletasPlantilla).find(bp =>
-          String(bp.n1).padStart(4,'0') === n1pad
+          String(bp.n1).padStart(nvCifras(),'0') === n1pad
         );
         const anversoImg = bpEntry?.anverso_img || null;
         let imgHTML = '';
@@ -5799,9 +5823,9 @@ function renderBoletasVendedor() {
     pedidosVendedor.filter(([, p]) => p.estado === 'pendiente').forEach(([, p]) => {
       const grupos = p.boletas_grupos || [];
       if (grupos.length) {
-        grupos.forEach(g => g.forEach(n => { if (n) numEnPedidoPendiente.add(String(n).padStart(4,'0')); }));
+        grupos.forEach(g => g.forEach(n => { if (n) numEnPedidoPendiente.add(String(n).padStart(nvCifras(),'0')); }));
       } else {
-        (p.numeros || []).forEach(n => { if (n) numEnPedidoPendiente.add(String(n).padStart(4,'0')); });
+        (p.numeros || []).forEach(n => { if (n) numEnPedidoPendiente.add(String(n).padStart(nvCifras(),'0')); });
       }
     });
     // asignadas son valores n1 numéricos
@@ -5809,12 +5833,12 @@ function renderBoletasVendedor() {
 
     const totalVendidas    = vendidas.length;
     const totalAbonadas    = abonadas.length;
-    const rawDisponibles   = asignadas.filter(n => !numConVenta.has(String(n).padStart(4,'0')) && !n1EnPedidoSet.has(Number(n))).length;
+    const rawDisponibles   = asignadas.filter(n => !numConVenta.has(String(n).padStart(nvCifras(),'0')) && !n1EnPedidoSet.has(Number(n))).length;
     const totalDisponibles = Math.round(rawDisponibles / 4) || rawDisponibles;
 
     // Financiero
     const precioBoleta  = Number((window.tiendaConfig?.precio || '0').toString().replace(/[.\s]/g,'').replace(',','.')) || 0;
-    const totalBoletas  = asignadas.length ? Math.round(asignadas.length / 4) : 0;
+    const totalBoletas  = asignadas.length ? Math.round(asignadas.length / nvNumsPorBoleta()) : 0;
     const totalEnBoletas = totalBoletas * precioBoleta;
     const recogido      = boletasDeVendedor.reduce((s, [, b]) => s + (Number(b.monto_pagado) || 0), 0);
     const falta         = Math.max(0, totalEnBoletas - recogido);
@@ -6133,7 +6157,7 @@ window.vpToggleHabilitado  = vpToggleHabilitado;
 
 // ===== MIS VENTAS (vendedor) =====
 function renderMisVentas() {
-  const asig = new Set((currentUser.boletasAsignadas || []).map(n => String(n).padStart(4,'0')));
+  const asig = new Set((currentUser.boletasAsignadas || []).map(n => String(n).padStart(nvCifras(),'0')));
   const totalBoletas = asig.size;
 
   // Obtener boletas con venta que pertenezcan a este vendedor
@@ -6469,7 +6493,7 @@ function renderMisPedidos() {
     const numsFlat = grupos.length ? [].concat(...grupos) : (p.numeros || []);
     const _n1ToBp = {};
     Object.entries(window.allBoletasPlantilla || {}).forEach(([pk, bp]) => {
-      if (bp.n1) _n1ToBp[String(bp.n1).padStart(4,'0')] = { pk, bp };
+      if (bp.n1) _n1ToBp[String(bp.n1).padStart(nvCifras(),'0')] = { pk, bp };
     });
     const _pedidoId = id.slice(-6);
     let minicardsHTML = '';
@@ -6477,7 +6501,7 @@ function renderMisPedidos() {
     if (grupos.length > 0) {
       minicardsHTML = grupos.map((g, gi) => {
         const nums = g.filter(Boolean);
-        const n1key = String(nums[0] || '').padStart(4,'0');
+        const n1key = String(nums[0] || '').padStart(nvCifras(),'0');
         const match = _n1ToBp[n1key];
         const bp = match ? match.bp : null;
         const cvId = `vdped-${_pedidoId}-${gi}`;
@@ -6748,7 +6772,7 @@ function abrirCuenta(cuentaKey) {
         const badgeLabel = esPagada ? 'Vendida' : esAbonado ? 'Abonado' : 'Disponible';
         // Buscar imagen de plantilla por n1
         const bpEntry = Object.entries(allBoletasPlantilla).find(([, bp]) =>
-          String(bp.n1).padStart(4,'0') === String(nums[0]||'').padStart(4,'0')
+          String(bp.n1).padStart(nvCifras(),'0') === String(nums[0]||'').padStart(nvCifras(),'0')
         );
         const bp = bpEntry ? bpEntry[1] : null;
         const cvId = 'cuentacv-' + (b.key||Math.random().toString(36).slice(2));
@@ -6772,9 +6796,9 @@ function abrirCuenta(cuentaKey) {
   // Dibujar canvas tras render (solo para boletas sin anverso_img individual)
   const _boletasParaDraw = boletas.map(b => {
     const nums = (b.numeros||'').split(',').map(n=>n.trim()).filter(Boolean);
-    const n1pad = String(nums[0]||'').padStart(4,'0');
+    const n1pad = String(nums[0]||'').padStart(nvCifras(),'0');
     const bpEntry = Object.entries(allBoletasPlantilla).find(([, bp]) =>
-      String(bp.n1).padStart(4,'0') === n1pad
+      String(bp.n1).padStart(nvCifras(),'0') === n1pad
     );
     const hasImg = bpEntry?.[1]?.anverso_img || false;
     return { key: b.key, hasImg };
@@ -7311,7 +7335,7 @@ async function enviarBoletaJPG(cuentaKey) {
           ctx.font = `bold ${fontSize}px "Bebas Neue", Arial, sans-serif`;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText(String(num).padStart(4, '0'), x + boxW / 2, y + boxH / 2);
+          ctx.fillText(String(num).padStart(nvCifras(),'0'), x + boxW / 2, y + boxH / 2);
         });
         ctx.restore();
       }
@@ -7330,9 +7354,9 @@ async function enviarBoletaJPG(cuentaKey) {
       }
 
       // 2. anverso_img individual de la boleta en plantilla
-      const n1pad = String(nums[0] || '').padStart(4, '0');
+      const n1pad = String(nums[0] || '').padStart(nvCifras(),'0');
       const bpEntry = Object.entries(allBoletasPlantilla || {}).find(([, bp]) =>
-        String(bp.n1).padStart(4, '0') === n1pad
+        String(bp.n1).padStart(nvCifras(),'0') === n1pad
       );
       const srcImg = bpEntry?.[1]?.anverso_img || null;
 
@@ -7619,7 +7643,7 @@ async function generarPDFBoletas(boletas, cuenta, anversoDataURLs) {
       pdf.setLineWidth(0.4);
       pdf.roundedRect(nx, cy, 18, 7, 1.5, 1.5, 'FD');
       pdf.setFont('helvetica', 'bold');
-      pdf.text(String(n).padStart(4,'0'), nx + 9, cy + 5, { align: 'center' });
+      pdf.text(String(n).padStart(nvCifras(),'0'), nx + 9, cy + 5, { align: 'center' });
     });
 
     let py = cy + 11;
@@ -7728,7 +7752,7 @@ async function generarPDFBoletas(boletas, cuenta, anversoDataURLs) {
       pdf.setLineWidth(0.4);
       pdf.roundedRect(nx, dy, 18, 7, 1.5, 1.5, 'FD');
       pdf.setFont('helvetica', 'bold');
-      pdf.text(String(n).padStart(4,'0'), nx + 9, dy + 5, { align: 'center' });
+      pdf.text(String(n).padStart(nvCifras(),'0'), nx + 9, dy + 5, { align: 'center' });
     });
   });
 
@@ -8297,7 +8321,7 @@ function renderVendedores() {
 
   cont.innerHTML = lista.map(([id, v]) => {
     const boletas = Object.values(allBoletas).filter(b => b.vendedor_id === id && b.estado !== 'libre');
-    const totalBoletas = v.boletasAsignadas?.length ? Math.round(v.boletasAsignadas.length / 4) : 0;
+    const totalBoletas = v.boletasAsignadas?.length ? Math.round(v.boletasAsignadas.length / nvNumsPorBoleta()) : 0;
     const asig = totalBoletas || '\u221e';
     const recogido = boletas.reduce((s, b) => s + (Number(b.monto_pagado) || 0), 0);
     const totalEnBoletas = totalBoletas * _precioBoleta;
@@ -8392,20 +8416,20 @@ function abrirDetalleVendedor(vid) {
   pedidosVendedor.filter(([,p]) => p.estado === 'pendiente').forEach(([,p]) => {
     const grupos = p.boletas_grupos || [];
     if (grupos.length) {
-      grupos.forEach(g => g.forEach(n => { if (n) numEnPedidoPendiente2.add(String(n).padStart(4,'0')); }));
+      grupos.forEach(g => g.forEach(n => { if (n) numEnPedidoPendiente2.add(String(n).padStart(nvCifras(),'0')); }));
     } else {
-      (p.numeros || []).forEach(n => { if (n) numEnPedidoPendiente2.add(String(n).padStart(4,'0')); });
+      (p.numeros || []).forEach(n => { if (n) numEnPedidoPendiente2.add(String(n).padStart(nvCifras(),'0')); });
     }
   });
   // asignadas son valores n1 numéricos
   const n1EnPedidoSet2 = new Set([...numEnPedidoPendiente2].map(n => Number(n)));
-  const rawDisponibles = asignadas.filter(n => !numConVenta.has(String(n).padStart(4,'0')) && !n1EnPedidoSet2.has(Number(n))).length;
+  const rawDisponibles = asignadas.filter(n => !numConVenta.has(String(n).padStart(nvCifras(),'0')) && !n1EnPedidoSet2.has(Number(n))).length;
   const totalDisponibles = Math.round(rawDisponibles / 4) || rawDisponibles;
 
   // ---- Cálculos financieros ----
   const _pStr = (window.tiendaConfig?.precio || document.getElementById('cfg-tienda-precio')?.value || '0').toString().replace(/[.\s]/g,'').replace(',','.');
   const precioBoleta = Number(_pStr) || 0;
-  const totalBoletas = asignadas.length ? Math.round(asignadas.length / 4) : 0;
+  const totalBoletas = asignadas.length ? Math.round(asignadas.length / nvNumsPorBoleta()) : 0;
   const totalEnBoletas = totalBoletas * precioBoleta;
   const recogido = boletasDeVendedor.reduce((s, [,b]) => s + (Number(b.monto_pagado) || 0), 0);
   const falta = Math.max(0, totalEnBoletas - recogido);
@@ -8433,7 +8457,7 @@ function abrirDetalleVendedor(vid) {
           ${v.direccion2 ? `<span class="vd-chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${v.direccion2}</span>` : ''}
           ${v.nota ? `<span class="vd-chip" style="background:#fffbeb;color:#92400e;border-color:#fde68a"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:3px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>${v.nota}</span>` : ''}
           <span class="vd-chip">${comisionLabel}</span>
-          <span class="vd-chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="2" x2="9" y2="22"/></svg> Asig: ${asignadas.length ? Math.round(asignadas.length / 4) : '∞'}</span>
+          <span class="vd-chip"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="9" y1="2" x2="9" y2="22"/></svg> Asig: ${asignadas.length ? Math.round(asignadas.length / nvNumsPorBoleta()) : '∞'}</span>
         </div>
       </div>
       <button onclick="abrirEditarVendedor('${vid}')" style="flex-shrink:0;padding:8px 12px;background:#edf2f7;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;color:#4a5568;cursor:pointer;display:flex;align-items:center;gap:5px">
@@ -8661,7 +8685,7 @@ function vdRenderPedidosVendedor(vid) {
 
   const _n1ToBp = {};
   Object.entries(window.allBoletasPlantilla || {}).forEach(([pk, bp]) => {
-    if (bp.n1) _n1ToBp[String(bp.n1).padStart(4,'0')] = { pk, bp };
+    if (bp.n1) _n1ToBp[String(bp.n1).padStart(nvCifras(),'0')] = { pk, bp };
   });
 
   // Helper: renderiza una tarjeta de pedido
@@ -8690,7 +8714,7 @@ function vdRenderPedidosVendedor(vid) {
     if (grupos.length > 0) {
       minicardsHTML = grupos.map((g, gi) => {
         const nums = g.filter(Boolean);
-        const n1key = String(nums[0] || '').padStart(4,'0');
+        const n1key = String(nums[0] || '').padStart(nvCifras(),'0');
         const match = _n1ToBp[n1key];
         const bp = match ? match.bp : null;
         const cvId = `vdped2-${_pedidoId}-${gi}`;
@@ -8811,13 +8835,13 @@ function vdRenderDisponibles(vid) {
     .forEach(p => {
       const grupos = p.boletas_grupos || [];
       if (grupos.length) {
-        grupos.forEach(g => g.forEach(n => { if (n) numEnPedidoPendiente.add(String(n).padStart(4,'0')); }));
+        grupos.forEach(g => g.forEach(n => { if (n) numEnPedidoPendiente.add(String(n).padStart(nvCifras(),'0')); }));
       } else {
-        (p.numeros || []).forEach(n => { if (n) numEnPedidoPendiente.add(String(n).padStart(4,'0')); });
+        (p.numeros || []).forEach(n => { if (n) numEnPedidoPendiente.add(String(n).padStart(nvCifras(),'0')); });
       }
     });
 
-  const asignadasSet = new Set(asignadas.map(n => String(n).padStart(4,'0')));
+  const asignadasSet = new Set(asignadas.map(n => String(n).padStart(nvCifras(),'0')));
 
   const hayPlantilla = Object.keys(allBoletasPlantilla).length > 0;
   let boletasCompletas;
@@ -8825,7 +8849,7 @@ function vdRenderDisponibles(vid) {
   if (hayPlantilla) {
     boletasCompletas = Object.entries(allBoletasPlantilla)
       .filter(([, bp]) => {
-        const n1 = String(bp.n1).padStart(4,'0');
+        const n1 = String(bp.n1).padStart(nvCifras(),'0');
         return asignadasSet.has(n1) && !numConVenta.has(n1) && !numEnPedidoPendiente.has(n1);
       })
       .sort(([, a], [, b]) => (a.idx || 0) - (b.idx || 0));
@@ -8834,16 +8858,17 @@ function vdRenderDisponibles(vid) {
     let idx = 0;
     boletasCompletas = [];
     const sortedNums = [...asignadas]
-      .map(n => String(n).padStart(4,'0'))
+      .map(n => String(n).padStart(nvCifras(),'0'))
       .filter(n => !numConVenta.has(n) && !numEnPedidoPendiente.has(n))
       .sort();
-    for (let i = 0; i + 3 < sortedNums.length; i += 4) {
-      const [n1, n2, n3, n4] = sortedNums.slice(i, i + 4);
+    const NPB = nvNumsPorBoleta();
+    for (let i = 0; i + (NPB - 1) < sortedNums.length; i += NPB) {
+      const [n1, n2, n3, n4] = sortedNums.slice(i, i + NPB);
       const key = `grp_${i}`;
       boletasCompletas.push([key, { n1, n2, n3, n4, idx: idx++ }]);
     }
     // Grupos incompletos al final
-    const resto = sortedNums.length % 4;
+    const resto = sortedNums.length % NPB;
     if (resto > 0) {
       const startIdx = sortedNums.length - resto;
       const nums = sortedNums.slice(startIdx);
@@ -8913,9 +8938,9 @@ function vdRenderBoletasTile(lista, estadoDefault, vid, tab) {
     const numColor    = isVendida ? '#c53030'  : isAbonada ? '#975a16'  : '#276749';
 
     // Buscar imagen de anverso en allBoletasPlantilla por n1
-    const n1pad = String(nums[0] || '').padStart(4, '0');
+    const n1pad = String(nums[0] || '').padStart(nvCifras(),'0');
     const bpEntry = Object.values(allBoletasPlantilla).find(bpe =>
-      String(bpe.n1).padStart(4,'0') === n1pad
+      String(bpe.n1).padStart(nvCifras(),'0') === n1pad
     );
     const anversoImg = bpEntry?.anverso_img || bp.anverso_img || null;
     let imgHTML = '';
@@ -9016,7 +9041,7 @@ async function vdAbrirAddAbono(key) {
   const infoEl = document.getElementById('vd-add-abono-info');
   if (infoEl && b) {
     const nums = (b.numeros || '').split(',').map(n => n.trim()).filter(Boolean);
-    const numsStr = nums.map(n => String(n).padStart(4,'0')).join('  ·  ');
+    const numsStr = nums.map(n => String(n).padStart(nvCifras(),'0')).join('  ·  ');
     infoEl.innerHTML = `<span style="font-size:13px;color:var(--dark);font-weight:800">${b.comprador || ''}</span><br>
       <span style="font-family:'Bebas Neue',cursive;font-size:14px;color:var(--azul);letter-spacing:1px">${numsStr}</span>
       ${b.telefono ? ` <span style="font-weight:600;color:#a0aec0">· ${b.telefono}</span>` : ''}`;
@@ -9824,6 +9849,8 @@ async function guardarConfigTienda(silencioso) {
     nombre: document.getElementById('cfg-tienda-nombre').value.trim(),
     descripcion: document.getElementById('cfg-tienda-desc').value.trim(),
     precio: document.getElementById('cfg-tienda-precio').value.trim(),
+    cifras: Number(document.getElementById('cfg-tienda-cifras')?.value) || 4,
+    numerosPorBoleta: Number(document.getElementById('cfg-tienda-numeros-boleta')?.value) || 4,
     fecha: document.getElementById('cfg-tienda-fecha').value.trim(),
     ganador_mayor_nombre: document.getElementById('cfg-tienda-ganador-nombre')?.value.trim() || '',
     ganador_mayor_numero: document.getElementById('cfg-tienda-ganador-numero')?.value.trim() || '',
@@ -10215,11 +10242,11 @@ function renderPedidos(pedidos) {
     if (!vId && !vCodigo) {
       const bkeys = p.boleta_keys || [];
       const numsDelPedido = new Set(
-        bkeys.map(k => allBoletasPlantilla[k] && String(allBoletasPlantilla[k].n1).padStart(4,'0')).filter(Boolean)
+        bkeys.map(k => allBoletasPlantilla[k] && String(allBoletasPlantilla[k].n1).padStart(nvCifras(),'0')).filter(Boolean)
       );
       if (numsDelPedido.size > 0) {
         for (const [vid, vdata] of Object.entries(allVendedores)) {
-          const asigSet = new Set((vdata.boletasAsignadas || []).map(n => String(n).padStart(4,'0')));
+          const asigSet = new Set((vdata.boletasAsignadas || []).map(n => String(n).padStart(nvCifras(),'0')));
           const coincide = [...numsDelPedido].some(n => asigSet.has(n));
           if (coincide) {
             vId = vid; vCodigo = vdata.codigo || ''; vNombre = vdata.nombre || '';
@@ -10240,7 +10267,7 @@ function renderPedidos(pedidos) {
     // Mapa n1→plantilla para buscar imagen
     const _n1ToBp = {};
     Object.entries(allBoletasPlantilla).forEach(([pk, bp]) => {
-      if (bp.n1) _n1ToBp[String(bp.n1).padStart(4,'0')] = { pk, bp };
+      if (bp.n1) _n1ToBp[String(bp.n1).padStart(nvCifras(),'0')] = { pk, bp };
     });
 
     // ID único para canvas de esta tarjeta de pedido
@@ -10252,7 +10279,7 @@ function renderPedidos(pedidos) {
     if (grupos.length > 0) {
       minicardsHTML = grupos.map((g, gi) => {
         const nums = g.filter(Boolean);
-        const n1key = String(nums[0] || '').padStart(4,'0');
+        const n1key = String(nums[0] || '').padStart(nvCifras(),'0');
         const match = _n1ToBp[n1key];
         const bp = match ? match.bp : null;
         const cvId = `pedcv-${_pedidoId}-${gi}`;
@@ -10646,10 +10673,10 @@ async function ejecutarConfirmarPedido() {
   let vendedorCodigoFinal = p.vendedor_codigo || '';
   if (!vendedorIdFinal) {
     const bkeys = p.boleta_keys || [];
-    const numsDelPedido = new Set(bkeys.map(k => allBoletasPlantilla[k] && String(allBoletasPlantilla[k].n1).padStart(4,'0')).filter(Boolean));
+    const numsDelPedido = new Set(bkeys.map(k => allBoletasPlantilla[k] && String(allBoletasPlantilla[k].n1).padStart(nvCifras(),'0')).filter(Boolean));
     if (numsDelPedido.size > 0) {
       for (const [vid, vdata] of Object.entries(allVendedores)) {
-        const asigSet = new Set((vdata.boletasAsignadas || []).map(n => String(n).padStart(4,'0')));
+        const asigSet = new Set((vdata.boletasAsignadas || []).map(n => String(n).padStart(nvCifras(),'0')));
         if ([...numsDelPedido].some(n => asigSet.has(n))) {
           vendedorIdFinal = vid;
           vendedorCodigoFinal = vdata.codigo || '';
@@ -10821,6 +10848,16 @@ function renderRedesSociales(cfg) {
   `).join('');
 }
 window.renderRedesSociales = renderRedesSociales;
+
+// ===== CONFIG DINÁMICA DE SORTEO (Fase 2) =====
+// Cifras por número y números por boleta, definidos en Configuración (Fase 1).
+// Fallback a 4/4 para no romper sorteos existentes sin config nueva.
+function nvCifras() {
+  return Number(window.tiendaConfig?.cifras) || 4;
+}
+function nvNumsPorBoleta() {
+  return Number(window.tiendaConfig?.numerosPorBoleta) || 4;
+}
 
 // ===== TIENDA PÚBLICA =====
 let carritoSeleccion = [];
@@ -11204,9 +11241,9 @@ async function abrirTienda(codigoVendedor) {
 
   // Set de n1 asignados a este vendedor (para filtrar en tienda)
   // boletasAsignadas puede guardar strings n1 ('0001') o índices numéricos (1)
-  // Normalizamos todo a string padStart(4,'0') para comparar con b.n1
+  // Normalizamos todo a string padStart(nvCifras(),'0') para comparar con b.n1
   const n1Vendedor = vendedorFiltro && (vendedorFiltro.boletasAsignadas||[]).length > 0
-    ? new Set((vendedorFiltro.boletasAsignadas).map(n => String(n).padStart(4,'0')))
+    ? new Set((vendedorFiltro.boletasAsignadas).map(n => String(n).padStart(nvCifras(),'0')))
     : null; // null = sin filtro (mostrar todos)
 
   // Mapa n1 → vendedorId construido desde boletasAsignadas de cada vendedor
@@ -11214,14 +11251,14 @@ async function abrirTienda(codigoVendedor) {
   if (vendsSnapVis.exists()) {
     Object.entries(vendsSnapVis.val()).forEach(([vid, v]) => {
       (v.boletasAsignadas || []).forEach(n => {
-        n1ToVendedor[String(n).padStart(4, '0')] = vid;
+        n1ToVendedor[String(n).padStart(nvCifras(),'0')] = vid;
       });
     });
   }
 
   if (plantSnap.exists()) {
     Object.entries(plantSnap.val()).forEach(([k, b]) => {
-      const n1 = b.n1 ? String(b.n1).padStart(4, '0') : null;
+      const n1 = b.n1 ? String(b.n1).padStart(nvCifras(),'0') : null;
       // Determinar a qué vendedor pertenece la boleta por su n1
       const vidBoleta = n1 ? (n1ToVendedor[n1] || null) : null;
       // Filtro por oficina: solo boletas NO asignadas a ningún vendedor
@@ -12067,7 +12104,7 @@ async function descargarPDFPedido() {
         pdf.setFontSize(14);
         pdf.setFont('helvetica', 'bold');
         pdf.setTextColor(...ROJO);
-        pdf.text(String(n).padStart(4, '0'), nx + 22, numsY + 12, { align: 'center' });
+        pdf.text(String(n).padStart(nvCifras(),'0'), nx + 22, numsY + 12, { align: 'center' });
       });
 
       // ── Datos del cliente ──
@@ -12326,16 +12363,18 @@ function importarNumerosTxt(input) {
   const reader = new FileReader();
   reader.onload = function(e) {
     const raw = e.target.result;
+    const CIF = nvCifras();
+    const NPB = nvNumsPorBoleta();
     // Separar por coma, salto de línea, espacio, punto y coma
-    const partes = raw.split(/[\n\r,;\s]+/).map(s => s.trim()).filter(s => /^\d{1,4}$/.test(s));
-    editorNumerosBD = partes.map(n => n.padStart(4,'0'));
+    const partes = raw.split(/[\n\r,;\s]+/).map(s => s.trim()).filter(s => new RegExp('^\\d{1,' + CIF + '}$').test(s));
+    editorNumerosBD = partes.map(n => n.padStart(CIF,'0'));
     editorCuartetoIdx = 0;
     const count = editorNumerosBD.length;
     document.getElementById('txt-db-count').textContent = count + ' nums';
     const prev = document.getElementById('nums-db-preview');
     prev.style.display = 'block';
     prev.textContent = editorNumerosBD.slice(0, 80).join(' ') + (count > 80 ? '...' : '');
-    if (count >= 4) {
+    if (count >= NPB) {
       // Cargar primer cuarteto
       asignarCuarteto(0);
       const nav = document.getElementById('cuarteto-nav');
@@ -12347,7 +12386,7 @@ function importarNumerosTxt(input) {
     // Actualizar estado del tab BD Boletas
     const bdStatus = document.getElementById('bd-editor-status');
     if (bdStatus) {
-      const total = Math.floor(count / 4);
+      const total = Math.floor(count / nvNumsPorBoleta());
       bdStatus.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> <b>${count}</b> números cargados &rarr; <b>${total}</b> boletas listas`;
       bdStatus.style.color = 'var(--verde)';
       document.getElementById('bd-btn-generar').style.display = '';
@@ -12358,13 +12397,15 @@ function importarNumerosTxt(input) {
 }
 
 function asignarCuarteto(idx) {
-  const base = idx * 4;
-  if (base + 3 >= editorNumerosBD.length) {
+  const NPB = nvNumsPorBoleta();
+  const CIF = nvCifras();
+  const base = idx * NPB;
+  if (base + (NPB - 1) >= editorNumerosBD.length) {
     toast('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#d69e2e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> No hay más cuartetos en la base', 'rojo');
     return false;
   }
   ['enum1','enum2','enum3','enum4'].forEach((id, i) => {
-    document.getElementById(id).value = editorNumerosBD[base + i] || '0000';
+    document.getElementById(id).value = i < NPB ? (editorNumerosBD[base + i] || '0'.repeat(CIF)) : '';
   });
   renderEditorCanvas();
   return true;
@@ -12380,26 +12421,29 @@ function siguienteCuarteto() {
 }
 
 function actualizarInfoCuarteto() {
-  const total = Math.floor(editorNumerosBD.length / 4);
+  const total = Math.floor(editorNumerosBD.length / nvNumsPorBoleta());
   const info = document.getElementById('cuarteto-info');
   if (info) info.textContent = `Boleta ${editorCuartetoIdx + 1} de ${total}`;
 }
 
 function numerosAleatorios() {
+  const NPB = nvNumsPorBoleta();
+  const CIF = nvCifras();
+  const max = Math.pow(10, CIF) - 1;
   const nums = [];
-  while (nums.length < 4) {
-    const n = Math.floor(Math.random() * 9999) + 1;
-    const s = String(n).padStart(4,'0');
+  while (nums.length < NPB) {
+    const n = Math.floor(Math.random() * max) + 1;
+    const s = String(n).padStart(CIF,'0');
     if (!nums.includes(s)) nums.push(s);
   }
   ['enum1','enum2','enum3','enum4'].forEach((id, i) => {
-    document.getElementById(id).value = nums[i];
+    document.getElementById(id).value = i < NPB ? nums[i] : '';
   });
   renderEditorCanvas();
 }
 
 function padNum(input) {
-  input.value = input.value.padStart(4,'0');
+  input.value = input.value.padStart(nvCifras(),'0');
   renderEditorCanvas();
 }
 
@@ -12513,11 +12557,11 @@ let bdBoletas = [];       // array de { nums:[n1,n2,n3,n4], vendedor }
 let bdBoletasFiltradas = [];
 
 function bdUsarEditorDB() {
-  if (editorNumerosBD.length < 4) {
+  if (editorNumerosBD.length < nvNumsPorBoleta()) {
     toast('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#d69e2e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Primero ve al Editor y carga el .txt en el Paso ①', 'rojo');
     return;
   }
-  const total = Math.floor(editorNumerosBD.length / 4);
+  const total = Math.floor(editorNumerosBD.length / nvNumsPorBoleta());
   const stats = document.getElementById('bd-stats');
   if (stats) {
     stats.style.display = 'block';
@@ -12545,11 +12589,13 @@ function bdProcesarTxt(file) {
   const reader = new FileReader();
   reader.onload = e => {
     const texto = e.target.result;
-    bdNumerosRaw = texto.split(/[\n,;\s]+/).map(n => n.trim()).filter(n => /^\d{1,4}$/.test(n)).map(n => n.padStart(4,'0'));
-    const total = Math.floor(bdNumerosRaw.length / 4);
+    const CIF = nvCifras();
+    const NPB = nvNumsPorBoleta();
+    bdNumerosRaw = texto.split(/[\n,;\s]+/).map(n => n.trim()).filter(n => new RegExp('^\\d{1,' + CIF + '}$').test(n)).map(n => n.padStart(CIF,'0'));
+    const total = Math.floor(bdNumerosRaw.length / NPB);
     const stats = document.getElementById('bd-stats');
     stats.style.display = 'block';
-    stats.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> ${bdNumerosRaw.length} números cargados → ${total} boletas (${bdNumerosRaw.length % 4 !== 0 ? (bdNumerosRaw.length % 4) + ' números sobrantes ignorados' : 'completo'})`;
+    stats.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#38a169" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> ${bdNumerosRaw.length} números cargados → ${total} boletas (${bdNumerosRaw.length % NPB !== 0 ? (bdNumerosRaw.length % NPB) + ' números sobrantes ignorados' : 'completo'})`;
     document.getElementById('bd-upload-label').innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> ${file.name} — ${total} boletas`;
     document.getElementById('bd-btn-generar').style.display = '';
     bdActualizarSelectorVendedor();
@@ -12576,17 +12622,18 @@ function bdActualizarSelectorVendedor() {
 }
 
 function bdGenerarBoletas() {
+  const NPB = nvNumsPorBoleta();
   // Usar editorNumerosBD como fuente principal (única base de datos)
-  const fuente = editorNumerosBD.length >= 4 ? editorNumerosBD : bdNumerosRaw;
-  if (fuente.length < 4) { toast('Primero carga el .txt en el Editor (Paso ①)', 'rojo'); return; }
+  const fuente = editorNumerosBD.length >= NPB ? editorNumerosBD : bdNumerosRaw;
+  if (fuente.length < NPB) { toast('Primero carga el .txt en el Editor (Paso ①)', 'rojo'); return; }
   const vendedorId = document.getElementById('bd-vendedor-sel').value;
   const vendedorNombre = vendedorId
     ? (allVendedores[vendedorId]?.nombre || 'Vendedor')
     : 'La Oficina';
 
   bdBoletas = [];
-  for (let i = 0; i + 3 < fuente.length; i += 4) {
-    const nums = [fuente[i], fuente[i+1], fuente[i+2], fuente[i+3]];
+  for (let i = 0; i + (NPB - 1) < fuente.length; i += NPB) {
+    const nums = fuente.slice(i, i + NPB);
     const ventaEntry = Object.entries(allBoletas).find(([, b]) =>
       nums.some(n => (b.numeros || '').split(',').map(x => x.trim()).includes(n))
     );
@@ -12594,7 +12641,7 @@ function bdGenerarBoletas() {
       nums,
       vendedorId,
       vendedorNombre,
-      idx: Math.floor(i / 4) + 1,
+      idx: Math.floor(i / NPB) + 1,
       ventaKey: ventaEntry ? ventaEntry[0] : null,
       venta: ventaEntry ? ventaEntry[1] : null
     });
@@ -12631,6 +12678,13 @@ function bdRenderGrid() {
   grid.innerHTML = bdBoletasFiltradas.map((b, i) => renderBoletaFisica(b, i)).join('');
 }
 
+// Casilla de número individual para las plantillas físicas: se omite si el valor no existe
+// (boletas con menos de 4 números por la config de numerosPorBoleta)
+function nvNumBoxHTML(n) {
+  if (!n) return '';
+  return `<div class="boleta-num-item"><div class="boleta-num-label">N°</div><div class="boleta-num-val">${n}</div></div>`;
+}
+
 function renderBoletaFisica(b, i) {
   const [n1, n2, n3, n4] = b.nums;
   const vNombre = b.vendedorNombre || 'La Oficina';
@@ -12650,8 +12704,7 @@ function renderBoletaFisica(b, i) {
               <span class="boleta-bono-copia">BONO COPIA</span>
               <!-- Números arriba -->
               <div class="boleta-nums-row" style="padding-left:12px">
-                <div class="boleta-num-item"><div class="boleta-num-label">N°</div><div class="boleta-num-val">${n1}</div></div>
-                <div class="boleta-num-item"><div class="boleta-num-label">N°</div><div class="boleta-num-val">${n2}</div></div>
+                ${nvNumBoxHTML(n1)}${nvNumBoxHTML(n2)}
               </div>
               <!-- Premio anticipado -->
               <div class="boleta-premio-box">
@@ -12673,20 +12726,17 @@ function renderBoletaFisica(b, i) {
               </div>
               <!-- Números abajo -->
               <div class="boleta-nums-row-bottom" style="padding-left:12px">
-                <div class="boleta-num-item"><div class="boleta-num-label">N°</div><div class="boleta-num-val">${n3}</div></div>
-                <div class="boleta-num-item"><div class="boleta-num-label">N°</div><div class="boleta-num-val">${n4}</div></div>
+                ${nvNumBoxHTML(n3)}${nvNumBoxHTML(n4)}
               </div>
             </div>
             <!-- Columna derecha anverso (igual a la izq sin texto BONO) -->
             <div class="boleta-anv-der">
               <div class="boleta-nums-row">
-                <div class="boleta-num-item"><div class="boleta-num-label">N°</div><div class="boleta-num-val">${n1}</div></div>
-                <div class="boleta-num-item"><div class="boleta-num-label">N°</div><div class="boleta-num-val">${n2}</div></div>
+                ${nvNumBoxHTML(n1)}${nvNumBoxHTML(n2)}
               </div>
               <div style="flex:1"></div>
               <div class="boleta-nums-row">
-                <div class="boleta-num-item"><div class="boleta-num-label">N°</div><div class="boleta-num-val">${n3}</div></div>
-                <div class="boleta-num-item"><div class="boleta-num-label">N°</div><div class="boleta-num-val">${n4}</div></div>
+                ${nvNumBoxHTML(n3)}${nvNumBoxHTML(n4)}
               </div>
               <div class="boleta-vendedor-tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ${vNombre}</div>
             </div>
@@ -12703,8 +12753,7 @@ function renderBoletaFisica(b, i) {
               </div>
               <div style="flex:1;display:flex;flex-direction:column;padding:5px 4px">
                 <div class="boleta-nums-row">
-                  <div class="boleta-num-item"><div class="boleta-num-label">N°</div><div class="boleta-num-val">${n1}</div></div>
-                  <div class="boleta-num-item"><div class="boleta-num-label">N°</div><div class="boleta-num-val">${n2}</div></div>
+                  ${nvNumBoxHTML(n1)}${nvNumBoxHTML(n2)}
                 </div>
                 <!-- Premio anticipado -->
                 <div style="border:1px solid #aaa;border-radius:3px;padding:2px 4px;margin:3px 0 2px">
@@ -12719,16 +12768,14 @@ function renderBoletaFisica(b, i) {
                   <div style="font-size:4.5px;color:#444;line-height:1.3;margin-top:1px">${(window._anv||{}).mayDet1||''}<br>${(window._anv||{}).mayDet2||''}<br>${(window._anv||{}).mayDet3||''}</div>
                 </div>
                 <div class="boleta-nums-row" style="margin-top:auto">
-                  <div class="boleta-num-item"><div class="boleta-num-label">N°</div><div class="boleta-num-val">${n3}</div></div>
-                  <div class="boleta-num-item"><div class="boleta-num-label">N°</div><div class="boleta-num-val">${n4}</div></div>
+                  ${nvNumBoxHTML(n3)}${nvNumBoxHTML(n4)}
                 </div>
               </div>
             </div>
             <!-- Der reverso: números + NOMBRE/TELÉFONO/ABONO + vendedor -->
             <div class="boleta-rev-der">
               <div class="boleta-nums-row">
-                <div class="boleta-num-item"><div class="boleta-num-label">N°</div><div class="boleta-num-val">${n1}</div></div>
-                <div class="boleta-num-item"><div class="boleta-num-label">N°</div><div class="boleta-num-val">${n2}</div></div>
+                ${nvNumBoxHTML(n1)}${nvNumBoxHTML(n2)}
               </div>
               <div style="flex:1;padding:4px 0;display:flex;flex-direction:column;justify-content:center;gap:4px">
                 ${(() => {
@@ -12769,8 +12816,7 @@ function renderBoletaFisica(b, i) {
                 ${vNombre ? `<div style="margin-top:2px;display:flex;align-items:center;gap:2px"><span style="font-size:5px;font-weight:700;color:#888">VENDEDOR:</span><span style="font-size:5px;color:#555">${vNombre}</span></div>` : ''}
               </div>
               <div class="boleta-nums-row">
-                <div class="boleta-num-item"><div class="boleta-num-label">N°</div><div class="boleta-num-val">${n3}</div></div>
-                <div class="boleta-num-item"><div class="boleta-num-label">N°</div><div class="boleta-num-val">${n4}</div></div>
+                ${nvNumBoxHTML(n3)}${nvNumBoxHTML(n4)}
               </div>
             </div>
           </div>
@@ -12807,10 +12853,11 @@ function editorMostrarCara(cara) {
 
 function editorActualizarReverso() {
   // Números: si hay cuarteto activo los usa, si no usa placeholders
-  const n1 = document.getElementById('enum1')?.value || '0000';
-  const n2 = document.getElementById('enum2')?.value || '0000';
-  const n3 = document.getElementById('enum3')?.value || '0000';
-  const n4 = document.getElementById('enum4')?.value || '0000';
+  const _ph = '0'.repeat(nvCifras());
+  const n1 = document.getElementById('enum1')?.value || _ph;
+  const n2 = document.getElementById('enum2')?.value || _ph;
+  const n3 = document.getElementById('enum3')?.value || _ph;
+  const n4 = document.getElementById('enum4')?.value || _ph;
   // Datos del vendedor (hidden inputs, se toman del sistema)
   const vNombre = document.getElementById('rev-vendedor')?.value || 'La Oficina';
   const vTel    = document.getElementById('rev-vendedor-tel')?.value || '';
@@ -12876,13 +12923,13 @@ function editorReversoHTML(n1, n2, n3, n4, vNombre, vTel, vDir) {
         <div style="font-size:7.5px;color:#777;line-height:1.3">${a.det2}${a.det3 ? ' · ' + a.det3 : ''}</div>
       </div>`).join('');
 
+  const numsBoxes = [n1, n2, n3, n4].slice(0, nvNumsPorBoleta()).map(n => `
+        <div style="text-align:center"><div style="font-size:8px;font-weight:700;color:#e74c3c;letter-spacing:1px">N°</div><div style="font-size:20px;font-weight:900;color:#e74c3c;font-family:'Bebas Neue',cursive;line-height:1">${n}</div></div>`).join('');
+
   return `<div style="background:#fff;border:2px solid #e0e0e0;border-radius:8px;display:flex;flex-direction:column;width:100%;overflow:hidden;font-family:Arial,sans-serif;box-sizing:border-box">
     <div style="display:flex;flex-direction:column;padding:8px 12px 2px;flex-shrink:0">
       <div style="display:flex;justify-content:space-around;margin-bottom:2px">
-        <div style="text-align:center"><div style="font-size:8px;font-weight:700;color:#e74c3c;letter-spacing:1px">N°</div><div style="font-size:20px;font-weight:900;color:#e74c3c;font-family:'Bebas Neue',cursive;line-height:1">${n1}</div></div>
-        <div style="text-align:center"><div style="font-size:8px;font-weight:700;color:#e74c3c;letter-spacing:1px">N°</div><div style="font-size:20px;font-weight:900;color:#e74c3c;font-family:'Bebas Neue',cursive;line-height:1">${n2}</div></div>
-        <div style="text-align:center"><div style="font-size:8px;font-weight:700;color:#e74c3c;letter-spacing:1px">N°</div><div style="font-size:20px;font-weight:900;color:#e74c3c;font-family:'Bebas Neue',cursive;line-height:1">${n3}</div></div>
-        <div style="text-align:center"><div style="font-size:8px;font-weight:700;color:#e74c3c;letter-spacing:1px">N°</div><div style="font-size:20px;font-weight:900;color:#e74c3c;font-family:'Bebas Neue',cursive;line-height:1">${n4}</div></div>
+        ${numsBoxes}
       </div>
     </div>
     <div style="display:flex;flex-direction:column;padding:4px 12px 8px;gap:6px;">
@@ -12901,15 +12948,15 @@ function anteriorCuarteto() {
   if (editorCuartetoIdx > 0) {
     editorCuartetoIdx--;
     asignarCuarteto(editorCuartetoIdx);
-    toast('Boleta ' + (editorCuartetoIdx + 1) + ' de ' + Math.floor(editorNumerosBD.length / 4), 'verde');
+    toast('Boleta ' + (editorCuartetoIdx + 1) + ' de ' + Math.floor(editorNumerosBD.length / nvNumsPorBoleta()), 'verde');
   }
 }
 
 async function editorGenerarTodasBoletas() {
   if (!editorImgSorteo) { toast('Primero sube la imagen del anverso', 'rojo'); return; }
-  if (editorNumerosBD.length < 4) { toast('Primero importa el .txt con los números', 'rojo'); return; }
+  if (editorNumerosBD.length < nvNumsPorBoleta()) { toast('Primero importa el .txt con los números', 'rojo'); return; }
 
-  const totalBoletas = Math.floor(editorNumerosBD.length / 4);
+  const totalBoletas = Math.floor(editorNumerosBD.length / nvNumsPorBoleta());
   const ok = await sjConfirm(
     `Generar ${totalBoletas} boletas`,
     'Esto sobreescribirá las boletas actuales en la tienda. ¿Deseas continuar?',
@@ -12976,9 +13023,10 @@ async function editorGenerarTodasBoletas() {
   // sin imágenes: cada boleta pesa ~60 bytes en lugar de ~80 KB
   estadoEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> Preparando boletas...';
   const todasLasBoletas = {};
-  for (let i = 0; i + 3 < editorNumerosBD.length; i += 4) {
-    const nums = [editorNumerosBD[i], editorNumerosBD[i+1], editorNumerosBD[i+2], editorNumerosBD[i+3]];
-    const idxBoleta = Math.floor(i / 4) + 1;
+  const NPB = nvNumsPorBoleta();
+  for (let i = 0; i + (NPB - 1) < editorNumerosBD.length; i += NPB) {
+    const nums = editorNumerosBD.slice(i, i + NPB);
+    const idxBoleta = Math.floor(i / NPB) + 1;
     const key = 'b' + String(idxBoleta).padStart(5,'0');
     todasLasBoletas[key] = {
       n1: nums[0], n2: nums[1], n3: nums[2], n4: nums[3],
@@ -13677,13 +13725,14 @@ function _distribuirCargarColumna(lado) {
     const asignadasTotal = new Set();
     Object.entries(allVendedores).forEach(([vid, v]) => {
       if (vid !== otraId) { // no excluir las del vendedor que está en la otra columna
-        (v.boletasAsignadas || []).forEach(n => asignadasTotal.add(String(n).padStart(4,'0')));
+        (v.boletasAsignadas || []).forEach(n => asignadasTotal.add(String(n).padStart(nvCifras(),'0')));
       }
     });
     const lista = [];
-    if (editorNumerosBD.length >= 4) {
-      for (let i = 0; i + 3 < editorNumerosBD.length; i += 4) {
-        const nums = [editorNumerosBD[i], editorNumerosBD[i+1], editorNumerosBD[i+2], editorNumerosBD[i+3]];
+    if (editorNumerosBD.length >= nvNumsPorBoleta()) {
+      const NPB = nvNumsPorBoleta();
+      for (let i = 0; i + (NPB - 1) < editorNumerosBD.length; i += NPB) {
+        const nums = editorNumerosBD.slice(i, i + NPB);
         if (nums.some(n => asignadasTotal.has(n)) || nums.some(n => otrasNums.has(n))) continue;
         if (nums.some(n => numsPagadas.has(n))) continue;
         const bkey = n1ToKey[nums[0]];
@@ -13699,12 +13748,13 @@ function _distribuirCargarColumna(lado) {
     const v = allVendedores[id];
     if (!v) { if (lado === 'izq') distIzq = []; else distDer = []; distribuirRenderLista(lado); return; }
     const asignadas = v.boletasAsignadas || [];
-    const asignadasSet = new Set(asignadas.map(n => String(n).padStart(4,'0')));
+    const asignadasSet = new Set(asignadas.map(n => String(n).padStart(nvCifras(),'0')));
     const lista = [];
-    if (editorNumerosBD.length >= 4) {
-      for (let i = 0; i + 3 < editorNumerosBD.length; i += 4) {
-        const nums = [editorNumerosBD[i], editorNumerosBD[i+1], editorNumerosBD[i+2], editorNumerosBD[i+3]];
-        if (!nums.some(n => asignadasSet.has(String(n).padStart(4,'0')))) continue;
+    if (editorNumerosBD.length >= nvNumsPorBoleta()) {
+      const NPB = nvNumsPorBoleta();
+      for (let i = 0; i + (NPB - 1) < editorNumerosBD.length; i += NPB) {
+        const nums = editorNumerosBD.slice(i, i + NPB);
+        if (!nums.some(n => asignadasSet.has(String(n).padStart(nvCifras(),'0')))) continue;
         if (nums.some(n => otrasNums.has(n))) continue;
         if (nums.some(n => numsPagadas.has(n))) continue;
         const bkey = n1ToKey[nums[0]];
@@ -13713,8 +13763,9 @@ function _distribuirCargarColumna(lado) {
         lista.push({ nums, checked: false, id: nums.join('-') });
       }
     } else {
-      for (let i = 0; i + 3 < asignadas.length; i += 4) {
-        const nums = [asignadas[i], asignadas[i+1], asignadas[i+2], asignadas[i+3]];
+      const NPB2 = nvNumsPorBoleta();
+      for (let i = 0; i + (NPB2 - 1) < asignadas.length; i += NPB2) {
+        const nums = asignadas.slice(i, i + NPB2);
         if (nums.some(n => otrasNums.has(n))) continue;
         if (nums.some(n => numsPagadas.has(n))) continue;
         const bkey = n1ToKey[nums[0]];
@@ -14031,19 +14082,20 @@ function distribuirBuscarNum(query) {
   // Buscar en todos los vendedores de allVendedores
   const resultados = []; // [{nombre, tipo:'vendedor'|'oficina', id}]
 
-  // Construir mapa índice → {n1,n2,n3,n4} desde editorNumerosBD
-  // Cada boleta son 4 números consecutivos: índice de boleta = Math.floor(i/4)
-  const numABoleta = {}; // num → {idx, n1,n2,n3,n4}
-  if (editorNumerosBD.length >= 4) {
-    for (let i = 0; i + 3 < editorNumerosBD.length; i += 4) {
-      const boletaIdx = Math.floor(i / 4);
-      const nums = [editorNumerosBD[i], editorNumerosBD[i+1], editorNumerosBD[i+2], editorNumerosBD[i+3]];
+  // Construir mapa índice → {idx, nums} desde editorNumerosBD
+  // Cada boleta son numerosPorBoleta números consecutivos
+  const numABoleta = {}; // num → {idx, nums}
+  const NPB = nvNumsPorBoleta();
+  if (editorNumerosBD.length >= NPB) {
+    for (let i = 0; i + (NPB - 1) < editorNumerosBD.length; i += NPB) {
+      const boletaIdx = Math.floor(i / NPB);
+      const nums = editorNumerosBD.slice(i, i + NPB);
       nums.forEach(n => { numABoleta[n] = { idx: boletaIdx, nums }; });
     }
   }
 
   // Normalizar query: rellenar con ceros a la izquierda si es numérico
-  const qPad = /^\d+$/.test(q) ? q.padStart(4, '0') : q;
+  const qPad = /^\d+$/.test(q) ? q.padStart(nvCifras(),'0') : q;
 
   // Encontrar qué boleta(s) contienen ese número
   const boletasMatch = new Set();
@@ -14089,8 +14141,8 @@ function distribuirBuscarNum(query) {
   }
 
   el.innerHTML = resultados.map(r => {
-    const base = r.idx * 4;
-    const boleta = { idx: r.idx, nums: [editorNumerosBD[base], editorNumerosBD[base+1], editorNumerosBD[base+2], editorNumerosBD[base+3]] };
+    const base = r.idx * nvNumsPorBoleta();
+    const boleta = { idx: r.idx, nums: editorNumerosBD.slice(base, base + nvNumsPorBoleta()) };
     const nums = boleta ? boleta.nums.filter(Boolean) : [];
     const numsHTML = nums.map(n => `<span style="font-family:'Bebas Neue',cursive;font-size:15px;background:#fff5f5;color:#e74c3c;border:1px solid #fcc;border-radius:5px;padding:2px 7px">${n}</span>`).join(' ');
     const icono = r.tipo === 'oficina'
@@ -14100,7 +14152,7 @@ function distribuirBuscarNum(query) {
     const borde = r.tipo === 'oficina' ? 'var(--verde)' : 'var(--magenta)';
     const color = r.tipo === 'oficina' ? 'var(--azul-dark)' : 'var(--magenta)';
     // Estado anulada desde allBoletasPlantilla
-    const bpKey = nums.length ? Object.keys(allBoletasPlantilla || {}).find(k => String(allBoletasPlantilla[k].n1).padStart(4,'0') === String(nums[0]).padStart(4,'0')) : null;
+    const bpKey = nums.length ? Object.keys(allBoletasPlantilla || {}).find(k => String(allBoletasPlantilla[k].n1).padStart(nvCifras(),'0') === String(nums[0]).padStart(nvCifras(),'0')) : null;
     const esAnulada = bpKey && allBoletasPlantilla[bpKey]?.anulada === true;
     // Detectar si tiene un pedido activo (pendiente o confirmado)
     let estadoPedido = null;
