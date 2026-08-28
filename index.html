@@ -5274,7 +5274,7 @@ function cargarDatos() {
           const nums = [];
           Object.values(allBoletasPlantilla)
             .sort((a, b) => (a.idx||0)-(b.idx||0))
-            .forEach(b => { if (b.n1) nums.push(b.n1,b.n2,b.n3,b.n4); });
+            .forEach(b => { if (b.n1) nums.push(...[b.n1,b.n2,b.n3,b.n4].filter(Boolean)); });
           editorNumerosBD = nums;
         }
       }
@@ -5345,7 +5345,7 @@ function cargarDatos() {
         const nums = [];
         Object.values(allBoletasPlantilla)
           .sort((a, b) => (a.idx || 0) - (b.idx || 0))
-          .forEach(b => { if (b.n1) nums.push(b.n1, b.n2, b.n3, b.n4); });
+          .forEach(b => { if (b.n1) nums.push(...[b.n1, b.n2, b.n3, b.n4].filter(Boolean)); });
         editorNumerosBD = nums;
       }
       renderDashboard();
@@ -13180,7 +13180,7 @@ async function cargarEstadoEditor() {
       const nums = [];
       Object.values(boletas)
         .sort((a, b) => (a.idx || 0) - (b.idx || 0))
-        .forEach(b => { if (b.n1) nums.push(b.n1, b.n2, b.n3, b.n4); });
+        .forEach(b => { if (b.n1) nums.push(...[b.n1, b.n2, b.n3, b.n4].filter(Boolean)); });
       editorNumerosBD = nums;
       editorCuartetoIdx = 0;
       const count = nums.length;
@@ -13902,7 +13902,7 @@ function distribuirInit() {
       const nums = [];
       Object.values(boletas)
         .sort((a, b) => (a.idx || 0) - (b.idx || 0))
-        .forEach(b => { if (b.n1) nums.push(b.n1, b.n2, b.n3, b.n4); });
+        .forEach(b => { if (b.n1) nums.push(...[b.n1, b.n2, b.n3, b.n4].filter(Boolean)); });
       editorNumerosBD = nums;
       if (!Object.keys(allBoletasPlantilla).length) allBoletasPlantilla = boletas;
     }
