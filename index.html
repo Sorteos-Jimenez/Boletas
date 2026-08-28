@@ -4216,14 +4216,19 @@
           var c = document.getElementById('tienda-banner-carrusel');
           var dotsWrap = document.getElementById('tienda-banner-dots');
           if (!c || !dotsWrap) return;
-          if (c._bannerAuto) { clearInterval(c._bannerAuto); c._bannerAuto = null; }
+          if (c._bannerAuto) { clearTimeout(c._bannerAuto); c._bannerAuto = null; }
           clearTimeout(c._resumeT);
+          if (c._videoEndEl && c._videoEndHandler) { c._videoEndEl.removeEventListener('ended', c._videoEndHandler); }
+          c._videoEndEl = null;
+          c._videoEndHandler = null;
+          if (c._ytMsgHandler) { window.removeEventListener('message', c._ytMsgHandler); c._ytMsgHandler = null; }
           var list = (Array.isArray(banners) && banners.length) ? banners : window.DEFAULT_TIENDA_BANNERS;
           var ms = (typeof intervalMs === 'number' && intervalMs >= 1000) ? intervalMs : 4500;
           c.innerHTML = list.map(function(b) {
             var safeAlt = (b.alt || '').replace(/"/g, '&quot;');
             if (b.type === 'video_embed' && b.platform === 'youtube') {
-              return '<iframe src="' + b.src + '" style="width:100%;height:100%;border:0;display:block" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+              var ytSrc = b.src + (b.src.indexOf('?') === -1 ? '?' : '&') + 'enablejsapi=1';
+              return '<iframe src="' + ytSrc + '" style="width:100%;height:100%;border:0;display:block" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
             }
             if (b.type === 'video_embed' && b.platform === 'tiktok') {
               return '<div style="width:100%;height:100%;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center">' +
@@ -4232,11 +4237,11 @@
             }
             if (b.type === 'video_embed' && b.platform === 'facebook') {
               return '<div style="width:100%;height:100%;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center">' +
-                '<div class="fb-video" data-href="' + (b.url || '').replace(/"/g, '&quot;') + '" data-width="auto" data-height="auto" data-show-text="false" data-autoplay="true"></div>' +
+                '<div class="fb-video" data-href="' + (b.url || '').replace(/"/g, '&quot;') + '" data-width="300" data-show-text="false" data-autoplay="true"></div>' +
                 '</div>';
             }
             if (b.type === 'video') {
-              return '<video src="' + b.src + '" autoplay muted loop playsinline></video>';
+              return '<video src="' + b.src + '" autoplay muted playsinline></video>';
             }
             return '<img src="' + b.src + '" alt="' + safeAlt + '" style="cursor:zoom-in" onclick="tiendaZoomBanner(\'' + b.src.replace(/'/g, "\\'") + '\',\'' + safeAlt.replace(/'/g, "\\'") + '\')">';
           }).join('');
@@ -4253,15 +4258,54 @@
           var n = list.length;
           if (!n) return;
           function goTo(i) { c.scrollTo({ left: i * c.clientWidth, behavior: 'smooth' }); }
+          function limpiarEsperaVideo() {
+            if (c._videoEndEl && c._videoEndHandler) { c._videoEndEl.removeEventListener('ended', c._videoEndHandler); }
+            c._videoEndEl = null;
+            c._videoEndHandler = null;
+            if (c._ytMsgHandler) { window.removeEventListener('message', c._ytMsgHandler); c._ytMsgHandler = null; }
+          }
+          function programarSiguiente() {
+            if (n < 2) return;
+            clearTimeout(c._bannerAuto);
+            limpiarEsperaVideo();
+            var i = Math.round(c.scrollLeft / c.clientWidth);
+            var actual = list[i];
+            var slideEl = c.children[i];
+            var videoEl = slideEl ? slideEl.querySelector('video') : null;
+            var esYoutube = !!(actual && actual.type === 'video_embed' && actual.platform === 'youtube');
+            function avanzar() {
+              limpiarEsperaVideo();
+              goTo((i + 1) % n);
+              c._bannerAuto = setTimeout(programarSiguiente, 500);
+            }
+            if (videoEl) {
+              // Video propio: espera a que termine (evento "ended") antes de pasar a la siguiente imagen
+              c._videoEndEl = videoEl;
+              c._videoEndHandler = avanzar;
+              videoEl.addEventListener('ended', avanzar, { once: true });
+              c._bannerAuto = setTimeout(avanzar, 60000); // respaldo por si el video no dispara "ended"
+            } else if (esYoutube && slideEl) {
+              // YouTube: escucha el estado del reproductor vía postMessage y avanza cuando termina (estado 0)
+              c._ytMsgHandler = function(e) {
+                var datos;
+                try { datos = JSON.parse(e.data); } catch (err) { return; }
+                if (datos && datos.event === 'onStateChange' && datos.info === 0) avanzar();
+              };
+              window.addEventListener('message', c._ytMsgHandler);
+              c._bannerAuto = setTimeout(avanzar, 60000); // respaldo por si YouTube no informa el fin
+            } else {
+              // Imagen, TikTok o Facebook: no hay forma fiable de detectar el fin del video embebido,
+              // así que se conserva el tiempo de transición configurado para estos casos.
+              c._bannerAuto = setTimeout(avanzar, ms);
+            }
+          }
           function start() {
             if (n < 2) return;
-            c._bannerAuto = setInterval(function() {
-              var i = Math.round(c.scrollLeft / c.clientWidth);
-              goTo((i + 1) % n);
-            }, ms);
+            programarSiguiente();
           }
           function stopTemp() {
-            if (c._bannerAuto) { clearInterval(c._bannerAuto); c._bannerAuto = null; }
+            clearTimeout(c._bannerAuto);
+            limpiarEsperaVideo();
             clearTimeout(c._resumeT);
             c._resumeT = setTimeout(start, 6000);
           }
@@ -5003,6 +5047,7 @@ let filtroEstado = '';
   }
 
   if (codigoV) {
+    window._tiendaAutoAbrir = true;
     const timer = setInterval(() => {
       if (window._db) {
         clearInterval(timer);
@@ -11615,6 +11660,7 @@ async function abrirTienda(codigoVendedor) {
   }
 
   document.getElementById('tienda-loading').style.display = 'none';
+  if (typeof window._ocultarPreLoaderApp === 'function') window._ocultarPreLoaderApp();
 
   if (!Object.keys(tiendaBoletas).length) {
     document.getElementById('tienda-grid').innerHTML =
@@ -15388,13 +15434,23 @@ function onRecaptchaLoad() {
     document.body.classList.remove('pl-bloqueado');
     setTimeout(function(){ if(pl && pl.parentNode) pl.parentNode.removeChild(pl); }, 400);
   }
-  if(document.readyState === 'complete'){
-    ocultarPreLoader();
+  // Si se detectó un link de tienda (?v=, /Boletas/usuario, etc.), la precarga debe
+  // esperar a que abrirTienda() termine de traer los datos de Firebase, en vez de
+  // ocultarse apenas terminan de cargar los recursos estáticos (window.load).
+  window._ocultarPreLoaderApp = ocultarPreLoader;
+  if (window._tiendaAutoAbrir) {
+    // Respaldo: si algo falla y abrirTienda() nunca llama a _ocultarPreLoaderApp(),
+    // no dejar al usuario bloqueado indefinidamente.
+    setTimeout(ocultarPreLoader, 12000);
   } else {
-    window.addEventListener('load', ocultarPreLoader);
+    if(document.readyState === 'complete'){
+      ocultarPreLoader();
+    } else {
+      window.addEventListener('load', ocultarPreLoader);
+    }
+    // Seguro: si algo tarda demasiado (imagen lenta, etc.), no dejar al usuario bloqueado
+    setTimeout(ocultarPreLoader, 4000);
   }
-  // Seguro: si algo tarda demasiado (imagen lenta, etc.), no dejar al usuario bloqueado
-  setTimeout(ocultarPreLoader, 4000);
 })();
 </script>
 </body>
