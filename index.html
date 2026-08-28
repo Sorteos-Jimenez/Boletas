@@ -2968,7 +2968,12 @@
   }
 </style>
 </head>
-<body>
+<body class="pl-bloqueado">
+
+<div id="pre-loader">
+  <div class="pl-spinner"></div>
+  <div class="pl-texto">Cargando...</div>
+</div>
 
 <!-- ===== MODAL SELECTOR VENDEDOR ===== -->
 <div id="modal-sel-vendedor" onclick="if(event.target===this)cerrarModalSelVendedor()">
@@ -12704,6 +12709,29 @@ function imprimirBoleta() {
   win.document.write(`<!DOCTYPE html><html><head><title>Boleta</title>
     <style>body{margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#fff}
     img{max-width:100%;height:auto}@media print{body{min-height:0}}</style></head>
+
+<style id="pre-loader-style">
+  #pre-loader{
+    position:fixed; inset:0; z-index:999999;
+    background:linear-gradient(160deg,#1c2e7a 0%,#16215c 45%,#0e1640 100%);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:18px;
+    transition:opacity .35s ease, visibility .35s ease;
+  }
+  #pre-loader.oculto{ opacity:0; visibility:hidden; pointer-events:none; }
+  #pre-loader .pl-spinner{
+    width:56px; height:56px; border-radius:50%;
+    border:5px solid rgba(255,255,255,.25);
+    border-top-color:#ffd400;
+    animation:pl-girar .8s linear infinite;
+  }
+  #pre-loader .pl-texto{
+    color:#fff; font-family:'Nunito',sans-serif; font-weight:700;
+    font-size:15px; letter-spacing:.3px; opacity:.9;
+  }
+  @keyframes pl-girar{ to{ transform:rotate(360deg); } }
+  body.pl-bloqueado{ overflow:hidden; }
+</style>
     <body><img src="${dataUrl}"><script>window.onload=function(){window.print();}<\/script></body></html>`);
   win.document.close();
 }
@@ -15194,6 +15222,26 @@ function onRecaptchaLoad() {
     sitekey: '6LekgxYtAAAAALN2cNOMpMbC1m61TeFCyaX00ht9'
   });
 }
+</script>
+
+<script>
+// ===== PRE-LOADER: ocultar cuando la p\u00e1gina termina de cargar =====
+(function(){
+  function ocultarPreLoader(){
+    var pl = document.getElementById('pre-loader');
+    if(!pl) return;
+    pl.classList.add('oculto');
+    document.body.classList.remove('pl-bloqueado');
+    setTimeout(function(){ if(pl && pl.parentNode) pl.parentNode.removeChild(pl); }, 400);
+  }
+  if(document.readyState === 'complete'){
+    ocultarPreLoader();
+  } else {
+    window.addEventListener('load', ocultarPreLoader);
+  }
+  // Seguro: si algo tarda demasiado (imagen lenta, etc.), no dejar al usuario bloqueado
+  setTimeout(ocultarPreLoader, 4000);
+})();
 </script>
 </body>
 </html>
