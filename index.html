@@ -11050,31 +11050,24 @@ async function abrirTienda(codigoVendedor) {
         return null;
       }
 
-      // Genera el HTML del contador estilo "píldora" con más brillo y energía (glow + degradado)
+      // Genera el HTML del contador estilo "reloj flip" (tarjetas volteables tipo aeropuerto)
       function countdownBlocksHTML(id) {
-        return `<div id="${id}" style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px;border-radius:22px;overflow:hidden;background:var(--dark);padding:10px 16px">
-          <svg width="44" height="44" viewBox="0 0 100 100" style="flex-shrink:0">
-            <circle cx="50" cy="50" r="46" fill="#0b1230" stroke="var(--amarillo)" stroke-width="4"/>
-            <circle cx="50" cy="8"  r="2.4" fill="var(--amarillo)" opacity="0.7"/>
-            <circle cx="50" cy="92" r="2.4" fill="var(--amarillo)" opacity="0.7"/>
-            <circle cx="8"  cy="50" r="2.4" fill="var(--amarillo)" opacity="0.7"/>
-            <circle cx="92" cy="50" r="2.4" fill="var(--amarillo)" opacity="0.7"/>
-            <line id="${id}-hh" x1="50" y1="50" x2="50" y2="30" stroke="var(--amarillo)" stroke-width="5" stroke-linecap="round" style="transform-origin:50px 50px"/>
-            <line id="${id}-mm" x1="50" y1="50" x2="50" y2="20" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" style="transform-origin:50px 50px"/>
-            <line id="${id}-ss" x1="50" y1="50" x2="50" y2="15" stroke="var(--rojo)" stroke-width="2" stroke-linecap="round" style="transform-origin:50px 50px"/>
-            <circle cx="50" cy="50" r="4.5" fill="var(--amarillo)"/>
-          </svg>
-          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:150px">
-            <div style="display:flex;align-items:baseline;justify-content:center;gap:8px">
-              <span class="cnt-d" style="font-size:25px;font-weight:900;color:var(--amarillo);line-height:1">--</span>
-              <span style="font-size:17px;font-weight:700;color:var(--amarillo);opacity:.55">|</span>
-              <span style="font-size:25px;font-weight:900;color:var(--amarillo);line-height:1"><span class="cnt-h">--</span>:<span class="cnt-m">--</span>:<span class="cnt-s">--</span></span>
+        const grupo = (pref, label) => `
+          <div class="flip-group">
+            <div class="flip-pair">
+              <div class="flip-card"><div class="flip-num" id="${id}-${pref}0">0</div></div>
+              <div class="flip-card"><div class="flip-num" id="${id}-${pref}1">0</div></div>
             </div>
-            <div style="display:flex;justify-content:space-between;width:100%;margin-top:4px;padding:0 3px">
-              <span style="font-size:8.5px;font-weight:900;color:var(--amarillo);opacity:.85;text-transform:uppercase;letter-spacing:.4px">Días</span>
-              <span style="font-size:8.5px;font-weight:900;color:var(--amarillo);opacity:.85;text-transform:uppercase;letter-spacing:.4px">Horas</span>
-            </div>
-          </div>
+            <div class="flip-lbl">${label}</div>
+          </div>`;
+        return `<div id="${id}" class="flip-clock">
+          ${grupo('d', 'Días')}
+          <div class="flip-colon">:</div>
+          ${grupo('h', 'Hrs')}
+          <div class="flip-colon">:</div>
+          ${grupo('m', 'Mins')}
+          <div class="flip-colon">:</div>
+          ${grupo('s', 'Secs')}
         </div>`;
       }
 
@@ -11183,6 +11176,82 @@ async function abrirTienda(codigoVendedor) {
               padding: 5px 12px;
               letter-spacing: .2px;
             }
+            .flip-clock {
+              display: flex;
+              align-items: flex-start;
+              justify-content: center;
+              gap: 6px;
+              margin-top: 10px;
+              background: #14141c;
+              border-radius: 16px;
+              padding: 10px 12px;
+              box-shadow: 0 3px 10px rgba(0,0,0,.35), 0 0 0 3px rgba(255,255,255,.04) inset;
+            }
+            .flip-group {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 4px;
+            }
+            .flip-pair {
+              position: relative;
+              display: flex;
+              gap: 3px;
+            }
+            .flip-pair::before, .flip-pair::after {
+              content: '';
+              position: absolute;
+              top: 50%;
+              width: 4px;
+              height: 4px;
+              border-radius: 50%;
+              background: #555;
+              transform: translateY(-50%);
+              z-index: 3;
+            }
+            .flip-pair::before { left: -3px; }
+            .flip-pair::after  { right: -3px; }
+            .flip-card {
+              position: relative;
+              width: 24px;
+              height: 32px;
+              background: linear-gradient(180deg,#3a3a44,#232329);
+              border-radius: 5px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              box-shadow: 0 1px 2px rgba(0,0,0,.5) inset, 0 1px 0 rgba(255,255,255,.05);
+              overflow: hidden;
+            }
+            .flip-card::before {
+              content: '';
+              position: absolute;
+              left: 0; right: 0; top: 50%;
+              height: 1px;
+              background: rgba(0,0,0,.55);
+              z-index: 2;
+            }
+            .flip-num {
+              font-family: 'Nunito', sans-serif;
+              font-size: 18px;
+              font-weight: 900;
+              color: #fff;
+              line-height: 1;
+            }
+            .flip-colon {
+              color: var(--amarillo);
+              font-size: 16px;
+              font-weight: 900;
+              margin-top: 8px;
+            }
+            .flip-lbl {
+              font-size: 7.5px;
+              font-weight: 900;
+              letter-spacing: .5px;
+              color: var(--amarillo);
+              text-transform: uppercase;
+              opacity: .9;
+            }
           `;
           document.head.appendChild(s);
         }
@@ -11221,11 +11290,14 @@ async function abrirTienda(codigoVendedor) {
             const mins = Math.floor((diff % 3600000)  / 60000);
             const secs = Math.floor((diff % 60000)    / 1000);
             const pad = n => String(n).padStart(2, '0');
-            if (el.querySelector('.cnt-d')) {
-              el.querySelector('.cnt-d').textContent = pad(days);
-              el.querySelector('.cnt-h').textContent = pad(hrs);
-              el.querySelector('.cnt-m').textContent = pad(mins);
-              el.querySelector('.cnt-s').textContent = pad(secs);
+            const ddStr = pad(Math.min(days, 99));
+            const hhStr = pad(hrs), mmStr = pad(mins), ssStr = pad(secs);
+            const setDigit = (suf, val) => { const e = document.getElementById(id + '-' + suf); if (e) e.textContent = val; };
+            if (document.getElementById(id + '-d0')) {
+              setDigit('d0', ddStr[0]); setDigit('d1', ddStr[1]);
+              setDigit('h0', hhStr[0]); setDigit('h1', hhStr[1]);
+              setDigit('m0', mmStr[0]); setDigit('m1', mmStr[1]);
+              setDigit('s0', ssStr[0]); setDigit('s1', ssStr[1]);
             }
             // Reloj analógico: las manecillas representan el tiempo restante (HH:MM:SS, ciclo de 12h)
             const hh = document.getElementById(id + '-hh');
