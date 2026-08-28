@@ -2934,6 +2934,19 @@
     .vd-flip-wrap:hover .vd-flip-hint { display: block; }
   }
 
+  /* ===== RESPONSIVE: PANTALLAS ANCHAS (1440px+) — tienda pública ===== */
+  @media (min-width: 1440px) {
+    /* Tienda: aprovechar mejor el ancho disponible */
+    .tienda-body { max-width: 1400px; padding: 28px 40px; }
+
+    /* Grid boletas tienda: 5 columnas */
+    .boletas-grid { grid-template-columns: repeat(5, 1fr); gap: 22px; }
+
+    /* Header de tienda con más aire */
+    .tienda-header { padding: 40px 48px; }
+    .tienda-header h1 { font-size: 58px; }
+  }
+
   /* ===== HOVER EFFECTS (solo dispositivos con puntero) ===== */
   @media (hover: hover) and (pointer: fine) {
     .tab-btn:hover:not(.active) {
