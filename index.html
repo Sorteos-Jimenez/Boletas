@@ -2966,6 +2966,27 @@
     .vendedor-card:hover { background: var(--gris); border-radius: 12px; }
     .boleta-item:hover  { background: var(--gris); border-radius: 8px; margin: 0 -8px; padding: 12px 8px; }
   }
+
+  #pre-loader{
+    position:fixed; inset:0; z-index:999999;
+    background:linear-gradient(160deg,#1c2e7a 0%,#16215c 45%,#0e1640 100%);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:18px;
+    transition:opacity .35s ease, visibility .35s ease;
+  }
+  #pre-loader.oculto{ opacity:0; visibility:hidden; pointer-events:none; }
+  #pre-loader .pl-spinner{
+    width:56px; height:56px; border-radius:50%;
+    border:5px solid rgba(255,255,255,.25);
+    border-top-color:#ffd400;
+    animation:pl-girar .8s linear infinite;
+  }
+  #pre-loader .pl-texto{
+    color:#fff; font-family:'Nunito',sans-serif; font-weight:700;
+    font-size:15px; letter-spacing:.3px; opacity:.9;
+  }
+  @keyframes pl-girar{ to{ transform:rotate(360deg); } }
+  body.pl-bloqueado{ overflow:hidden; }
 </style>
 </head>
 <body class="pl-bloqueado">
@@ -12709,29 +12730,6 @@ function imprimirBoleta() {
   win.document.write(`<!DOCTYPE html><html><head><title>Boleta</title>
     <style>body{margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#fff}
     img{max-width:100%;height:auto}@media print{body{min-height:0}}</style></head>
-
-<style id="pre-loader-style">
-  #pre-loader{
-    position:fixed; inset:0; z-index:999999;
-    background:linear-gradient(160deg,#1c2e7a 0%,#16215c 45%,#0e1640 100%);
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:18px;
-    transition:opacity .35s ease, visibility .35s ease;
-  }
-  #pre-loader.oculto{ opacity:0; visibility:hidden; pointer-events:none; }
-  #pre-loader .pl-spinner{
-    width:56px; height:56px; border-radius:50%;
-    border:5px solid rgba(255,255,255,.25);
-    border-top-color:#ffd400;
-    animation:pl-girar .8s linear infinite;
-  }
-  #pre-loader .pl-texto{
-    color:#fff; font-family:'Nunito',sans-serif; font-weight:700;
-    font-size:15px; letter-spacing:.3px; opacity:.9;
-  }
-  @keyframes pl-girar{ to{ transform:rotate(360deg); } }
-  body.pl-bloqueado{ overflow:hidden; }
-</style>
     <body><img src="${dataUrl}"><script>window.onload=function(){window.print();}<\/script></body></html>`);
   win.document.close();
 }
