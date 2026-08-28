@@ -9608,8 +9608,8 @@ function cfgDetectarVideoEmbed(url) {
     return { platform: 'tiktok', label: 'TikTok', embedUrl: `https://www.tiktok.com/embed/v2/${m[1]}` };
   }
 
-  // Facebook (facebook.com/.../videos/..., fb.watch/...)
-  if (/facebook\.com\/.*\/videos\/|fb\.watch\//i.test(u)) {
+  // Facebook (facebook.com/.../videos/..., /share/r/..., /share/v/..., /reel/..., /watch/?v=..., fb.watch/...)
+  if (/facebook\.com\/.*\/videos\/|facebook\.com\/share\/[rv]\/|facebook\.com\/reel\/|facebook\.com\/watch\/?\?v=|facebook\.com\/video\.php\?v=|fb\.watch\//i.test(u)) {
     return { platform: 'facebook', label: 'Facebook', embedUrl: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(u)}&show_text=false` };
   }
 
