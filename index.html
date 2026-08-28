@@ -1340,7 +1340,8 @@
   .tienda-banner-carrusel::-webkit-scrollbar { display: none; }
   .tienda-banner-carrusel img,
   .tienda-banner-carrusel video,
-  .tienda-banner-carrusel iframe {
+  .tienda-banner-carrusel iframe,
+  .tienda-banner-carrusel > div {
     flex: 0 0 100%;
     width: 100%;
     height: 100%;
@@ -3664,7 +3665,7 @@
             </div>
             <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
               <input type="text" id="cfg-banner-video-link" placeholder="Pega un enlace de Facebook, TikTok o YouTube" style="flex:1;min-width:220px;padding:9px 12px;border:2px solid var(--borde);border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px">
-              <button type="button" onclick="cfgAgregarBannerVideoLink()" style="display:flex;align-items:center;gap:6px;padding:9px 16px;border:none;border-radius:10px;background:var(--verde);color:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer">
+              <button type="button" id="cfg-banner-video-btn" onclick="cfgAgregarBannerVideoLink()" style="display:flex;align-items:center;gap:6px;padding:9px 16px;border:none;border-radius:10px;background:var(--verde);color:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer">
                 <span style="font-size:16px;line-height:1">▶</span> Agregar video por enlace
               </button>
             </div>
@@ -9661,6 +9662,12 @@ function cfgDetectarVideoEmbed(url) {
     return { platform: 'tiktok', label: 'TikTok', videoId: m[1], url: u };
   }
 
+  // TikTok — enlace corto (vt.tiktok.com/..., vm.tiktok.com/...) o cualquier otro formato de
+  // tiktok.com sin el ID visible: hay que resolverlo con el oEmbed oficial de TikTok
+  if (/tiktok\.com/i.test(u)) {
+    return { platform: 'tiktok', label: 'TikTok', videoId: '', url: u, necesitaResolver: true };
+  }
+
   // Facebook (facebook.com/.../videos/..., /share/r/..., /share/v/..., /reel/..., /watch/?v=..., fb.watch/...)
   // usa el SDK oficial de Facebook, que sí resuelve enlaces cortos/compartidos correctamente
   if (/facebook\.com\/.*\/videos\/|facebook\.com\/share\/[rv]\/|facebook\.com\/reel\/|facebook\.com\/watch\/?\?v=|facebook\.com\/video\.php\?v=|fb\.watch\//i.test(u)) {
@@ -9715,9 +9722,10 @@ function cfgAgregarBannerArchivo(input) {
   input.value = '';
 }
 
-function cfgAgregarBannerVideoLink() {
+async function cfgAgregarBannerVideoLink() {
   const input = document.getElementById('cfg-banner-video-link');
   const errorBox = document.getElementById('cfg-banner-video-error');
+  const btn = document.getElementById('cfg-banner-video-btn');
   if (!input) return;
   const url = input.value.trim();
   errorBox.style.display = 'none';
@@ -9727,6 +9735,28 @@ function cfgAgregarBannerVideoLink() {
     errorBox.textContent = 'No se reconoció el enlace. Usa un link de Facebook, TikTok o YouTube.';
     errorBox.style.display = 'block';
     return;
+  }
+  if (info.necesitaResolver) {
+    const textoOriginal = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.style.opacity = '0.6'; btn.innerHTML = 'Resolviendo enlace...'; }
+    try {
+      const resp = await fetch('https://www.tiktok.com/oembed?url=' + encodeURIComponent(url));
+      if (!resp.ok) throw new Error('respuesta no ok');
+      const data = await resp.json();
+      let videoId = data.embed_product_id || '';
+      if (!videoId && data.html) {
+        const m2 = data.html.match(/data-video-id="(\d+)"/);
+        if (m2) videoId = m2[1];
+      }
+      if (!videoId) throw new Error('sin id de video');
+      info.videoId = videoId;
+    } catch (e) {
+      errorBox.textContent = 'No se pudo resolver ese enlace corto de TikTok. Abre el video en TikTok, copia el enlace completo (el que contiene "/video/") y pégalo aquí.';
+      errorBox.style.display = 'block';
+      if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.innerHTML = textoOriginal; }
+      return;
+    }
+    if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.innerHTML = textoOriginal; }
   }
   _cfgBanners.push({ src: info.embedUrl || '', url, alt: '', type: 'video_embed', platform: info.platform, label: info.label, videoId: info.videoId || '' });
   input.value = '';
