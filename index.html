@@ -1339,13 +1339,15 @@
   }
   .tienda-banner-carrusel::-webkit-scrollbar { display: none; }
   .tienda-banner-carrusel img,
-  .tienda-banner-carrusel video {
+  .tienda-banner-carrusel video,
+  .tienda-banner-carrusel iframe {
     flex: 0 0 100%;
     width: 100%;
     height: 100%;
     scroll-snap-align: start;
     display: block;
     object-fit: cover;
+    border: 0;
   }
   .tienda-banner-dots {
     display: flex;
@@ -3645,21 +3647,28 @@
       <div class="card">
         <div class="card-header"><h3><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Banners de la tienda</h3></div>
         <div class="card-body">
-          <p style="font-size:12px;color:#718096;margin-bottom:14px">Administra las fotos y videos (formato vertical, ideal celular) de ganadores y sorteos que rotan en el carrusel principal de la tienda pública, y el tiempo de transición entre ellos.</p>
+          <p style="font-size:12px;color:#718096;margin-bottom:14px">Administra las fotos (formato vertical, ideal celular) y videos (por enlace de Facebook, TikTok o YouTube) de ganadores y sorteos que rotan en el carrusel principal de la tienda pública, y el tiempo de transición entre ellos.</p>
           <div class="form-group">
             <label style="font-weight:800;color:var(--dark);font-size:13px">Fotos y videos del banner <span style="font-size:11px;font-weight:600;color:#718096">(orientación vertical · se muestran en orden)</span></label>
             <div id="cfg-banners-grid" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px"></div>
             <div style="display:flex;gap:14px;align-items:center;margin-top:10px;flex-wrap:wrap">
               <button type="button" onclick="document.getElementById('cfg-banner-file').click()" style="display:flex;align-items:center;gap:7px;padding:9px 16px;border:2px dashed var(--borde);border-radius:10px;background:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:#718096;cursor:pointer" onmouseover="this.style.borderColor='var(--verde)';this.style.color='var(--verde)'" onmouseout="this.style.borderColor='var(--borde)';this.style.color='#718096'">
-                <span style="font-size:18px;line-height:1">＋</span> Agregar foto o video
+                <span style="font-size:18px;line-height:1">＋</span> Agregar foto
               </button>
-              <input type="file" id="cfg-banner-file" accept="image/*,video/*" style="display:none" onchange="cfgAgregarBannerArchivo(this)">
+              <input type="file" id="cfg-banner-file" accept="image/*" style="display:none" onchange="cfgAgregarBannerArchivo(this)">
               <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--dark)">
                 Transición cada
                 <input type="number" id="cfg-banner-intervalo" min="1.5" step="0.5" value="4.5" style="width:60px;padding:6px 8px;border:2px solid var(--borde);border-radius:8px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;text-align:center">
                 segundos
               </label>
             </div>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
+              <input type="text" id="cfg-banner-video-link" placeholder="Pega un enlace de Facebook, TikTok o YouTube" style="flex:1;min-width:220px;padding:9px 12px;border:2px solid var(--borde);border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px">
+              <button type="button" onclick="cfgAgregarBannerVideoLink()" style="display:flex;align-items:center;gap:6px;padding:9px 16px;border:none;border-radius:10px;background:var(--verde);color:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer">
+                <span style="font-size:16px;line-height:1">▶</span> Agregar video por enlace
+              </button>
+            </div>
+            <div id="cfg-banner-video-error" style="display:none;font-size:12px;font-weight:700;color:#c53030;margin-top:6px"></div>
           </div>
           <button class="btn-primary" onclick="guardarConfigTienda()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Guardar banners</button>
         </div>
@@ -4175,6 +4184,9 @@
           var ms = (typeof intervalMs === 'number' && intervalMs >= 1000) ? intervalMs : 4500;
           c.innerHTML = list.map(function(b) {
             var safeAlt = (b.alt || '').replace(/"/g, '&quot;');
+            if (b.type === 'video_embed') {
+              return '<iframe src="' + b.src + '" style="width:100%;height:100%;border:0;display:block" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+            }
             if (b.type === 'video') {
               return '<video src="' + b.src + '" autoplay muted loop playsinline></video>';
             }
@@ -9576,8 +9588,33 @@ function sincronizarFechasConfig() {
 }
 
 
-// ===== FOTOS DEL BANNER PRINCIPAL EN CONFIG =====
-let _cfgBanners = []; // estado en memoria: [{src, alt}]
+// ===== FOTOS Y VIDEOS DEL BANNER PRINCIPAL EN CONFIG =====
+let _cfgBanners = []; // estado en memoria: [{src, alt, type}] — type 'image' | 'video_embed'
+
+// Detecta la plataforma de un enlace de video y arma la URL de embed correspondiente.
+function cfgDetectarVideoEmbed(url) {
+  if (!url) return null;
+  const u = url.trim();
+
+  // YouTube (youtube.com/watch?v=, youtu.be/, youtube.com/shorts/)
+  let m = u.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([A-Za-z0-9_-]{6,})/i);
+  if (m) {
+    return { platform: 'youtube', label: 'YouTube', embedUrl: `https://www.youtube.com/embed/${m[1]}` };
+  }
+
+  // TikTok (tiktok.com/@usuario/video/1234567890)
+  m = u.match(/tiktok\.com\/.*\/video\/(\d+)/i);
+  if (m) {
+    return { platform: 'tiktok', label: 'TikTok', embedUrl: `https://www.tiktok.com/embed/v2/${m[1]}` };
+  }
+
+  // Facebook (facebook.com/.../videos/..., fb.watch/...)
+  if (/facebook\.com\/.*\/videos\/|fb\.watch\//i.test(u)) {
+    return { platform: 'facebook', label: 'Facebook', embedUrl: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(u)}&show_text=false` };
+  }
+
+  return null;
+}
 
 function cfgRenderBanners() {
   const cont = document.getElementById('cfg-banners-grid');
@@ -9586,27 +9623,60 @@ function cfgRenderBanners() {
     cont.innerHTML = '<div style="font-size:12px;color:#a0aec0;font-style:italic">Sin fotos propias — se usan las predeterminadas del sistema</div>';
     return;
   }
+  const n = _cfgBanners.length;
   cont.innerHTML = _cfgBanners.map((b, i) => `
     <div style="position:relative;width:90px;height:56px;border-radius:8px;overflow:hidden;border:2px solid var(--borde);flex-shrink:0;background:#000">
-      ${b.type === 'video'
-        ? `<video src="${b.src}" muted style="width:100%;height:100%;object-fit:cover;display:block"></video>
-           <span style="position:absolute;left:3px;bottom:2px;background:rgba(0,0,0,0.6);color:#fff;font-size:8px;font-weight:800;padding:1px 5px;border-radius:6px;letter-spacing:.3px">▶ VIDEO</span>`
+      ${b.type === 'video_embed'
+        ? `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a202c,#2d3748)">
+             <span style="font-size:9px;font-weight:800;color:#fff;letter-spacing:.3px;text-align:center">▶ ${b.label || 'VIDEO'}</span>
+           </div>`
         : `<img src="${b.src}" style="width:100%;height:100%;object-fit:cover;display:block">`}
+      <span style="position:absolute;left:3px;top:2px;background:rgba(0,0,0,0.6);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:6px">${i + 1}</span>
       <button type="button" onclick="cfgEliminarBanner(${i})" title="Quitar" style="position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;border:none;background:rgba(220,38,38,0.92);color:white;font-size:13px;font-weight:800;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center">×</button>
+      <div style="position:absolute;left:0;bottom:0;right:0;display:flex">
+        <button type="button" onclick="cfgMoverBanner(${i},-1)" title="Mover antes" ${i === 0 ? 'disabled' : ''} style="flex:1;padding:2px 0;border:none;background:rgba(0,0,0,0.55);color:${i === 0 ? 'rgba(255,255,255,0.35)' : 'white'};font-size:11px;font-weight:800;cursor:${i === 0 ? 'default' : 'pointer'};line-height:1">◀</button>
+        <button type="button" onclick="cfgMoverBanner(${i},1)" title="Mover después" ${i === n - 1 ? 'disabled' : ''} style="flex:1;padding:2px 0;border:none;background:rgba(0,0,0,0.55);color:${i === n - 1 ? 'rgba(255,255,255,0.35)' : 'white'};font-size:11px;font-weight:800;cursor:${i === n - 1 ? 'default' : 'pointer'};line-height:1">▶</button>
+      </div>
     </div>`).join('');
+}
+
+function cfgMoverBanner(idx, dir) {
+  const j = idx + dir;
+  if (j < 0 || j >= _cfgBanners.length) return;
+  const tmp = _cfgBanners[idx];
+  _cfgBanners[idx] = _cfgBanners[j];
+  _cfgBanners[j] = tmp;
+  cfgRenderBanners();
 }
 
 function cfgAgregarBannerArchivo(input) {
   const file = input.files && input.files[0];
   if (!file) return;
-  const esVideo = file.type && file.type.startsWith('video/');
   const reader = new FileReader();
   reader.onload = () => {
-    _cfgBanners.push({ src: reader.result, alt: '', type: esVideo ? 'video' : 'image' });
+    _cfgBanners.push({ src: reader.result, alt: '', type: 'image' });
     cfgRenderBanners();
   };
   reader.readAsDataURL(file);
   input.value = '';
+}
+
+function cfgAgregarBannerVideoLink() {
+  const input = document.getElementById('cfg-banner-video-link');
+  const errorBox = document.getElementById('cfg-banner-video-error');
+  if (!input) return;
+  const url = input.value.trim();
+  errorBox.style.display = 'none';
+  if (!url) return;
+  const info = cfgDetectarVideoEmbed(url);
+  if (!info) {
+    errorBox.textContent = 'No se reconoció el enlace. Usa un link de Facebook, TikTok o YouTube.';
+    errorBox.style.display = 'block';
+    return;
+  }
+  _cfgBanners.push({ src: info.embedUrl, url, alt: '', type: 'video_embed', platform: info.platform, label: info.label });
+  input.value = '';
+  cfgRenderBanners();
 }
 
 function cfgEliminarBanner(idx) {
@@ -9615,7 +9685,9 @@ function cfgEliminarBanner(idx) {
 }
 
 window.cfgAgregarBannerArchivo = cfgAgregarBannerArchivo;
+window.cfgAgregarBannerVideoLink = cfgAgregarBannerVideoLink;
 window.cfgEliminarBanner = cfgEliminarBanner;
+window.cfgMoverBanner = cfgMoverBanner;
 
 // ===== MEDIOS DE PAGO EN CONFIG =====
 let _cfgMedios = [{ tipo: 'efectivo' }]; // estado en memoria
