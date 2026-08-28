@@ -5355,7 +5355,7 @@ function cargarDatos() {
       }
     });
     // Cargar config tienda
-    get(ref(db, 'config/tienda')).then(snap => {
+    window._cfgTiendaPromise = get(ref(db, 'config/tienda')).then(snap => {
       if (snap.exists()) {
         const c = snap.val();
         // Poblar window.tiendaConfig para que abrirCuenta y otros lo usen
@@ -13949,7 +13949,12 @@ function distribuirSeleccionarColumna(lado, nuevoId) {
   distribuirRenderLista(otroLado);
 }
 
-function distribuirInit() {
+async function distribuirInit() {
+  // Esperar a que config/tienda haya cargado (cifras/numerosPorBoleta reales)
+  // antes de agrupar números — evita que nvNumsPorBoleta() caiga en el
+  // valor por defecto (4) mientras la config real todavía está en camino.
+  if (window._cfgTiendaPromise) { try { await window._cfgTiendaPromise; } catch(e) {} }
+
   // Cargar boletas_plantilla si hace falta
   const _continuar = () => {
     _distribuirPoblarSelectores();
