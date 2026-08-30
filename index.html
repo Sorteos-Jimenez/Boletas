@@ -3648,7 +3648,7 @@
       <div class="card">
         <div class="card-header"><h3><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Banners de la tienda</h3></div>
         <div class="card-body">
-          <p style="font-size:12px;color:#718096;margin-bottom:14px">Administra las fotos (formato vertical, ideal celular) y videos (por enlace de Facebook, TikTok o YouTube) de ganadores y sorteos que rotan en el carrusel principal de la tienda pública, y el tiempo de transición entre ellos.</p>
+          <p style="font-size:12px;color:#718096;margin-bottom:14px">Administra las fotos (formato vertical, ideal celular) y videos (por enlace de Google Drive, Facebook, TikTok o YouTube) de ganadores y sorteos que rotan en el carrusel principal de la tienda pública, y el tiempo de transición entre ellos.</p>
           <div class="form-group">
             <label style="font-weight:800;color:var(--dark);font-size:13px">Fotos y videos del banner <span style="font-size:11px;font-weight:600;color:#718096">(orientación vertical · se muestran en orden)</span></label>
             <div id="cfg-banners-grid" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px"></div>
@@ -3664,7 +3664,7 @@
               </label>
             </div>
             <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
-              <input type="text" id="cfg-banner-video-link" placeholder="Pega un enlace de Facebook, TikTok o YouTube" style="flex:1;min-width:220px;padding:9px 12px;border:2px solid var(--borde);border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px">
+              <input type="text" id="cfg-banner-video-link" placeholder="Pega un enlace de Google Drive, Facebook, TikTok o YouTube" style="flex:1;min-width:220px;padding:9px 12px;border:2px solid var(--borde);border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px">
               <button type="button" id="cfg-banner-video-btn" onclick="cfgAgregarBannerVideoLink()" style="display:flex;align-items:center;gap:6px;padding:9px 16px;border:none;border-radius:10px;background:var(--verde);color:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer">
                 <span style="font-size:16px;line-height:1">▶</span> Agregar video por enlace
               </button>
@@ -4238,6 +4238,9 @@
             if (b.type === 'video_embed' && b.platform === 'youtube') {
               var ytSrc = b.src + (b.src.indexOf('?') === -1 ? '?' : '&') + 'enablejsapi=1';
               return '<iframe src="' + ytSrc + '" style="width:100%;height:100%;border:0;display:block" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+            }
+            if (b.type === 'video_embed' && b.platform === 'gdrive') {
+              return '<iframe src="' + b.src + '" style="width:100%;height:100%;border:0;display:block" allow="autoplay" allowfullscreen></iframe>';
             }
             if (b.type === 'video_embed' && b.platform === 'tiktok') {
               return '<div style="width:100%;height:100%;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center">' +
@@ -9760,6 +9763,14 @@ function cfgDetectarVideoEmbed(url) {
     return { platform: 'facebook', label: 'Facebook', url: u };
   }
 
+  // Google Drive (drive.google.com/file/d/ID/view..., drive.google.com/open?id=ID,
+  // drive.google.com/uc?id=ID) — usa el visor oficial de Google Drive vía iframe
+  m = u.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/i);
+  if (!m) m = u.match(/drive\.google\.com\/(?:open|uc)\?(?:.*&)?id=([a-zA-Z0-9_-]+)/i);
+  if (m) {
+    return { platform: 'gdrive', label: 'Google Drive', embedUrl: `https://drive.google.com/file/d/${m[1]}/preview` };
+  }
+
   return null;
 }
 
@@ -9818,7 +9829,7 @@ async function cfgAgregarBannerVideoLink() {
   if (!url) return;
   const info = cfgDetectarVideoEmbed(url);
   if (!info) {
-    errorBox.textContent = 'No se reconoció el enlace. Usa un link de Facebook, TikTok o YouTube.';
+    errorBox.textContent = 'No se reconoció el enlace. Usa un link de Google Drive, Facebook, TikTok o YouTube.';
     errorBox.style.display = 'block';
     return;
   }
