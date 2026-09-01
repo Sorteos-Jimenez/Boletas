@@ -4450,6 +4450,10 @@
       <label style="font-size:12px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">Ciudad</label>
       <input type="text" id="co-ciudad" placeholder="Tu ciudad" style="width:100%;padding:12px 16px;border:2px solid var(--borde);border-radius:10px;font-size:15px;font-family:'Nunito',sans-serif;outline:none">
     </div>
+    <div class="form-group" style="margin:10px 0 0">
+      <label style="font-size:12px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px">País</label>
+      <input type="text" id="co-pais" value="Colombia" placeholder="Tu país" style="width:100%;padding:12px 16px;border:2px solid var(--borde);border-radius:10px;font-size:15px;font-family:'Nunito',sans-serif;outline:none">
+    </div>
 
     <!-- Direcciones -->
     <div class="form-group" style="margin:10px 0 0">
@@ -5921,8 +5925,8 @@ function renderBoletasPagina() {
           </div>
           <div style="font-size:12px;color:#718096;margin-bottom:6px">${c.telefono ? (() => { const _tw = c.telefono; return `<a href="https://wa.me/${_waNum(_tw)}" target="_blank" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:3px;color:#25d366;text-decoration:none;font-weight:700"><svg width="12" height="12" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>${c.telefono}</a> &middot; `; })() : ''}<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:3px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${c.fecha || ''} &middot; <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-1px;margin-right:3px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ${vendNombre}</div>
           ${numeros}
-          ${(c.ciudad || c.dir_casa || c.dir_trabajo) ? `<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:6px;background:#f8fafc;border-radius:8px;padding:7px 10px;border:1px solid var(--borde)">
-            ${c.ciudad ? `<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#4a5568"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#e53e3e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> <strong>${c.ciudad}</strong></div>` : ''}
+          ${(c.ciudad || c.pais || c.dir_casa || c.dir_trabajo) ? `<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:6px;background:#f8fafc;border-radius:8px;padding:7px 10px;border:1px solid var(--borde)">
+            ${c.ciudad ? `<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#4a5568"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#e53e3e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> <strong>${c.ciudad}</strong>${c.pais ? ', ' + c.pais : ''}</div>` : (c.pais ? `<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#4a5568"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#e53e3e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> <strong>${c.pais}</strong></div>` : '')}
             ${c.dir_casa ? `<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#4a5568"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#718096" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> ${c.dir_casa}</div>` : ''}
             ${c.dir_trabajo ? `<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#4a5568"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#718096" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> ${c.dir_trabajo}</div>` : ''}
             ${c.tipo_entrega ? `<div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#718096"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#718096" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg> Entrega: <strong>${c.tipo_entrega === 'trabajo' ? 'En trabajo' : 'En casa'}</strong></div>` : ''}
@@ -6524,7 +6528,7 @@ async function ejecutarConfirmarEntrega() {
 
   const estadoBoleta = tipoPago === 'completo' ? 'pagada' : tipoPago === 'abono' ? 'abonado' : 'sin_abono';
   const montoPorBoleta = tipoPago === 'completo' ? precioPorBoleta : tipoPago === 'abono' ? Math.floor(montoAbono / grupos.length) : 0;
-  const obsBase = 'Pedido desde tienda · entregado por vendedor' + (p.ciudad ? ' · ' + p.ciudad : '');
+  const obsBase = 'Pedido desde tienda · entregado por vendedor' + (p.ciudad ? ' · ' + p.ciudad : '') + (p.pais ? ' · ' + p.pais : '');
 
   // Crear cuenta_cliente unificada para este pedido
   const cuentaRef = push(ref(db, 'cuentas_cliente'));
@@ -6549,6 +6553,7 @@ async function ejecutarConfirmarEntrega() {
       observaciones: obsBase,
       dir_casa:      p.dir_casa  || p.dir_entrega || '',
       ciudad:        p.ciudad    || '',
+      pais:          p.pais      || 'Colombia',
       fecha,
       fecha_ts,
       cuenta_id:     cuentaKey
@@ -6563,6 +6568,7 @@ async function ejecutarConfirmarEntrega() {
     telefono:     p.telefono  || '',
     vendedor_id:  currentUser.id,
     ciudad:       p.ciudad    || '',
+    pais:         p.pais      || 'Colombia',
     dir_casa:     p.dir_casa  || p.dir_entrega || '',
     fecha,
     fecha_ts,
@@ -6777,7 +6783,7 @@ function renderMisPedidos() {
       <div style="padding:10px 14px;border-bottom:1.5px solid var(--borde);display:flex;flex-direction:column;gap:5px">
         <div style="display:flex;align-items:center;gap:6px">
           <span style="font-size:14px;font-weight:800;color:var(--dark)">${p.nombre||'—'}</span>
-          ${p.ciudad ? `<span style="font-size:11px;color:#718096;font-weight:600">· <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${p.ciudad}</span>` : ''}
+          ${p.ciudad ? `<span style="font-size:11px;color:#718096;font-weight:600">· <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${p.ciudad}${p.pais ? ', ' + p.pais : ''}</span>` : (p.pais ? `<span style="font-size:11px;color:#718096;font-weight:600">· <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${p.pais}</span>` : '')}
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <span style="font-size:12px;color:#4a5568;font-weight:700"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.78a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> ${p.telefono||'—'}</span>
@@ -7209,6 +7215,10 @@ function editarDatosCliente(cuentaKey) {
         <input type="text" id="ec-ciudad" value="${(c.ciudad||'').replace(/"/g,'&quot;')}" placeholder="Ciudad" style="width:100%;padding:10px 12px;border:1.5px solid var(--borde);border-radius:8px;font-family:'Nunito',sans-serif;font-size:14px;outline:none">
       </div>
       <div class="form-group">
+        <label>País</label>
+        <input type="text" id="ec-pais" value="${(c.pais||'Colombia').replace(/"/g,'&quot;')}" placeholder="País" style="width:100%;padding:10px 12px;border:1.5px solid var(--borde);border-radius:8px;font-family:'Nunito',sans-serif;font-size:14px;outline:none">
+      </div>
+      <div class="form-group">
         <label>Dir. casa</label>
         <input type="text" id="ec-dir-casa" value="${(c.dir_casa||'').replace(/"/g,'&quot;')}" placeholder="Cra 5 #12-34" style="width:100%;padding:10px 12px;border:1.5px solid var(--borde);border-radius:8px;font-family:'Nunito',sans-serif;font-size:14px;outline:none">
       </div>
@@ -7235,11 +7245,12 @@ async function guardarDatosCliente(cuentaKey) {
   const nombre    = document.getElementById('ec-nombre')?.value.trim() || '';
   const telefono  = document.getElementById('ec-telefono')?.value.trim() || '';
   const ciudad    = document.getElementById('ec-ciudad')?.value.trim() || '';
+  const pais      = document.getElementById('ec-pais')?.value.trim() || 'Colombia';
   const dirCasa   = document.getElementById('ec-dir-casa')?.value.trim() || '';
   const dirTrabajo= document.getElementById('ec-dir-trabajo')?.value.trim() || '';
   if (!nombre) { toast('El nombre no puede estar vacío', 'rojo'); return; }
   try {
-    const patch = { comprador: nombre, telefono, ciudad, dir_casa: dirCasa, dir_trabajo: dirTrabajo };
+    const patch = { comprador: nombre, telefono, ciudad, pais, dir_casa: dirCasa, dir_trabajo: dirTrabajo };
     await update(ref(db, 'cuentas_cliente/' + cuentaKey), patch);
     // Actualizar boletas vinculadas también
     const c = allCuentas[cuentaKey] || {};
@@ -7248,6 +7259,7 @@ async function guardarDatosCliente(cuentaKey) {
       batchUpd['boletas/' + bk + '/comprador'] = nombre;
       batchUpd['boletas/' + bk + '/telefono']  = telefono;
       batchUpd['boletas/' + bk + '/ciudad']    = ciudad;
+      batchUpd['boletas/' + bk + '/pais']      = pais;
       batchUpd['boletas/' + bk + '/dir_casa']  = dirCasa;
       batchUpd['boletas/' + bk + '/dir_trabajo'] = dirTrabajo;
     });
@@ -8008,6 +8020,12 @@ function abrirEditar(key) {
         <label><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Ciudad</label>
         <input type="text" id="e-ciudad" value="${b.ciudad || ''}" placeholder="Ciudad">
       </div>
+    </div>
+    <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0">
+      <div class="form-group">
+        <label><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> País</label>
+        <input type="text" id="e-pais" value="${b.pais || 'Colombia'}" placeholder="País">
+      </div>
       <div class="form-group">
         <label><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> Entrega en</label>
         <select id="e-tipo-entrega" style="width:100%;padding:10px 12px;border:1.5px solid var(--borde);border-radius:8px;font-family:'Nunito',sans-serif;font-size:13px;outline:none;background:white">
@@ -8190,6 +8208,7 @@ async function guardarEdicion(key) {
     comprador: document.getElementById('e-nombre').value,
     telefono: document.getElementById('e-tel').value,
     ciudad: document.getElementById('e-ciudad')?.value.trim() || '',
+    pais: document.getElementById('e-pais')?.value.trim() || 'Colombia',
     direccion_casa: document.getElementById('e-dir').value.trim(),
     dir_casa: document.getElementById('e-dir').value.trim(),
     dir_trabajo: document.getElementById('e-dir-trabajo')?.value.trim() || '',
@@ -8969,7 +8988,7 @@ function vdRenderPedidosVendedor(vid) {
         <div style="display:flex;flex-wrap:wrap;gap:5px">${minicardsHTML}</div>
       </div>
       <div style="padding:8px 10px;${esPendiente ? 'border-bottom:1.5px solid var(--borde);' : ''}display:flex;flex-direction:column;gap:4px">
-        <div style="font-size:12px;font-weight:800;color:var(--dark)">${p.nombre||'—'}${p.ciudad ? `<span style="font-size:10px;font-weight:600;color:#718096"> · ${p.ciudad}</span>` : ''}</div>
+        <div style="font-size:12px;font-weight:800;color:var(--dark)">${p.nombre||'—'}${p.ciudad ? `<span style="font-size:10px;font-weight:600;color:#718096"> · ${p.ciudad}${p.pais ? ', ' + p.pais : ''}</span>` : (p.pais ? `<span style="font-size:10px;font-weight:600;color:#718096"> · ${p.pais}</span>` : '')}</div>
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
           <span style="font-size:11px;color:#4a5568;font-weight:600">📞 ${p.telefono||'—'}</span>
           ${waLink ? `<a href="${waLink}" target="_blank" style="display:inline-flex;align-items:center;gap:3px;background:#25d366;color:white;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;text-decoration:none;font-family:'Nunito',sans-serif"><svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WA</a>` : ''}
@@ -10697,7 +10716,7 @@ function renderPedidos(pedidos) {
       <div style="padding:10px 14px;border-bottom:1.5px solid var(--borde);display:flex;flex-direction:column;gap:5px">
         <div style="display:flex;align-items:center;gap:6px">
           <span style="font-size:14px;font-weight:800;color:var(--dark)">${p.nombre||'—'}</span>
-          ${p.ciudad ? `<span style="font-size:11px;color:#718096;font-weight:600">· <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${p.ciudad}</span>` : ''}
+          ${p.ciudad ? `<span style="font-size:11px;color:#718096;font-weight:600">· <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${p.ciudad}${p.pais ? ', ' + p.pais : ''}</span>` : (p.pais ? `<span style="font-size:11px;color:#718096;font-weight:600">· <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${p.pais}</span>` : '')}
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <span style="font-size:12px;color:#4a5568;font-weight:700"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.78a16 16 0 0 0 6.29 6.29l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> ${p.telefono||'—'}</span>
@@ -11032,7 +11051,7 @@ async function ejecutarConfirmarPedido() {
   const cuentaKey2 = cuentaRef2.key;
   const boletaKeys2 = [];
   const batchCpp = {};
-  const obsBase2 = 'Pedido desde tienda online · ' + (p.ciudad || '') + (vendedorCodigoFinal ? ' · Vendedor: ' + vendedorCodigoFinal : '');
+  const obsBase2 = 'Pedido desde tienda online · ' + (p.ciudad || '') + (p.pais ? ' · ' + p.pais : '') + (vendedorCodigoFinal ? ' · Vendedor: ' + vendedorCodigoFinal : '');
 
   for (const grupo of grupos) {
     const numerosStr = grupo.join(', ');
@@ -11044,6 +11063,7 @@ async function ejecutarConfirmarPedido() {
       comprador: p.nombre,
       telefono: p.telefono,
       ciudad: p.ciudad || '',
+      pais: p.pais || 'Colombia',
       dir_casa: p.dir_casa || '',
       direccion_casa: p.dir_casa || '',
       dir_trabajo: p.dir_trabajo || '',
@@ -11068,6 +11088,7 @@ async function ejecutarConfirmarPedido() {
     telefono:     p.telefono  || '',
     vendedor_id:  vendedorIdFinal,
     ciudad:       p.ciudad    || '',
+    pais:         p.pais      || 'Colombia',
     dir_casa:     p.dir_casa  || '',
     fecha,
     fecha_ts,
@@ -12313,6 +12334,7 @@ async function enviarPedido() {
   const telPrefix = telPrefixSel === 'otro' ? (document.getElementById('co-tel-prefix-custom')?.value.trim() || '') : telPrefixSel;
   const tel = telRaw ? (telPrefix + telRaw) : '';
   const dirCasa = document.getElementById('co-dir-casa').value.trim();
+  const pais = document.getElementById('co-pais')?.value.trim() || 'Colombia';
 
   // Verificar reCAPTCHA tienda
   const captchaTienda = grecaptcha.getResponse(_rcWidgetTienda);
@@ -12372,6 +12394,7 @@ async function enviarPedido() {
     nombre,
     telefono: tel,
     ciudad: document.getElementById('co-ciudad').value.trim(),
+    pais,
     dir_casa: dirCasa,
     dir_trabajo: dirTrabajo || '',
     dir_entrega: dirEntrega,
@@ -12462,6 +12485,7 @@ function limpiarCarrito() {
   actualizarCarritoBar();
   // Limpiar form
   ['co-nombre','co-tel','co-ciudad','co-dir-casa','co-dir-trabajo','co-nota'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+  const coPaisEl1 = document.getElementById('co-pais'); if (coPaisEl1) coPaisEl1.value = 'Colombia';
   _entregaSeleccionada = 'casa';
   const btnTrab = document.getElementById('co-btn-trabajo');
   if (btnTrab) btnTrab.style.display = 'none';
@@ -12483,6 +12507,7 @@ function limpiarCarritoPostPedido() {
   carritoSeleccion = [];
   actualizarCarritoBar();
   ['co-nombre','co-tel','co-ciudad','co-dir-casa','co-dir-trabajo','co-nota'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+  const coPaisEl2 = document.getElementById('co-pais'); if (coPaisEl2) coPaisEl2.value = 'Colombia';
   _entregaSeleccionada = 'casa';
   const btnTrab = document.getElementById('co-btn-trabajo');
   if (btnTrab) btnTrab.style.display = 'none';
