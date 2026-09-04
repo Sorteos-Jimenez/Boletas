@@ -1808,6 +1808,71 @@
     text-align: center;
   }
 
+  /* Categorías por rango de números (modo manual) */
+  .tienda-cat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+  @media (min-width: 480px) {
+    .tienda-cat-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  .tienda-cat-card {
+    border-radius: 14px;
+    border: 2px solid var(--borde);
+    background: white;
+    padding: 16px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.18s;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+  }
+  .tienda-cat-card:hover {
+    border-color: var(--verde);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(58,181,74,0.2);
+  }
+  .tienda-cat-card .tienda-cat-label {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 20px;
+    color: var(--dark);
+    letter-spacing: .5px;
+  }
+  .tienda-cat-card .tienda-cat-count {
+    font-size: 11px;
+    font-weight: 700;
+    color: #718096;
+    margin-top: 2px;
+  }
+  .tienda-cat-card.sin-stock {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .tienda-cat-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 24px 0;
+    color: #a0aec0;
+    font-size: 13px;
+  }
+  .tienda-cat-volver-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    margin-bottom: 12px;
+    border: 2px solid var(--borde);
+    border-radius: 10px;
+    background: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--dark);
+    cursor: pointer;
+  }
+  .tienda-cat-volver-btn:hover { border-color: var(--verde); color: var(--verde); }
+
   /* Carrito */
   .carrito-bar {
     position: fixed;
@@ -2986,6 +3051,10 @@
     transition:opacity .35s ease, visibility .35s ease;
   }
   #pre-loader.oculto{ opacity:0; visibility:hidden; pointer-events:none; }
+  #pre-loader .pl-logo{
+    width:76px; height:76px; border-radius:18px; object-fit:cover;
+    box-shadow:0 4px 18px rgba(0,0,0,.35);
+  }
   #pre-loader .pl-spinner{
     width:56px; height:56px; border-radius:50%;
     border:5px solid rgba(255,255,255,.25);
@@ -3003,6 +3072,7 @@
 <body class="pl-bloqueado">
 
 <div id="pre-loader">
+  <img id="pre-loader-logo" class="pl-logo" src="" alt="" style="display:none">
   <div class="pl-spinner"></div>
   <div class="pl-texto">Cargando...</div>
 </div>
@@ -3678,6 +3748,16 @@
               </button>
             </div>
             <div id="cfg-banner-video-error" style="display:none;font-size:12px;font-weight:700;color:#c53030;margin-top:6px"></div>
+          </div>
+          <div class="form-group" style="margin-top:18px;padding-top:16px;border-top:1px solid var(--borde)">
+            <label style="font-weight:800;color:var(--dark);font-size:13px">Logo del negocio <span style="font-size:11px;font-weight:600;color:#718096">(se muestra en la pantalla de carga)</span></label>
+            <div style="display:flex;gap:14px;align-items:center;margin-top:10px;flex-wrap:wrap">
+              <img id="cfg-logo-negocio-preview" src="" alt="Logo del negocio" style="height:36px;border-radius:7px;object-fit:cover;display:none;box-shadow:0 1px 4px rgba(0,0,0,0.3)">
+              <button type="button" onclick="document.getElementById('cfg-logo-negocio-file').click()" style="display:flex;align-items:center;gap:7px;padding:9px 16px;border:2px dashed var(--borde);border-radius:10px;background:white;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:#718096;cursor:pointer" onmouseover="this.style.borderColor='var(--verde)';this.style.color='var(--verde)'" onmouseout="this.style.borderColor='var(--borde)';this.style.color='#718096'">
+                <span style="font-size:18px;line-height:1">＋</span> Cambiar logo
+              </button>
+              <input type="file" id="cfg-logo-negocio-file" accept="image/*" style="display:none" onchange="cfgSeleccionarLogoNegocio(this)">
+            </div>
           </div>
           <div class="form-group" style="margin-top:18px;padding-top:16px;border-top:1px solid var(--borde)">
             <label style="font-weight:800;color:var(--dark);font-size:13px">Lotería con la que se juega <span style="font-size:11px;font-weight:600;color:#718096">(nombre y logo que se muestran en la tienda)</span></label>
@@ -4393,6 +4473,10 @@
         <span class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
         <input type="number" id="tienda-buscar" placeholder="Buscar número específico..." oninput="tiendaBuscar()">
       </div>
+
+      <!-- Categorías por rango de números -->
+      <div id="tienda-categorias" class="tienda-cat-grid"></div>
+      <button type="button" id="tienda-cat-volver" class="tienda-cat-volver-btn" onclick="tiendaVolverCategorias()" style="display:none">← Ver categorías</button>
 
       <!-- Leyenda -->
       <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;font-weight:700;margin-bottom:12px">
@@ -5599,6 +5683,8 @@ function cargarDatos() {
         cfgCargarMediosPago(c.medios_pago || (c.pago ? [{tipo:'efectivo'}] : [{tipo:'efectivo'}]));
         _cfgBanners = Array.isArray(c.banners) ? c.banners.slice() : [];
         cfgRenderBanners();
+        _cfgLogoNegocio = c.logoNegocio || null;
+        cfgActualizarPreviewLogoNegocio();
         const loteriaCfg = c.loteria || {};
         const cfgLoteriaNombreEl = document.getElementById('cfg-loteria-nombre');
         if (cfgLoteriaNombreEl) cfgLoteriaNombreEl.value = loteriaCfg.nombre || 'Lotería del Valle';
@@ -9757,6 +9843,30 @@ function sincronizarFechasConfig() {
 // ===== FOTOS Y VIDEOS DEL BANNER PRINCIPAL EN CONFIG =====
 let _cfgBanners = []; // estado en memoria: [{src, alt, type}] — type 'image' | 'video_embed'
 let _cfgLoteriaLogo = null; // base64 del logo de lotería elegido en Config, o null para usar el predeterminado
+let _cfgLogoNegocio = null; // base64 del logo del negocio elegido en Config, o null si no se ha configurado
+
+function cfgActualizarPreviewLogoNegocio() {
+  const img = document.getElementById('cfg-logo-negocio-preview');
+  if (!img) return;
+  if (_cfgLogoNegocio) {
+    img.src = _cfgLogoNegocio;
+    img.style.display = 'block';
+  } else {
+    img.style.display = 'none';
+  }
+}
+
+function cfgSeleccionarLogoNegocio(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    _cfgLogoNegocio = reader.result;
+    cfgActualizarPreviewLogoNegocio();
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
 
 function cfgActualizarPreviewLoteria() {
   const img = document.getElementById('cfg-loteria-logo-preview');
@@ -10212,6 +10322,7 @@ async function guardarConfigTienda(silencioso) {
     anticipados: anticipadosConFecha.length ? anticipadosConFecha : null,
     medios_pago: cfgLeerMediosPago(),
     banners: _cfgBanners.length ? _cfgBanners : null,
+    logoNegocio: _cfgLogoNegocio || null,
     loteria: {
       nombre: document.getElementById('cfg-loteria-nombre')?.value.trim() || 'Lotería del Valle',
       etiqueta: document.getElementById('cfg-loteria-etiqueta')?.value.trim() || '🎟️ Se juega con',
@@ -11257,6 +11368,11 @@ async function abrirTienda(codigoVendedor) {
   if (cfgSnap.exists()) {
     tiendaConfig = cfgSnap.val();
     window.tiendaConfig = tiendaConfig;
+    const preLoaderLogoEl = document.getElementById('pre-loader-logo');
+    if (preLoaderLogoEl && tiendaConfig.logoNegocio) {
+      preLoaderLogoEl.src = tiendaConfig.logoNegocio;
+      preLoaderLogoEl.style.display = 'block';
+    }
     document.getElementById('tienda-nombre-texto').textContent = (tiendaConfig.nombre||'Sorteos Jiménez');
     document.getElementById('tienda-desc').textContent = tiendaConfig.descripcion||'Escoge tus boletas y participa';
     document.getElementById('tienda-precio').textContent = tiendaConfig.precio||'80.000';
@@ -11817,7 +11933,7 @@ async function abrirTienda(codigoVendedor) {
           delete b._estadoPrevio; cambio = true;
         }
       });
-      if (cambio) renderTiendaGrid(tiendaBoletas);
+      if (cambio) tiendaActualizarVistaActual();
     });
   }
 
@@ -11855,18 +11971,20 @@ async function abrirTienda(codigoVendedor) {
             if (removeF) removeF(ref(db, 'tienda_reservas/' + k)).catch(() => {});
           }
         });
-        renderTiendaGrid(tiendaBoletas);
+        tiendaActualizarVistaActual();
       }
     });
   }
 
   renderTiendaGrid(tiendaBoletas);
+  tiendaActualizarVistaActual();
 }
 
 // ===== PAGINACIÓN TIENDA =====
 const TIENDA_POR_PAGINA = 10;
 let tiendaPagActual = 1;
 let tiendaListaFiltrada = [];
+let tiendaRangoActivo = null; // {min, max} del rango de números elegido en categorías, o null si se muestran todas
 
 function renderTiendaGrid(boletas) {
   // Mostrar boletas libres y reservadas (las reservadas se muestran bloqueadas visualmente)
@@ -11960,6 +12078,80 @@ function tiendaCambiarPag(pag) {
   tiendaPagActual = pag;
   renderTiendaPagina();
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ===== CATEGORÍAS POR RANGO DE NÚMEROS (modo manual) =====
+// Agrupa las boletas disponibles en bloques de 100 según su número (b.n1),
+// ej: 000-099, 100-199, etc. Mismo criterio de visibilidad que renderTiendaGrid.
+function tiendaCalcularRangos() {
+  const cifras = (window.tiendaConfig && window.tiendaConfig.cifras) || 4;
+  const bloques = {};
+  Object.entries(tiendaBoletas).forEach(([k, b]) => {
+    const estado = b.estadoVenta || 'libre';
+    const visible = estado === 'libre' || (estado !== 'reservada' && carritoSeleccion.includes(k));
+    if (!visible) return;
+    const n = parseInt(b.n1, 10);
+    if (isNaN(n)) return;
+    const min = Math.floor(n / 100) * 100;
+    const max = min + 99;
+    const key = min + '-' + max;
+    if (!bloques[key]) bloques[key] = { min, max, count: 0 };
+    bloques[key].count++;
+  });
+  return Object.values(bloques)
+    .sort((a, b) => a.min - b.min)
+    .map(r => ({ ...r, label: String(r.min).padStart(cifras, '0') + ' - ' + String(r.max).padStart(cifras, '0') }));
+}
+
+function tiendaMostrarCategorias() {
+  tiendaRangoActivo = null;
+  const cont = document.getElementById('tienda-categorias');
+  const volverBtn = document.getElementById('tienda-cat-volver');
+  const grid = document.getElementById('tienda-grid');
+  const paginador = document.getElementById('tienda-paginador');
+  if (!cont) return;
+  const rangos = tiendaCalcularRangos();
+  cont.innerHTML = rangos.length
+    ? rangos.map(r =>
+        `<div class="tienda-cat-card" onclick="tiendaAbrirRango(${r.min},${r.max})">` +
+          `<div class="tienda-cat-label">${r.label}</div>` +
+          `<div class="tienda-cat-count">${r.count} disponible${r.count !== 1 ? 's' : ''}</div>` +
+        `</div>`
+      ).join('')
+    : '<div class="tienda-cat-empty">No hay boletas disponibles</div>';
+  cont.style.display = 'grid';
+  if (volverBtn) volverBtn.style.display = 'none';
+  if (grid) grid.innerHTML = '';
+  if (paginador) paginador.style.display = 'none';
+}
+
+function tiendaAbrirRango(min, max) {
+  tiendaRangoActivo = { min, max };
+  const filtrado = {};
+  Object.entries(tiendaBoletas).forEach(([k, b]) => {
+    const n = parseInt(b.n1, 10);
+    if (!isNaN(n) && n >= min && n <= max) filtrado[k] = b;
+  });
+  const cont = document.getElementById('tienda-categorias');
+  const volverBtn = document.getElementById('tienda-cat-volver');
+  if (cont) cont.style.display = 'none';
+  if (volverBtn) volverBtn.style.display = 'flex';
+  renderTiendaGrid(filtrado);
+}
+
+function tiendaVolverCategorias() {
+  const buscador = document.getElementById('tienda-buscar');
+  if (buscador) buscador.value = '';
+  tiendaMostrarCategorias();
+}
+
+// Redibuja lo que corresponda según el estado actual: búsqueda activa, rango activo, o categorías.
+// Se usa tanto al cargar boletas por primera vez como al recibir actualizaciones en tiempo real.
+function tiendaActualizarVistaActual() {
+  const q = (document.getElementById('tienda-buscar')?.value || '').trim();
+  if (q) { tiendaBuscar(); return; }
+  if (tiendaRangoActivo) { tiendaAbrirRango(tiendaRangoActivo.min, tiendaRangoActivo.max); return; }
+  tiendaMostrarCategorias();
 }
 
 function tiendaSeleccionarModo(modo) {
@@ -12134,12 +12326,22 @@ function azarConfirmarShow() {
 
 function tiendaBuscar() {
   const q = (document.getElementById('tienda-buscar').value || '').trim();
-  if (!q) { renderTiendaGrid(tiendaBoletas); return; }
+  if (!q) { tiendaActualizarVistaActual(); return; }
+  const origen = tiendaRangoActivo
+    ? Object.fromEntries(Object.entries(tiendaBoletas).filter(([, b]) => {
+        const n = parseInt(b.n1, 10);
+        return !isNaN(n) && n >= tiendaRangoActivo.min && n <= tiendaRangoActivo.max;
+      }))
+    : tiendaBoletas;
   const filtrado = {};
-  Object.entries(tiendaBoletas).forEach(([k, b]) => {
+  Object.entries(origen).forEach(([k, b]) => {
     const nums = [b.n1, b.n2, b.n3, b.n4].filter(Boolean);
     if (nums.some(n => n.includes(q))) filtrado[k] = b;
   });
+  const cont = document.getElementById('tienda-categorias');
+  const volverBtn = document.getElementById('tienda-cat-volver');
+  if (cont) cont.style.display = 'none';
+  if (volverBtn) volverBtn.style.display = 'flex';
   renderTiendaGrid(filtrado);
 }
 
