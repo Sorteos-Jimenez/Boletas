@@ -1873,6 +1873,41 @@
   }
   .tienda-cat-volver-btn:hover { border-color: var(--verde); color: var(--verde); }
 
+  /* Carga progresiva de boletas: "Has visto X de Y boletas" + barra + botón */
+  .tienda-progress-text {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--dark);
+    text-align: center;
+    margin: 0 0 10px;
+  }
+  .tienda-progress-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--gris);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .tienda-progress-fill {
+    height: 100%;
+    background: var(--verde);
+    transition: width 0.3s;
+  }
+  .tienda-load-more {
+    display: block;
+    margin: 0 auto;
+    padding: 12px 32px;
+    border: 2px solid var(--verde);
+    border-radius: 10px;
+    background: white;
+    color: var(--verde);
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .tienda-load-more:hover { background: var(--verde); color: white; }
+
   /* Carrito */
   .carrito-bar {
     position: fixed;
@@ -4486,7 +4521,11 @@
 
       <div id="tienda-loading" class="spinner"></div>
       <div class="boletas-grid" id="tienda-grid"></div>
-      <div id="tienda-paginador" style="display:none;padding:12px 0 8px;display:flex;align-items:center;justify-content:space-between;gap:8px"></div>
+      <div id="tienda-paginador" style="display:none;padding:14px 0 8px">
+        <p class="tienda-progress-text" id="tienda-progress-text"></p>
+        <div class="tienda-progress-bar"><div class="tienda-progress-fill" id="tienda-progress-fill"></div></div>
+        <button type="button" class="tienda-load-more" id="tienda-load-more" onclick="tiendaCargarMas()">Cargar más boletas</button>
+      </div>
       <div style="height:20px"></div>
     </div>
   </div>
@@ -11980,9 +12019,9 @@ async function abrirTienda(codigoVendedor) {
   tiendaActualizarVistaActual();
 }
 
-// ===== PAGINACIÓN TIENDA =====
-const TIENDA_POR_PAGINA = 10;
-let tiendaPagActual = 1;
+// ===== CARGA PROGRESIVA DE BOLETAS ("Cargar más boletas") =====
+const TIENDA_PAGE_SIZE = 10;
+let tiendaMostrados = 0;
 let tiendaListaFiltrada = [];
 let tiendaRangoActivo = null; // {min, max} del rango de números elegido en categorías, o null si se muestran todas
 
@@ -11997,11 +12036,10 @@ function renderTiendaGrid(boletas) {
       return false;
     })
     .sort(([,a],[,b]) => (a.idx||0)-(b.idx||0));
-  tiendaPagActual = 1;
-  renderTiendaPagina();
+  renderTiendaPagina(true);
 }
 
-function renderTiendaPagina() {
+function renderTiendaPagina(reset) {
   const grid = document.getElementById('tienda-grid');
   const paginador = document.getElementById('tienda-paginador');
   const lista = tiendaListaFiltrada;
@@ -12012,12 +12050,10 @@ function renderTiendaPagina() {
     return;
   }
 
-  const totalPags = Math.ceil(lista.length / TIENDA_POR_PAGINA);
-  if (tiendaPagActual > totalPags) tiendaPagActual = totalPags;
-  const desde = (tiendaPagActual - 1) * TIENDA_POR_PAGINA;
-  const pagina = lista.slice(desde, desde + TIENDA_POR_PAGINA);
+  if (reset !== false) tiendaMostrados = Math.min(TIENDA_PAGE_SIZE, lista.length);
+  const visible = lista.slice(0, tiendaMostrados);
 
-  grid.innerHTML = pagina.map(([k, b]) => {
+  grid.innerHTML = visible.map(([k, b]) => {
     const esSel = carritoSeleccion.includes(k);
     const estado = esSel ? 'seleccionada' : (b.estadoVenta || 'libre');
     const nums = [b.n1, b.n2, b.n3, b.n4].filter(Boolean);
@@ -12048,7 +12084,7 @@ function renderTiendaPagina() {
   if (tiendaPlantilla) {
     requestAnimationFrame(() => {
       const p = tiendaPlantilla;
-      pagina.forEach(([k]) => {
+      visible.forEach(([k]) => {
         const cv = document.getElementById('cv-' + k);
         if (!cv) return;
         // Usar dimensiones reales de la imagen para máxima nitidez
@@ -12059,25 +12095,21 @@ function renderTiendaPagina() {
     });
   }
 
-  // Paginador
-  if (totalPags > 1) {
-    paginador.style.display = 'flex';
-    const btnStyle = (dis) => `padding:10px 18px;border:2px solid ${dis ? '#e2e8f0' : 'var(--verde)'};border-radius:10px;background:${dis ? '#f7fafc' : 'white'};font-size:13px;font-weight:800;font-family:'Nunito',sans-serif;color:${dis ? '#cbd5e0' : 'var(--verde)'};cursor:${dis ? 'default' : 'pointer'}`;
-    paginador.innerHTML =
-      `<button style="${btnStyle(tiendaPagActual===1)}" onclick="tiendaCambiarPag(${tiendaPagActual-1})" ${tiendaPagActual===1?'disabled':''}>← Anterior</button>` +
-      `<span style="font-size:12px;font-weight:800;color:#718096;text-align:center">${tiendaPagActual} / ${totalPags}<br><span style="font-weight:600;color:#a0aec0">${lista.length} boletas</span></span>` +
-      `<button style="${btnStyle(tiendaPagActual===totalPags)}" onclick="tiendaCambiarPag(${tiendaPagActual+1})" ${tiendaPagActual===totalPags?'disabled':''}>Siguiente →</button>`;
-  } else {
-    paginador.style.display = 'none';
-  }
+  // Progreso + botón "Cargar más boletas"
+  const total = lista.length;
+  const seen = visible.length;
+  paginador.style.display = 'block';
+  const progressText = document.getElementById('tienda-progress-text');
+  const progressFill = document.getElementById('tienda-progress-fill');
+  const loadMoreBtn = document.getElementById('tienda-load-more');
+  if (progressText) progressText.textContent = `Has visto ${seen} de ${total} boletas`;
+  if (progressFill) progressFill.style.width = (total ? Math.round((seen / total) * 100) : 0) + '%';
+  if (loadMoreBtn) loadMoreBtn.style.display = seen >= total ? 'none' : 'inline-block';
 }
 
-function tiendaCambiarPag(pag) {
-  const totalPags = Math.ceil(tiendaListaFiltrada.length / TIENDA_POR_PAGINA);
-  if (pag < 1 || pag > totalPags) return;
-  tiendaPagActual = pag;
-  renderTiendaPagina();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+function tiendaCargarMas() {
+  tiendaMostrados = Math.min(tiendaMostrados + TIENDA_PAGE_SIZE, tiendaListaFiltrada.length);
+  renderTiendaPagina(false);
 }
 
 // ===== CATEGORÍAS POR RANGO DE NÚMEROS (modo manual) =====
@@ -15371,7 +15403,7 @@ window.limpiarCarrito = limpiarCarrito;
 window.limpiarCarritoPostPedido = limpiarCarritoPostPedido;
 window.volverLogin = volverLogin;
 window.tiendaBuscar = tiendaBuscar;
-window.tiendaCambiarPag = tiendaCambiarPag;
+window.tiendaCargarMas = tiendaCargarMas;
 window.formatearMiles = formatearMiles;
 window.parseMiles = parseMiles;
 window.confirmarPedido = confirmarPedido;
