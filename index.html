@@ -12294,30 +12294,6 @@ function confirmarAzar() {
 function azarDelay(ms) { return new Promise(res => setTimeout(res, ms)); }
 function azarSaltarBalotera() { window._azarSaltar = true; }
 
-// Sonidos de la balotera generados con Web Audio API (no requieren archivos externos)
-function azarAudioCtx() {
-  if (!window._azarAudioCtx) {
-    try { window._azarAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { window._azarAudioCtx = null; }
-  }
-  return window._azarAudioCtx;
-}
-function azarBeep(freq, dur, vol) {
-  const ctx = azarAudioCtx();
-  if (!ctx) return;
-  try {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.value = freq;
-    gain.gain.value = vol || 0.15;
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
-    osc.stop(ctx.currentTime + dur);
-  } catch (e) {}
-}
-
 // Simula una balotera de sorteo: los números van "saliendo" uno por uno
 // hasta completar cada boleta, antes de mostrar el show de revelación final.
 async function mostrarBaloteraAzar(elegidas, cant) {
@@ -12395,7 +12371,6 @@ async function mostrarBaloteraAzar(elegidas, cant) {
       for (let di = 0; di < digitos.length; di++) {
         if (window._azarSaltar) break;
         bombo.classList.add('balotera-spin');
-        azarBeep(280 + Math.random() * 60, 0.75, 0.09);
         await azarDelay(700);
         bombo.classList.remove('balotera-spin');
         const slot = grupo && grupo.children[di];
@@ -12405,7 +12380,6 @@ async function mostrarBaloteraAzar(elegidas, cant) {
           slot.style.background = 'white';
           slot.style.color = '#7c4dcc';
           slot.textContent = digitos[di];
-          azarBeep(1100 + di * 40, 0.18, 0.16);
         }
         await azarDelay(260);
       }
