@@ -12247,25 +12247,25 @@ function escogerAlAzar() {
 
   const overlay = document.createElement('div');
   overlay.id = 'modal-azar-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(10,6,30,0.72);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(22,33,92,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)';
   overlay.innerHTML =
-    '<div style="animation:azarFadeIn 0.4s cubic-bezier(0.34,1.3,0.64,1) both;background:linear-gradient(160deg,#1e0a40 0%,#2d1260 50%,#1a0830 100%);border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center;box-shadow:0 24px 80px rgba(108,63,197,0.6);border:1.5px solid rgba(180,120,255,0.25);position:relative;overflow:hidden">'
-    + '<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(150,80,255,0.18) 0%,transparent 70%);pointer-events:none"></div>'
+    '<div style="animation:azarFadeIn 0.4s cubic-bezier(0.34,1.3,0.64,1) both;background:#ffffff;border-radius:24px;padding:28px 24px;width:100%;max-width:340px;text-align:center;box-shadow:0 24px 60px rgba(22,33,92,0.35);border:2px solid var(--borde);position:relative;overflow:hidden">'
+    + '<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(22,33,92,0.06) 0%,transparent 70%);pointer-events:none"></div>'
     // dice icon animated
-    + '<div style="animation:azarPulse 1.8s ease infinite;display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#6c3fc5,#9b59b6);margin-bottom:14px;box-shadow:0 8px 24px rgba(108,63,197,0.5)">'
-    + '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="4"/><circle cx="8" cy="8" r="1.5" fill="white" stroke="none"/><circle cx="16" cy="8" r="1.5" fill="white" stroke="none"/><circle cx="8" cy="16" r="1.5" fill="white" stroke="none"/><circle cx="16" cy="16" r="1.5" fill="white" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="white" stroke="none"/></svg>'
+    + '<div style="animation:azarPulse 1.8s ease infinite;display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--azul),var(--azul-dark));margin-bottom:14px;box-shadow:0 8px 24px rgba(22,33,92,0.4)">'
+    + '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="var(--amarillo)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="4"/><circle cx="8" cy="8" r="1.5" fill="var(--amarillo)" stroke="none"/><circle cx="16" cy="8" r="1.5" fill="var(--amarillo)" stroke="none"/><circle cx="8" cy="16" r="1.5" fill="var(--amarillo)" stroke="none"/><circle cx="16" cy="16" r="1.5" fill="var(--amarillo)" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="var(--amarillo)" stroke="none"/></svg>'
     + '</div>'
-    + '<div style="font-size:20px;font-weight:900;color:white;letter-spacing:-0.5px;margin-bottom:6px;font-family:Nunito,sans-serif">¡Suerte al azar!</div>'
-    + '<div style="font-size:13px;color:rgba(200,170,255,0.85);margin-bottom:22px;font-family:Nunito,sans-serif">¿Cuántas boletas quieres que la suerte elija por ti?</div>'
+    + '<div style="font-size:20px;font-weight:900;color:var(--dark);letter-spacing:-0.5px;margin-bottom:6px;font-family:Nunito,sans-serif">¡Suerte al azar!</div>'
+    + '<div style="font-size:13px;color:var(--texto);margin-bottom:22px;font-family:Nunito,sans-serif">¿Cuántas boletas quieres que la suerte elija por ti?</div>'
     + '<div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:10px">'
-    + '<button onclick="var i=document.getElementById(\'azar-cant\');i.value=Math.max(1,+(i.value||1)-1);azarActualizarLabel()" style="width:42px;height:42px;border-radius:50%;border:2px solid rgba(180,120,255,0.4);background:rgba(255,255,255,0.08);font-size:22px;font-weight:800;cursor:pointer;color:white;font-family:Nunito,sans-serif;line-height:1">−</button>'
-    + '<input id="azar-cant" type="number" value="1" min="1" max="' + maxDisp + '" oninput="azarActualizarLabel()" style="width:70px;text-align:center;font-size:28px;font-weight:900;background:rgba(255,255,255,0.1);border:2px solid rgba(180,120,255,0.5);border-radius:14px;padding:8px 4px;font-family:Nunito,sans-serif;outline:none;color:white">'
-    + '<button onclick="var i=document.getElementById(\'azar-cant\');i.value=Math.min(' + maxDisp + ',+(i.value||1)+1);azarActualizarLabel()" style="width:42px;height:42px;border-radius:50%;border:2px solid rgba(180,120,255,0.4);background:rgba(255,255,255,0.08);font-size:22px;font-weight:800;cursor:pointer;color:white;font-family:Nunito,sans-serif;line-height:1">+</button>'
+    + '<button onclick="var i=document.getElementById(\'azar-cant\');i.value=Math.max(1,+(i.value||1)-1);azarActualizarLabel()" style="width:42px;height:42px;border-radius:50%;border:2px solid var(--borde);background:#f7f8fc;font-size:22px;font-weight:800;cursor:pointer;color:var(--dark);font-family:Nunito,sans-serif;line-height:1">−</button>'
+    + '<input id="azar-cant" type="number" value="1" min="1" max="' + maxDisp + '" oninput="azarActualizarLabel()" style="width:70px;text-align:center;font-size:28px;font-weight:900;background:#f7f8fc;border:2px solid var(--azul);border-radius:14px;padding:8px 4px;font-family:Nunito,sans-serif;outline:none;color:var(--dark)">'
+    + '<button onclick="var i=document.getElementById(\'azar-cant\');i.value=Math.min(' + maxDisp + ',+(i.value||1)+1);azarActualizarLabel()" style="width:42px;height:42px;border-radius:50%;border:2px solid var(--borde);background:#f7f8fc;font-size:22px;font-weight:800;cursor:pointer;color:var(--dark);font-family:Nunito,sans-serif;line-height:1">+</button>'
     + '</div>'
-    + '<div id="azar-label" style="font-size:11px;color:rgba(200,170,255,0.7);margin-bottom:22px;font-family:Nunito,sans-serif">' + maxDisp + ' boletas disponibles · 1 seleccionada</div>'
+    + '<div id="azar-label" style="font-size:11px;color:var(--texto);margin-bottom:22px;font-family:Nunito,sans-serif">' + maxDisp + ' boletas disponibles · 1 seleccionada</div>'
     + '<div style="display:flex;gap:10px">'
-    + '<button onclick="document.getElementById(\'modal-azar-overlay\').remove()" style="flex:1;padding:13px;border:1.5px solid rgba(255,255,255,0.15);border-radius:14px;background:rgba(255,255,255,0.07);font-family:Nunito,sans-serif;font-size:13px;font-weight:800;cursor:pointer;color:rgba(255,255,255,0.6)">Cancelar</button>'
-    + '<button onclick="confirmarAzar()" style="flex:2;padding:13px;border:none;border-radius:14px;background:linear-gradient(135deg,#7c4dcc,#b06aff);color:white;font-family:Nunito,sans-serif;font-size:14px;font-weight:900;cursor:pointer;box-shadow:0 6px 20px rgba(108,63,197,0.5);letter-spacing:0.3px">🎲 ¡Que la suerte decida!</button>'
+    + '<button onclick="document.getElementById(\'modal-azar-overlay\').remove()" style="flex:1;padding:13px;border:2px solid var(--borde);border-radius:14px;background:#ffffff;font-family:Nunito,sans-serif;font-size:13px;font-weight:800;cursor:pointer;color:var(--texto)">Cancelar</button>'
+    + '<button onclick="confirmarAzar()" style="flex:2;padding:13px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--azul),var(--azul-dark));color:var(--amarillo);font-family:Nunito,sans-serif;font-size:14px;font-weight:900;cursor:pointer;box-shadow:0 6px 20px rgba(22,33,92,0.4);letter-spacing:0.3px">🎲 ¡Que la suerte decida!</button>'
     + '</div></div>';
   document.body.appendChild(overlay);
   overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
@@ -12356,9 +12356,9 @@ async function mostrarBaloteraAzar(elegidas, cant) {
 
     // Un grupo de casillas (una casilla por cifra) por cada número de la boleta
     slotsEl.innerHTML = nums.map(num =>
-      '<div style="display:flex;gap:3px">'
+      '<div style="display:flex;gap:5px">'
       + num.split('').map(() =>
-          '<div class="balotera-slot" style="width:' + (azarCifras >= 4 ? 26 : 32) + 'px;height:42px;border-radius:8px;background:rgba(255,255,255,0.08);border:2px dashed rgba(180,120,255,0.4);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;color:white;font-family:Nunito,sans-serif"></div>'
+          '<div class="balotera-slot" style="width:' + (azarCifras >= 4 ? 30 : 36) + 'px;height:' + (azarCifras >= 4 ? 30 : 36) + 'px;border-radius:50%;background:rgba(255,255,255,0.08);border:2px dashed rgba(180,120,255,0.4);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:white;font-family:Nunito,sans-serif"></div>'
         ).join('')
       + '</div>'
     ).join('');
